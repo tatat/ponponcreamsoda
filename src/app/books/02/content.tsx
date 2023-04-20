@@ -94,14 +94,17 @@ const useStyles = () => {
     return {
       background: css`
         height: 100vh;
+        height: 100dvh;
       `,
       container: css`
         position: relative;
         min-height: 100vh;
+        min-height: 100dvh;
       `,
       inner: css`
         position: relative;
         min-height: 100vh;
+        min-height: 100dvh;
         box-sizing: border-box;
         display: grid;
         grid-template-columns: 1fr 2fr;
