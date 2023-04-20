@@ -95,6 +95,7 @@ const useStyles = () => {
       background: css`
         height: 100vh;
         height: 100dvh;
+        background-color: #888;
       `,
       container: css`
         position: relative;
