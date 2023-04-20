@@ -134,6 +134,7 @@ export default function BackgroundVideo({ size, src, className, fixed }: Props):
           height={params.size.height}
           muted={true}
           loop={true}
+          playsInline={true}
         >
           {params.src.map((config) => (
             <source key={config.url} src={config.url} type={config.type} />
