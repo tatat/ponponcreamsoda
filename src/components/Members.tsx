@@ -21,6 +21,7 @@ export default function Members({ className }: Props): React.ReactElement {
       a {
         color: inherit;
         text-decoration-line: none;
+        white-space: nowrap;
 
         &:hover {
           text-decoration-line: underline;
