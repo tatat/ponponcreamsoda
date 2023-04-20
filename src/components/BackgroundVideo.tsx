@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
 'use client'
 
-import { css } from '@emotion/react'
+import { SerializedStyles, css } from '@emotion/react'
 import { Breakpoint, useBreakpoint } from '@/hooks/use-breakpoint'
 import { arrayWrap } from '@/helpers'
 import { useEffect, useMemo, useRef } from 'react'
@@ -30,15 +30,10 @@ export type Props = {
   size: ConfigWithDefault<SizeConfig>;
   src: ConfigWithDefault<SourceConfig | SourceConfig[]>;
   poster?: ConfigWithDefault<string>;
-  fixed?: boolean | {
-    top?: number;
-    right?: number;
-    left?: number;
-    bottom?: number;
-  };
   className?: string;
   onCanPlay?: () => void;
   onLoadStart?: () => void;
+  videoContainerCss?: SerializedStyles;
 }
 
 const styles = {
@@ -70,9 +65,9 @@ export default function BackgroundVideo({
   src,
   poster,
   className,
-  fixed,
   onCanPlay,
   onLoadStart,
+  videoContainerCss,
 }: Props): React.ReactElement {
   const videoRef = useRef<HTMLVideoElement | null>(null)
 
@@ -132,29 +127,9 @@ export default function BackgroundVideo({
     onLoadStart,
   ])
 
-  const fixedStyle = useMemo(() => {
-    if (fixed === true) {
-      return {
-        position: 'fixed',
-      } as const
-    }
-
-    if (!fixed) {
-      return {}
-    }
-
-    return {
-      position: 'fixed',
-      top: fixed.top ?? 'auto',
-      right: fixed.right ?? 'auto',
-      bottom: fixed.bottom ?? 'auto',
-      left: fixed.left ?? 'auto',
-    } as const
-  }, [fixed])
-
   return (
     <div css={styles.container} className={className}>
-      <div css={styles.videoContainer} style={fixedStyle}>
+      <div css={css(styles.videoContainer, videoContainerCss)}>
         <video
           ref={videoRef}
           css={styles.video}

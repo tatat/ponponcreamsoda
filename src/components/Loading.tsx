@@ -4,6 +4,7 @@
 import { css, keyframes } from '@emotion/react'
 
 type Props = {
+  visible: boolean;
   className?: string;
 }
 
@@ -33,9 +34,13 @@ const styles = {
   `,
 }
 
-export default function Loading({ className }: Props): React.ReactElement {
+export default function Loading({ className, visible }: Props): React.ReactElement {
   return (
-    <div css={styles.container} className={className}>
+    <div
+      css={styles.container}
+      className={className}
+      style={{ display: visible ? 'block' : 'none' }}
+    >
       <div css={styles.inner} />
     </div>
   )

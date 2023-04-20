@@ -98,6 +98,17 @@ const useStyles = () => {
         height: 100lvh;
         background-color: #888;
       `,
+      backgroundInner: css`
+        position: fixed;
+        bottom: auto;
+        height: 100vh;
+        height: 100lvh;
+      `,
+      loading: css`
+        position: absolute;
+        top: 0;
+        left: 0;
+      `,
       container: css`
         position: relative;
         min-height: 100vh;
@@ -226,7 +237,7 @@ export default function Book02Content() {
     <main css={styles.container}>
       <BackgroundVideo
         css={styles.background}
-        fixed={true}
+        videoContainerCss={styles.backgroundInner}
         size={{
           landscape: {
             width: 1920,
@@ -254,14 +265,7 @@ export default function Book02Content() {
         onCanPlay={handleCanPlay}
         onLoadStart={handleLoadStart}
       />
-      <Loading
-        css={css`
-          position: absolute;
-          top: 0;
-          left: 0;
-          display: ${isLoading ? 'block': 'none'};
-        `}
-      />
+      <Loading css={styles.loading} visible={isLoading} />
       <div css={styles.inner}>
         <div css={styles.innerCol1}>
           <h1 css={styles.title}>
