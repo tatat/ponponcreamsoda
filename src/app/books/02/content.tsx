@@ -2,9 +2,10 @@
 'use client'
 
 import { css, keyframes, useTheme } from '@emotion/react'
-import { useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import BackgroundVideo from '@/components/BackgroundVideo'
 import Members from '@/components/Members'
+import Loading from '@/components/Loading'
 
 const useStyles = () => {
   const theme = useTheme()
@@ -211,6 +212,15 @@ const useStyles = () => {
 
 export default function Book02Content() {
   const styles = useStyles()
+  const [isLoading, setIsLoading] = useState(false)
+
+  const handleLoadStart = useCallback(() => {
+    setIsLoading(true)
+  }, [])
+
+  const handleCanPlay = useCallback(() => {
+    setIsLoading(false)
+  }, [])
 
   return (
     <main css={styles.container}>
@@ -237,6 +247,20 @@ export default function Book02Content() {
             type: 'video/mp4',
           },
         }}
+        poster={{
+          landscape: '/videos/book02-1920x1080.jpg',
+          portrait: '/videos/book02-1080x1920.jpg',
+        }}
+        onCanPlay={handleCanPlay}
+        onLoadStart={handleLoadStart}
+      />
+      <Loading
+        css={css`
+          position: absolute;
+          top: 0;
+          left: 0;
+          display: ${isLoading ? 'block': 'none'};
+        `}
       />
       <div css={styles.inner}>
         <div css={styles.innerCol1}>

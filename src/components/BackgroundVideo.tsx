@@ -29,6 +29,7 @@ type ConfigWithDefault<T> = ({
 export type Props = {
   size: ConfigWithDefault<SizeConfig>;
   src: ConfigWithDefault<SourceConfig | SourceConfig[]>;
+  poster?: ConfigWithDefault<string>;
   fixed?: boolean | {
     top?: number;
     right?: number;
@@ -36,6 +37,8 @@ export type Props = {
     bottom?: number;
   };
   className?: string;
+  onCanPlay?: () => void;
+  onLoadStart?: () => void;
 }
 
 const styles = {
@@ -62,7 +65,15 @@ const styles = {
   `,
 }
 
-export default function BackgroundVideo({ size, src, className, fixed }: Props): React.ReactElement {
+export default function BackgroundVideo({
+  size,
+  src,
+  poster,
+  className,
+  fixed,
+  onCanPlay,
+  onLoadStart,
+}: Props): React.ReactElement {
   const videoRef = useRef<HTMLVideoElement | null>(null)
 
   const params = useBreakpoint((breakpoint) => {
@@ -72,6 +83,7 @@ export default function BackgroundVideo({ size, src, className, fixed }: Props):
       return {
         src: arrayWrap(getFrom(src)),
         size: getFrom(size),
+        poster: poster ? getFrom(poster) : undefined,
         breakpoint,
       }
     }
@@ -82,27 +94,43 @@ export default function BackgroundVideo({ size, src, className, fixed }: Props):
         width: 0,
         height: 0,
       },
+      poster: undefined,
       breakpoint,
     }
   })
 
   useEffect(() => {
-    (async () => {
-      const video = videoRef.current
+    const video = videoRef.current
 
-      if (!video) {
-        return
-      }
+    if (!video) {
+      return
+    }
 
-      if (params.src.length === 0) {
-        return
-      }
+    if (params.src.length === 0) {
+      return
+    }
 
-      video.load()
+    const handleLoadStart = () => onLoadStart?.()
+    const handleCanPlay = () => onCanPlay?.()
 
-      await video.play()
-    })()
-  }, [params])
+    video.addEventListener('loadstart', handleLoadStart)
+    video.addEventListener('canplay', handleCanPlay)
+    video.load()
+
+    video.play()
+      .catch((error) => {
+        console.error(error)
+      })
+
+    return () => {
+      video.removeEventListener('loadstart', handleLoadStart)
+      video.removeEventListener('canplay', handleCanPlay)
+    }
+  }, [
+    params,
+    onCanPlay,
+    onLoadStart,
+  ])
 
   const fixedStyle = useMemo(() => {
     if (fixed === true) {
@@ -132,6 +160,7 @@ export default function BackgroundVideo({ size, src, className, fixed }: Props):
           css={styles.video}
           width={params.size.width}
           height={params.size.height}
+          poster={params.poster}
           muted={true}
           loop={true}
           playsInline={true}
