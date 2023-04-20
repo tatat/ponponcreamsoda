@@ -4,7 +4,7 @@ import RootStyleRegistry from './emotion'
 
 export const metadata = {
   title: 'Pon Pon Creamsoda',
-  description: 'Pon Pon Creamsoda',
+  description: 'Pon Pon Creamsoda Website',
   icons: {
     icon: '/images/logo.svg',
   },

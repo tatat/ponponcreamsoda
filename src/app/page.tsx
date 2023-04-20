@@ -5,8 +5,8 @@ export async function generateMetadata(_props: unknown, parent: ResolvingMetadat
   const metadata = await parent
 
   return {
-    title: `Home | ${metadata.title}`,
-    description: `Home | ${metadata.title}`,
+    title: `Home | ${metadata.title?.absolute}`,
+    description: `Home | ${metadata.title?.absolute}`,
   }
 }
 

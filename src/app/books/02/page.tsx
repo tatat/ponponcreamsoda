@@ -5,8 +5,8 @@ export async function generateMetadata(_props: unknown, parent: ResolvingMetadat
   const metadata = await parent
 
   return {
-    title: `劈ヶ原衛星第二高校イラスト本 | ${metadata.title}`,
-    description: `劈ヶ原衛星第二高校イラスト本 | ${metadata.title}`,
+    title: `劈ヶ原衛星第二高校イラスト本 | ${metadata.title?.absolute}`,
+    description: `劈ヶ原衛星第二高校イラスト本 | ${metadata.title?.absolute}`,
   }
 }
 
