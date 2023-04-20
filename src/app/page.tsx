@@ -1,3 +1,4 @@
+import { siteOrigin } from '@/config'
 import HomeContent from './content'
 import type { Metadata, ResolvingMetadata } from 'next'
 
@@ -6,10 +7,10 @@ export async function generateMetadata(_props: unknown, parent: ResolvingMetadat
   const siteName = metadata.title?.absolute ?? 'Pon Pon Creamsoda'
   const title = `Home | ${siteName}`
   const description = '同人サークル Pon Pon Creamsoda ウェッッブサイト'
-  const url = `${process.env.SITE_ORIGIN}/`
+  const url = `${siteOrigin}/`
 
   const images = {
-    url: `${process.env.SITE_ORIGIN}/images/og-image-home.png`,
+    url: `${siteOrigin}/images/og-image-home.png`,
     width: 1200,
     height: 630,
     type: 'image/png',

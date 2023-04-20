@@ -1,6 +1,8 @@
 import 'normalize.css'
 import './global.scss'
 import RootStyleRegistry from './emotion'
+import { FirebaseProvider, FirebaseTracking } from './firebase'
+import { firebaseConfig } from '@/config'
 
 export const metadata = {
   title: 'Pon Pon Creamsoda',
@@ -19,7 +21,11 @@ export default function RootLayout({ children }: RootLayoutProps): React.ReactEl
     <html lang="ja">
       <body>
         <RootStyleRegistry>
-          {children}
+          <FirebaseProvider config={firebaseConfig}>
+            <FirebaseTracking>
+              {children}
+            </FirebaseTracking>
+          </FirebaseProvider>
         </RootStyleRegistry>
       </body>
     </html>
