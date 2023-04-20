@@ -9,7 +9,7 @@ export async function generateMetadata(_props: unknown, parent: ResolvingMetadat
   const url = `${process.env.SITE_ORIGIN}/books/02/`
 
   const images = {
-    url: `${process.env.SITE_ORIGIN}/images/og-book02.png`,
+    url: `${process.env.SITE_ORIGIN}/images/og-image-book02.png`,
     width: 1200,
     height: 630,
     type: 'image/png',
