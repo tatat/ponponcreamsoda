@@ -3,8 +3,10 @@ import type { Metadata, ResolvingMetadata } from 'next'
 
 export async function generateMetadata(_props: unknown, parent: ResolvingMetadata): Promise<Metadata> {
   const metadata = await parent
-  const title = `劈ヶ原衛星第二高校イラスト本 | ${metadata.title?.absolute}`
+  const siteName = metadata.title?.absolute ?? 'Pon Pon Creamsoda'
+  const title = `劈ヶ原衛星第二高校イラスト本 | ${siteName}`
   const description = '同人サークル Pon Pon Creamsoda 劈ヶ原衛星第二高校イラスト本販促サイト'
+  const url = `${process.env.SITE_ORIGIN}/books/02/`
 
   const images = {
     url: `${process.env.SITE_ORIGIN}/images/og-book02.png`,
@@ -17,6 +19,9 @@ export async function generateMetadata(_props: unknown, parent: ResolvingMetadat
     title,
     description,
     openGraph: {
+      type: 'website',
+      siteName,
+      url,
       title,
       description,
       images,
