@@ -5,6 +5,9 @@ const nextConfig = {
   },
   trailingSlash: true,
   output: 'export',
+  env: {
+    SITE_ORIGIN: process.env.SITE_ORIGIN ?? 'http://localhost:3000',
+  },
 }
 
 module.exports = nextConfig
