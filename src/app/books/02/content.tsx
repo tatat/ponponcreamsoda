@@ -94,18 +94,18 @@ const useStyles = () => {
     return {
       background: css`
         height: 100vh;
-        height: 100dvh;
+        height: 100lvh;
         background-color: #888;
       `,
       container: css`
         position: relative;
         min-height: 100vh;
-        min-height: 100dvh;
+        min-height: 100lvh;
       `,
       inner: css`
         position: relative;
         min-height: 100vh;
-        min-height: 100dvh;
+        min-height: 100lvh;
         box-sizing: border-box;
         display: grid;
         grid-template-columns: 1fr 2fr;
@@ -129,6 +129,7 @@ const useStyles = () => {
         padding: 6%;
         overflow: hidden;
         min-height: 100vmin;
+        min-height: 100dvmin;
 
         @media ${theme.breakpoints.portrait} {
           flex: 1;
