@@ -3,6 +3,7 @@
 
 import { css, useTheme } from '@emotion/react'
 import { useMemo } from 'react'
+import Logo from '@/components/Logo'
 
 const useStyles = () => {
   const theme = useTheme()
@@ -23,6 +24,7 @@ const useStyles = () => {
     `,
     logoImage: css`
       width: 100%;
+      height: auto;
     `,
   }), [theme])
 }
@@ -33,7 +35,7 @@ export default function HomeContent() {
   return (
     <main css={styles.container}>
       <h1 css={styles.logo}>
-        <img css={styles.logoImage} src="/images/logo.svg" alt="Pon Pon Creamsoda" />
+        <Logo colors={{ primary: '#f6ca1b' }} css={styles.logoImage} />
       </h1>
     </main>
   )

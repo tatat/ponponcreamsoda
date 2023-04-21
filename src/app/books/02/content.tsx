@@ -3,6 +3,7 @@
 
 import { css, keyframes, useTheme } from '@emotion/react'
 import { useCallback, useMemo, useState } from 'react'
+import LogoTSSH from '@/components/LogoTSSH'
 import BackgroundVideo from '@/components/BackgroundVideo'
 import Schedule from '@/components/Schedule'
 import Members from '@/components/Members'
@@ -152,6 +153,7 @@ const useStyles = () => {
       titleImage: css`
         box-sizing: border-box;
         width: 100%;
+        height: auto;
         mix-blend-mode: multiply;
       `,
       content1: css`
@@ -260,7 +262,14 @@ export default function Book02Content() {
       <div css={styles.inner}>
         <div css={styles.innerCol1}>
           <h1 css={styles.title}>
-            <img css={styles.titleImage} src="/images/title.svg" alt="劈ヶ原衛星第二高校" />
+            <LogoTSSH
+              colors={{
+                primary: '#231815',
+                secondary: '#f6ca1b',
+                tertiary: '#bcb7ad',
+              }}
+              css={styles.titleImage}
+            />
           </h1>
           <div css={styles.content1}>
             <h2 css={styles.contentTitle}>

@@ -4,6 +4,7 @@
     "quotes": ["error", "single"],
     "semi": ["error", "never"],
     "comma-dangle": ["error", "always-multiline"],
-    "@next/next/no-img-element": "off"
+    "@next/next/no-img-element": "off",
+    "react/jsx-tag-spacing": ["error", { "beforeSelfClosing": "always" }]
   }
 }
