@@ -4,6 +4,7 @@
 import { css, keyframes, useTheme } from '@emotion/react'
 import { useCallback, useMemo, useState } from 'react'
 import BackgroundVideo from '@/components/BackgroundVideo'
+import Schedule from '@/components/Schedule'
 import Members from '@/components/Members'
 import Loading from '@/components/Loading'
 
@@ -86,12 +87,6 @@ const useStyles = () => {
       }
     `
 
-    const text = css`
-      letter-spacing: 0.05em;
-      font-family: 'Kaisei Decol', serif;
-      line-height: 1.3;
-    `
-
     return {
       background: css`
         height: 100vh;
@@ -171,19 +166,15 @@ const useStyles = () => {
         padding: 4%;
         color: #fff;
       `,
-      location: css`
-        ${text};
-        font-size: 1.2rem;
-        font-weight: bold;
-        margin: 0 0 0.6rem 0;
+      schedule: css`
+        margin-bottom: 0.6rem;
 
         @media ${theme.breakpoints.portrait} {
-          font-size: 1rem;
           margin-bottom: 0.5rem;
         }
       `,
       contentTitle: css`
-        ${text};
+        ${theme.styles.text};
         margin: 0;
         font-size: 2rem;
 
@@ -278,7 +269,7 @@ export default function Book02Content() {
             </h2>
           </div>
           <div css={styles.content2}>
-            <p css={styles.location}>COMITIA 144 N55a</p>
+            <Schedule css={styles.schedule} />
             <Members />
           </div>
         </div>

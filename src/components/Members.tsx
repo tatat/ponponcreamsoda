@@ -4,7 +4,7 @@
 import { css, useTheme } from '@emotion/react'
 import { useMemo } from 'react'
 
-type Props = {
+export type Props = {
   className?: string;
 }
 
@@ -13,10 +13,8 @@ export default function Members({ className }: Props): React.ReactElement {
 
   const styles = useMemo(() => ({
     container: css`
+      ${theme.styles.text};
       position: relative;
-      letter-spacing: 0.05em;
-      font-family: 'Kaisei Decol', serif;
-      line-height: 1.3;
 
       a {
         color: inherit;

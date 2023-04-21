@@ -3,7 +3,7 @@
 
 import { css, keyframes } from '@emotion/react'
 
-type Props = {
+export type Props = {
   visible: boolean;
   className?: string;
 }
