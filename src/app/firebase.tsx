@@ -59,6 +59,11 @@ export type FirebaseTrackingProps = {
   children: React.ReactNode;
 }
 
+/**
+ * NOTE:
+ *   Since the page_view event is sent automatically, we don't need to send it manually.
+ *   This code is just an example.
+*/
 export const FirebaseTracking: React.FC<FirebaseTrackingProps> = ({ children }) => {
   const pathname = usePathname()
   const searchParams = useSearchParams()

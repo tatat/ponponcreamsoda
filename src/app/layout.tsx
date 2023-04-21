@@ -22,9 +22,7 @@ export default function RootLayout({ children }: RootLayoutProps): React.ReactEl
       <body>
         <RootStyleRegistry>
           <FirebaseProvider config={firebaseConfig}>
-            <FirebaseTracking>
-              {children}
-            </FirebaseTracking>
+            {children}
           </FirebaseProvider>
         </RootStyleRegistry>
       </body>
