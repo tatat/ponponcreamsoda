@@ -8,7 +8,8 @@ import { usePathname, useSearchParams } from 'next/navigation'
 export type FirebaseContextType = {
   initialized: boolean;
   app: FirebaseApp;
-  analytics: Analytics;
+  analytics: Analytics | null;
+  withLogEvent: (callback: (_logEvent: typeof logEvent, analitics: Analytics) => void) => void;
 }
 
 const defaultContext = {
@@ -19,34 +20,41 @@ const defaultContext = {
   get analytics(): Analytics {
     throw new Error('FirebaseContext is not initialized')
   },
+  withLogEvent: () => {
+    throw new Error('FirebaseContext is not initialized')
+  },
 }
 
 const FirebaseContext = createContext<FirebaseContextType>(defaultContext)
 
 export const useFirebase = () => useContext(FirebaseContext)
 
-const init = (config: FirebaseOptions): FirebaseContextType => {
+const init = (config: FirebaseOptions, inactivateAnalytics: boolean): FirebaseContextType => {
   const app = initializeApp(config)
-  const analytics = getAnalytics(app)
+  const analytics = inactivateAnalytics ? null : getAnalytics(app)
 
   return {
     initialized: true,
     app,
     analytics,
+    withLogEvent: analytics ? (callback) => {
+      callback(logEvent, analytics)
+    } : () => {},
   }
 }
 
 export type FirebaseProviderProps = {
   children: React.ReactNode;
   config: FirebaseOptions;
+  inactivateAnalytics?: boolean;
 }
 
-export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({ config, children }) => {
+export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({ config, children, inactivateAnalytics = false }) => {
   const [contextValue, setContextValue] = useState<FirebaseContextType | null>(null)
 
   useEffect(() => {
-    setContextValue(init(config))
-  }, [config])
+    setContextValue(init(config, inactivateAnalytics))
+  }, [config, inactivateAnalytics])
 
   return (
     <FirebaseContext.Provider value={contextValue ?? defaultContext}>
@@ -74,7 +82,7 @@ export const FirebaseTracking: React.FC<FirebaseTrackingProps> = ({ children }) 
       return
     }
 
-    logEvent(firebase.analytics, 'page_view')
+    firebase.withLogEvent((log, a) => log(a, 'page_view'))
   }, [
     pathname,
     searchParams,

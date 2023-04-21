@@ -8,6 +8,8 @@ const ensureDefined = <T>(value: T | null | undefined): T => {
 
 export const siteOrigin = ensureDefined(process.env.NEXT_PUBLIC_SITE_ORIGIN)
 
+export const inactivateAnalytics = process.env.NEXT_PUBLIC_FIREBASE_INACTIVATE_ANALYTICS === 'true'
+
 export const firebaseConfig = {
   apiKey: ensureDefined(process.env.NEXT_PUBLIC_FIREBASE_API_KEY),
   authDomain: ensureDefined(process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN),
