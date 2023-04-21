@@ -8,6 +8,7 @@ import BackgroundVideo from '@/components/BackgroundVideo'
 import Schedule from '@/components/Schedule'
 import Members from '@/components/Members'
 import Loading from '@/components/Loading'
+import * as layout from '@/components/layout-1'
 
 const useStyles = () => {
   const theme = useTheme()
@@ -105,50 +106,8 @@ const useStyles = () => {
         top: 0;
         left: 0;
       `,
-      container: css`
-        position: relative;
-        min-height: 100vh;
-        min-height: 100lvh;
-      `,
-      inner: css`
-        position: relative;
-        min-height: 100vh;
-        min-height: 100lvh;
-        box-sizing: border-box;
-        display: grid;
-        grid-template-columns: 1fr 2fr;
-
-        @media ${theme.breakpoints.portrait} {
-          grid-template-columns: auto;
-          display: flex;
-          flex-direction: column;
-        }
-      `,
-      innerCol1: css`
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        justify-content: stretch;
-        gap: 2px;
-      `,
-      innerCol2: css`
-        box-sizing: border-box;
-        position: relative;
-        padding: 6%;
-        overflow: hidden;
-        min-height: 100vmin;
-        min-height: 100dvmin;
-
-        @media ${theme.breakpoints.portrait} {
-          flex: 1;
-        }
-      `,
       title: css`
         ${background1};
-        box-sizing: border-box;
-        width: 100%;
-        margin: 0;
-        padding: 6%;
       `,
       titleImage: css`
         box-sizing: border-box;
@@ -156,16 +115,15 @@ const useStyles = () => {
         height: auto;
         mix-blend-mode: multiply;
       `,
-      content1: css`
+      contentTitle: css`
         ${background1};
-        box-sizing: border-box;
-        padding: 4%;
+
+        span {
+          display: inline-block;
+        }
       `,
-      content2: css`
+      content: css`
         ${background2};
-        box-sizing: border-box;
-        flex: 1;
-        padding: 4%;
         color: #fff;
       `,
       schedule: css`
@@ -173,19 +131,6 @@ const useStyles = () => {
 
         @media ${theme.breakpoints.portrait} {
           margin-bottom: 0.5rem;
-        }
-      `,
-      contentTitle: css`
-        ${theme.styles.text};
-        margin: 0;
-        font-size: 2rem;
-
-        span {
-          display: inline-block;
-        }
-
-        @media ${theme.breakpoints.portrait} {
-          font-size: 1.4rem;
         }
       `,
       mainImageContainer: css`
@@ -227,7 +172,7 @@ export default function Book02Content() {
   }, [])
 
   return (
-    <main css={styles.container}>
+    <layout.Container>
       <BackgroundVideo
         css={styles.background}
         videoContainerCss={styles.backgroundInner}
@@ -259,9 +204,9 @@ export default function Book02Content() {
         onLoadStart={handleLoadStart}
       />
       <Loading css={styles.loading} visible={isLoading} />
-      <div css={styles.inner}>
-        <div css={styles.innerCol1}>
-          <h1 css={styles.title}>
+      <layout.Inner>
+        <layout.Inner1>
+          <layout.Title css={styles.title}>
             <LogoTSSH
               colors={{
                 primary: '#231815',
@@ -270,24 +215,22 @@ export default function Book02Content() {
               }}
               css={styles.titleImage}
             />
-          </h1>
-          <div css={styles.content1}>
-            <h2 css={styles.contentTitle}>
-              <span>劈ヶ原衛星第二高校</span>
-              <span>イラスト本</span>
-            </h2>
-          </div>
-          <div css={styles.content2}>
+          </layout.Title>
+          <layout.ContentTitle css={styles.contentTitle}>
+            <span>劈ヶ原衛星第二高校</span>
+            <span>イラスト本</span>
+          </layout.ContentTitle>
+          <layout.Content css={styles.content}>
             <Schedule css={styles.schedule} />
             <Members />
-          </div>
-        </div>
-        <div css={styles.innerCol2}>
+          </layout.Content>
+        </layout.Inner1>
+        <layout.Inner2>
           <div css={styles.mainImageContainer}>
             <img css={styles.mainImage} src="/images/observer.jpg" alt="Observer" />
           </div>
-        </div>
-      </div>
-    </main>
+        </layout.Inner2>
+      </layout.Inner>
+    </layout.Container>
   )
 }
