@@ -4,7 +4,7 @@
 import { SerializedStyles, css } from '@emotion/react'
 import { Breakpoint, useBreakpoint } from '@/hooks/use-breakpoint'
 import { arrayWrap } from '@/helpers'
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 
 type SizeConfig = {
   width: number;

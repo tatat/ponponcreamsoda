@@ -1,28 +1,21 @@
 /** @jsxImportSource @emotion/react */
 'use client'
 
-import { css, keyframes, useTheme } from '@emotion/react'
-import { useCallback, useMemo, useState } from 'react'
+import { css, useTheme } from '@emotion/react'
+import { useMemo } from 'react'
 import LogoTSSH from '@/components/LogoTSSH'
-import BackgroundVideo from '@/components/BackgroundVideo'
+import BackgroundImage from '@/components/BackgroundImage'
 import Schedule from '@/components/Schedule'
 import Members from '@/components/Members'
-import Loading from '@/components/Loading'
 import * as layout from '@/components/layout-1'
+import dynamic from 'next/dynamic'
+
+const Game = dynamic(() => import('./game').then((mod) => mod.Game), { ssr: false })
 
 const useStyles = () => {
   const theme = useTheme()
 
   return useMemo(() => {
-    const fadeIn = keyframes`
-      0% {
-        opacity: 0;
-      }
-      100% {
-        opacity: 1;
-      }
-    `
-
     const background1 = css`
       position: relative;
 
@@ -44,7 +37,7 @@ const useStyles = () => {
       }
 
       &::before {
-        mix-blend-mode: soft-light;
+        mix-blend-mode: normal;
         background-color: rgba(255, 255, 255, 0.8);
         transform: translate3d(0, 0, 0);
       }
@@ -77,14 +70,14 @@ const useStyles = () => {
       }
 
       &::before {
-        mix-blend-mode: soft-light;
+        mix-blend-mode: multiply;
         background-color: rgba(0, 0, 0, 0.4);
         transform: translate3d(0, 0, 0);
       }
 
       &::after {
         mix-blend-mode: overlay;
-        background-color: rgba(0, 255, 127, 0.2);
+        background-color: rgba(255, 255, 127, 0.2);
         transform: translate3d(0, 0, 0);
       }
     `
@@ -93,18 +86,9 @@ const useStyles = () => {
       background: css`
         height: 100vh;
         height: 100lvh;
-        background-color: #aa9;
-      `,
-      backgroundInner: css`
+        background-color: #e6e6e6;
         position: fixed;
         bottom: auto;
-        height: 100vh;
-        height: 100lvh;
-      `,
-      loading: css`
-        position: absolute;
-        top: 0;
-        left: 0;
       `,
       title: css`
         ${background1};
@@ -133,92 +117,37 @@ const useStyles = () => {
           margin-bottom: 0.5rem;
         }
       `,
-      mainImageContainer: css`
-        position: absolute;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        overflow: hidden;
-      `,
-      mainImage: css`
-        animation: ${fadeIn} 10s 12s ease forwards;
-        opacity: 0;
-        object-fit: contain;
-        mix-blend-mode: multiply;
-        width: 100%;
-        height: 100%;
-        transform-origin: top center;
-        transform: scale(5) translate3d(5%, -3%, 0);
-
-        @media ${theme.breakpoints.portrait} {
-          transform: scale(6) translate3d(6%, -5%, 0);
-        }
-      `,
     }
   }, [theme])
 }
 
 export default function Book02Content() {
   const styles = useStyles()
-  const [isLoading, setIsLoading] = useState(false)
-
-  const handleLoadStart = useCallback(() => {
-    setIsLoading(true)
-  }, [])
-
-  const handleCanPlay = useCallback(() => {
-    setIsLoading(false)
-  }, [])
 
   return (
     <layout.Container>
-      <BackgroundVideo
+      <BackgroundImage
         css={styles.background}
-        videoContainerCss={styles.backgroundInner}
-        size={{
-          landscape: {
-            width: 1920,
-            height: 1080,
-          },
-          portrait: {
-            width: 1080,
-            height: 1920,
-          },
-        }}
         src={{
-          landscape: {
-            url: '/videos/book02-1920x1080.mp4',
-            type: 'video/mp4',
-          },
-          portrait: {
-            url: '/videos/book02-1080x1920.mp4',
-            type: 'video/mp4',
-          },
+          landscape: '/images/book01-1920x1080.jpg',
+          portrait: '/images/book01-1080x1920.jpg',
         }}
-        poster={{
-          landscape: '/videos/book02-1920x1080.jpg',
-          portrait: '/videos/book02-1080x1920.jpg',
-        }}
-        onCanPlay={handleCanPlay}
-        onLoadStart={handleLoadStart}
       />
-      <Loading css={styles.loading} visible={isLoading} />
       <layout.Inner>
         <layout.Inner1>
           <layout.Title css={styles.title}>
             <LogoTSSH
               colors={{
                 primary: '#231815',
-                secondary: '#f6ca1b',
-                tertiary: '#bcb7ad',
+                secondary: '#007ec6',
+                tertiary: '#007ec6',
               }}
               css={styles.titleImage}
             />
           </layout.Title>
           <layout.ContentTitle css={styles.contentTitle}>
             <span>劈ヶ原衛星第二高校</span>
-            <span>イラスト本</span>
+            <span>漫画本</span>
           </layout.ContentTitle>
           <layout.Content css={styles.content}>
             <Schedule css={styles.schedule} />
@@ -226,9 +155,7 @@ export default function Book02Content() {
           </layout.Content>
         </layout.Inner1>
         <layout.Inner2>
-          <div css={styles.mainImageContainer}>
-            <img css={styles.mainImage} src="/images/observer.jpg" alt="Observer" />
-          </div>
+          <Game />
         </layout.Inner2>
       </layout.Inner>
     </layout.Container>
