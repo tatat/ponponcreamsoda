@@ -73,7 +73,6 @@ const useStyles = () => {
       bottom: 0;
       left: 0;
       overflow: hidden;
-      object-fit: cover;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -81,8 +80,16 @@ const useStyles = () => {
       transition: opacity 0.3s linear;
       mix-blend-mode: normal;
 
-      img {
+      a {
+        display: block;
         width: 100%;
+        height: 100%;
+      }
+
+      img {
+        object-fit: cover;
+        width: 100%;
+        height: 100%;
       }
 
       &:hover {
