@@ -29,9 +29,13 @@ class Scene extends Phaser.Scene {
   }
 
   create () {
+    const blocks: Phaser.GameObjects.GameObject[] = []
+
     objectNames.forEach(n => {
       const pos = Phaser.Geom.Rectangle.Random(this.physics.world.bounds, new Phaser.Geom.Point(0, 0))
       const block = this.physics.add.image(pos.x, pos.y, n).setScale(0.2)
+
+      block.setSize(block.width * 0.7, block.height * 0.7)
 
       block.setVelocity(Phaser.Math.Between(200, 400), Phaser.Math.Between(200, 400))
       block.setBounce(0.95).setCollideWorldBounds(true)
@@ -46,8 +50,10 @@ class Scene extends Phaser.Scene {
         block.body.velocity.y *= -1
       }
 
-
+      blocks.push(block)
     })
+
+    this.physics.add.collider(blocks, blocks)
 
     this.input.on('drag', (
       _pointer: Phaser.Input.Pointer,
@@ -67,6 +73,18 @@ class Scene extends Phaser.Scene {
       gameObjects.forEach((gameObject) => {
         if (gameObject instanceof Phaser.Physics.Arcade.Image) {
           gameObject.setVelocity(0)
+          ;(gameObject.body as Phaser.Physics.Arcade.Body).setAllowGravity(false)
+        }
+      })
+    })
+
+    this.input.on('pointerup', (
+      _pointer: Phaser.Input.Pointer,
+      gameObjects: Phaser.GameObjects.GameObject[]
+    ) => {
+      gameObjects.forEach((gameObject) => {
+        if (gameObject instanceof Phaser.Physics.Arcade.Image) {
+          (gameObject.body as Phaser.Physics.Arcade.Body).setAllowGravity(true)
         }
       })
     })
@@ -96,8 +114,9 @@ export const Game: React.FC = () => {
         default: 'arcade',
         arcade: {
           gravity: {
-            y: 0,
+            y: 100,
           },
+          // debug: true,
         },
       },
     })
