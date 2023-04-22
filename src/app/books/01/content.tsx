@@ -9,6 +9,7 @@ import Schedule from '@/components/Schedule'
 import Members from '@/components/Members'
 import * as layout from '@/components/layout-1'
 import dynamic from 'next/dynamic'
+import { books } from '@/constants'
 
 const Game = dynamic(() => import('./game').then((mod) => mod.Game), { ssr: false })
 
@@ -146,8 +147,7 @@ export default function Book02Content() {
             />
           </layout.Title>
           <layout.ContentTitle css={styles.contentTitle}>
-            <span>劈ヶ原衛星第二高校</span>
-            <span>漫画本</span>
+            {books.vol01.titleMultiline.map((x, i) => <span key={i}>{x}</span>)}
           </layout.ContentTitle>
           <layout.Content css={styles.content}>
             <Schedule css={styles.schedule} />

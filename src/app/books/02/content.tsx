@@ -9,6 +9,7 @@ import Schedule from '@/components/Schedule'
 import Members from '@/components/Members'
 import Loading from '@/components/Loading'
 import * as layout from '@/components/layout-1'
+import { books } from '@/constants'
 
 const useStyles = () => {
   const theme = useTheme()
@@ -217,8 +218,7 @@ export default function Book02Content() {
             />
           </layout.Title>
           <layout.ContentTitle css={styles.contentTitle}>
-            <span>劈ヶ原衛星第二高校</span>
-            <span>イラスト本</span>
+            {books.vol02.titleMultiline.map((x, i) => <span key={i}>{x}</span>)}
           </layout.ContentTitle>
           <layout.Content css={styles.content}>
             <Schedule css={styles.schedule} />
