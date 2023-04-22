@@ -10,7 +10,7 @@ export async function generateMetadata(_props: unknown, parent: ResolvingMetadat
   const url = `${siteOrigin}/`
 
   const images = {
-    url: `${siteOrigin}/images/og-image-home.png`,
+    url: `${siteOrigin}/images/og-image-home-v2.png`,
     width: 1200,
     height: 630,
     type: 'image/png',
