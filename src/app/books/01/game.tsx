@@ -29,65 +29,40 @@ class Scene extends Phaser.Scene {
   }
 
   create () {
-    const blocks: Phaser.GameObjects.GameObject[] = []
+    this.matter.world.setBounds()
 
-    objectNames.forEach(n => {
-      const pos = Phaser.Geom.Rectangle.Random(this.physics.world.bounds, new Phaser.Geom.Point(0, 0))
-      const block = this.physics.add.image(pos.x, pos.y, n).setScale(0.2)
+    const { top, left } = this.matter.world.walls
+    const x = {
+      min: 0,
+      max: top?.bounds.max.x ?? 0,
+    }
+    const y = {
+      min: 0,
+      max: left?.bounds.max.y ?? 0,
+    }
 
-      block.setSize(block.width * 0.7, block.height * 0.7)
+    Array.from({ length: 3 }).forEach(() => {
+      objectNames.forEach(n => {
+        const block = this.matter.add.image(
+          Phaser.Math.Between(x.min + 100, x.max - 100),
+          Phaser.Math.Between(y.min, y.max / 2),
+          n,
+          undefined,
+          {
+            restitution: 1,
+          }
+        )
+        const width = block.width / 2 * 0.2
 
-      block.setVelocity(Phaser.Math.Between(200, 400), Phaser.Math.Between(200, 400))
-      block.setBounce(0.95).setCollideWorldBounds(true)
-      block.setDepth(Math.floor(Math.random() * 100))
-      block.setInteractive()
+        block.setScale(0.2)
+        block.setCircle(width * 0.7)
+        block.setDepth(Math.floor(Math.random() * 100))
+        block.setBounce(0.95)
+        block.setMass(Math.pow(width / 50, 2))
+        block.setVelocity(Phaser.Math.Between(0, 10), Phaser.Math.Between(0, 10))
+        block.setFriction(0)
 
-      this.input.setDraggable(block)
-
-      if (Math.random() > 0.5) {
-        block.body.velocity.x *= -1
-      } else {
-        block.body.velocity.y *= -1
-      }
-
-      blocks.push(block)
-    })
-
-    this.physics.add.collider(blocks, blocks)
-
-    this.input.on('drag', (
-      _pointer: Phaser.Input.Pointer,
-      gameObject: Phaser.GameObjects.GameObject,
-      dragX: number,
-      dragY: number,
-    ) => {
-      if (gameObject instanceof Phaser.Physics.Arcade.Image) {
-        gameObject.setPosition(dragX, dragY)
-      }
-    })
-
-    this.input.on('pointerdown', (
-      _pointer: Phaser.Input.Pointer,
-      gameObjects: Phaser.GameObjects.GameObject[]
-    ) => {
-      gameObjects.forEach((gameObject) => {
-        if (gameObject instanceof Phaser.Physics.Arcade.Image) {
-          gameObject.setVelocity(0)
-          gameObject.setImmovable(true)
-          ;(gameObject.body as Phaser.Physics.Arcade.Body).setAllowGravity(false)
-        }
-      })
-    })
-
-    this.input.on('pointerup', (
-      _pointer: Phaser.Input.Pointer,
-      gameObjects: Phaser.GameObjects.GameObject[]
-    ) => {
-      gameObjects.forEach((gameObject) => {
-        if (gameObject instanceof Phaser.Physics.Arcade.Image) {
-          gameObject.setImmovable(false)
-          ;(gameObject.body as Phaser.Physics.Arcade.Body).setAllowGravity(true)
-        }
+        this.matter.add.mouseSpring()
       })
     })
   }
@@ -113,10 +88,10 @@ export const Game: React.FC = () => {
       scene: Scene,
       transparent: true,
       physics: {
-        default: 'arcade',
-        arcade: {
+        default: 'matter',
+        matter: {
           gravity: {
-            y: 100,
+            y: 0.1,
           },
           // debug: true,
         },
@@ -138,8 +113,6 @@ export const Game: React.FC = () => {
         height: 100%;
 
         canvas {
-          /* width: 100% !important;
-          height: 100% !important; */
           object-fit: cover;
         }
       `}
