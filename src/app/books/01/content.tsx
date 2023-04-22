@@ -10,6 +10,7 @@ import Members from '@/components/Members'
 import * as layout from '@/components/layout-1'
 import dynamic from 'next/dynamic'
 import { books } from '@/constants'
+import Menu from '@/components/Menu'
 
 const Game = dynamic(() => import('./game').then((mod) => mod.Game), { ssr: false })
 
@@ -134,6 +135,7 @@ export default function Book02Content() {
           portrait: '/images/book01-1080x1920.jpg',
         }}
       />
+      <Menu />
       <layout.Inner>
         <layout.Inner1>
           <layout.Title css={styles.title}>

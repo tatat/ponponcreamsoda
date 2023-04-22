@@ -10,6 +10,7 @@ import Members from '@/components/Members'
 import Loading from '@/components/Loading'
 import * as layout from '@/components/layout-1'
 import { books } from '@/constants'
+import Menu from '@/components/Menu'
 
 const useStyles = () => {
   const theme = useTheme()
@@ -205,6 +206,7 @@ export default function Book02Content() {
         onLoadStart={handleLoadStart}
       />
       <Loading css={styles.loading} visible={isLoading} />
+      <Menu />
       <layout.Inner>
         <layout.Inner1>
           <layout.Title css={styles.title}>
