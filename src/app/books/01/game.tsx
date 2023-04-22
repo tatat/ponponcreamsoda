@@ -73,6 +73,7 @@ class Scene extends Phaser.Scene {
       gameObjects.forEach((gameObject) => {
         if (gameObject instanceof Phaser.Physics.Arcade.Image) {
           gameObject.setVelocity(0)
+          gameObject.setImmovable(true)
           ;(gameObject.body as Phaser.Physics.Arcade.Body).setAllowGravity(false)
         }
       })
@@ -84,7 +85,8 @@ class Scene extends Phaser.Scene {
     ) => {
       gameObjects.forEach((gameObject) => {
         if (gameObject instanceof Phaser.Physics.Arcade.Image) {
-          (gameObject.body as Phaser.Physics.Arcade.Body).setAllowGravity(true)
+          gameObject.setImmovable(false)
+          ;(gameObject.body as Phaser.Physics.Arcade.Body).setAllowGravity(true)
         }
       })
     })
