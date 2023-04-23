@@ -8,4 +8,9 @@
       ]
     }
   }
+  // Since forwardPorts not yet supported by the CLI.
+  "appPort": [
+    // For AWS Cloud9
+    "8080:3000"
+  ]
 }
