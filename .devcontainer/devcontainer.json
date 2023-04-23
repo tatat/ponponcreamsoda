@@ -7,7 +7,7 @@
         "dbaeumer.vscode-eslint"
       ]
     }
-  }
+  },
   // Since forwardPorts not yet supported by the CLI.
   "appPort": [
     // For AWS Cloud9
