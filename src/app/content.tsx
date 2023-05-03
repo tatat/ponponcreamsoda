@@ -55,7 +55,7 @@ const useStyles = () => {
       gap: 2px;
 
       @media ${theme.breakpoints.portrait} {
-        top: 100vw;
+        padding-top: 100vw;
         grid-auto-rows: calc(100vw - 1px);
         grid-template-columns: 100vw;
       }
