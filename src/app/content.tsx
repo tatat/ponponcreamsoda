@@ -6,6 +6,7 @@ import { useMemo } from 'react'
 import Logo from '@/components/Logo'
 import { books } from '@/constants'
 import Link from 'next/link'
+import Menu from '@/components/Menu'
 
 const useStyles = () => {
   const theme = useTheme()
@@ -107,6 +108,7 @@ export default function HomeContent() {
       <h1 css={styles.logo}>
         <Logo colors={{ primary: '#ffffff' }} css={styles.logoImage} />
       </h1>
+      <Menu color="#bbbbbb" />
       <div css={styles.menu}>
         <div css={styles.menuItem}>
           <div css={styles.menuItemInner}>

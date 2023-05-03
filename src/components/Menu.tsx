@@ -8,14 +8,15 @@ import Logo from './Logo'
 
 export type Props = {
   className?: string;
+  color?: string;
 }
 
-export default function Menu({ className }: Props): React.ReactElement {
+export default function Menu({ className, color = '#333333' }: Props): React.ReactElement {
   const styles = useMemo(() => ({
     container: css`
       position: fixed;
       top: 0;
-      right: 0;
+      right: 5px;
       box-sizing: border-box;
       z-index: 99;
       padding: 10px 10px 8px 10px;
@@ -31,7 +32,7 @@ export default function Menu({ className }: Props): React.ReactElement {
       &::before {
         display: block;
         content: "";
-        border-top: 2px dashed #333333;
+        border-top: 2px dashed ${color};
         position: absolute;
         top: -7px;
         left: 0;
@@ -42,12 +43,12 @@ export default function Menu({ className }: Props): React.ReactElement {
       width: 100%;
       height: auto;
     `,
-  }), [])
+  }), [color])
 
   return (
     <div css={styles.container} className={className}>
       <Link css={styles.inner} href="/">
-        <Logo css={styles.logo} colors={{ primary: '#333333' }} />
+        <Logo css={styles.logo} colors={{ primary: color }} />
       </Link>
     </div>
   )

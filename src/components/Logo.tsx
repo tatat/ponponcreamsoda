@@ -1,3 +1,8 @@
+/** @jsxImportSource @emotion/react */
+'use client'
+
+import { css } from '@emotion/react'
+
 export type Props = {
   className?: string;
   colors: {
@@ -7,22 +12,26 @@ export type Props = {
 
 export default function Logo({ className, colors }: Props): React.ReactElement {
   return (
-    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="238.29" height="62.88" viewBox="0 0 238.29 62.88">
-      <defs>
-        <style>{`
-          .logo-cls-1 {
-            fill: ${colors.primary};
-          }
+    <svg
+      css={css`
+        .logo-cls-1 {
+          fill: ${colors.primary};
+        }
 
-          .logo-cls-2 {
-            mix-blend-mode: multiply;
-          }
+        .logo-cls-2 {
+          mix-blend-mode: multiply;
+        }
 
-          .logo-cls-3 {
-            isolation: isolate;
-          }
-        `}</style>
-      </defs>
+        .logo-cls-3 {
+          isolation: isolate;
+        }
+      `}
+      className={className}
+      xmlns="http://www.w3.org/2000/svg"
+      width="238.29"
+      height="62.88"
+      viewBox="0 0 238.29 62.88"
+    >
       <g className="logo-cls-3">
         <g>
           <g>

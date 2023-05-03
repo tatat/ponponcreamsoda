@@ -1,3 +1,8 @@
+/** @jsxImportSource @emotion/react */
+'use client'
+
+import { css } from '@emotion/react'
+
 export type Props = {
   className?: string;
   colors: {
@@ -9,22 +14,26 @@ export type Props = {
 
 export default function LogoTSSH({ className, colors }: Props): React.ReactElement {
   return (
-    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="239.34" height="217.41" viewBox="0 0 239.34 217.41">
-      <defs>
-        <style>{`
-          .logo-tssh-cls-1 {
-            fill: ${colors.secondary};
-          }
+    <svg
+      css={css`
+        .logo-tssh-cls-1 {
+          fill: ${colors.secondary};
+        }
 
-          .logo-tssh-cls-2 {
-            fill: ${colors.tertiary};
-          }
+        .logo-tssh-cls-2 {
+          fill: ${colors.tertiary};
+        }
 
-          .logo-tssh-cls-3 {
-            fill: ${colors.primary};
-          }
-        `}</style>
-      </defs>
+        .logo-tssh-cls-3 {
+          fill: ${colors.primary};
+        }
+      `}
+      className={className}
+      xmlns="http://www.w3.org/2000/svg"
+      width="239.34"
+      height="217.41"
+      viewBox="0 0 239.34 217.41"
+    >
       <g>
         <g>
           <rect className="logo-tssh-cls-1" x="30.62" y=".21" width=".8" height="17.09" />
