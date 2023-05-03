@@ -64,11 +64,7 @@ export default function Members({ className }: Props): React.ReactElement {
 
   return (
     <div css={styles.container} className={className}>
-      <div css={styles.groupName}>
-        <a href="https://twitter.com/CreamsodaPon" target="_blank" rel="noopener noreferrer">
-          Pon Pon Creamsoda
-        </a>
-      </div>
+      <div css={styles.groupName}>Pon Pon Creamsoda</div>
       <ul css={styles.members}>
         <li>
           <a href="https://twitter.com/ryuga11112" target="_blank" rel="noopener noreferrer">

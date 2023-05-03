@@ -68,17 +68,15 @@ const useStyles = () => {
       align-items: center;
     `,
     menuItemInner: css`
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
+      position: relative;
+      width: 100%;
+      height: 100%;
       overflow: hidden;
       display: flex;
       justify-content: center;
       align-items: center;
       opacity: 0.4;
-      transition: opacity 0.3s linear;
+      transition: opacity 0.1s linear, width 0.1s linear, height 0.1s linear;
       mix-blend-mode: normal;
 
       a {
@@ -95,6 +93,8 @@ const useStyles = () => {
 
       &:hover {
         opacity: 1;
+        width: 97%;
+        height: 97%;
       }
     `,
   }), [theme])

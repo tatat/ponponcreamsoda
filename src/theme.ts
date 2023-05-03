@@ -11,6 +11,11 @@ const styles = {
     font-family: 'Kaisei Decol', serif;
     line-height: 1.3;
   `,
+  textMenu: css`
+    letter-spacing: 0.05em;
+    font-family: Poppins, sans-serif;
+    line-height: 1.3;
+  `,
 }
 
 export const theme = {
