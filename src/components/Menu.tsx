@@ -104,8 +104,6 @@ export default function Menu({ className, color = '#333333' }: Props): React.Rea
       flex-wrap: wrap;
       justify-content: end;
       gap: 2px;
-      overflow-y: auto;
-      overflow-x: hidden;
       width: 322px;
 
       li {
