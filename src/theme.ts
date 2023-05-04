@@ -13,7 +13,7 @@ const styles = {
   `,
   textMenu: css`
     letter-spacing: 0.05em;
-    font-family: Poppins, sans-serif;
+    font-family: futura-pt, sans-serif;
     line-height: 1.3;
   `,
 }

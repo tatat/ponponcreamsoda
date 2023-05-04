@@ -117,7 +117,9 @@ export default function Menu({ className, color = '#333333' }: Props): React.Rea
 
       li > a,
       li > span {
-        ${theme.styles.text};
+        ${theme.styles.textMenu};
+        font-weight: 500;
+        font-style: italic;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -128,7 +130,6 @@ export default function Menu({ className, color = '#333333' }: Props): React.Rea
         background-color: #ffffff;
         box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
         transition: color 0.1s linear, text-shadow 0.1s linear, width 0.1s linear, height 0.1s linear;
-        font-weight: 400;
         box-sizing: border-box;
         padding: 0.4rem 0.8rem;
       }
