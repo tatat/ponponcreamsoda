@@ -5,7 +5,7 @@ import { css, useTheme } from '@emotion/react'
 import { useMemo } from 'react'
 import LogoTSSH from '@/components/LogoTSSH'
 import BackgroundImage from '@/components/BackgroundImage'
-import Schedule from '@/components/Schedule'
+import Info from '@/components/Info'
 import Members from '@/components/Members'
 import * as layout from '@/components/layout-1'
 import dynamic from 'next/dynamic'
@@ -13,6 +13,8 @@ import { books } from '@/constants'
 import Menu from '@/components/Menu'
 
 const Game = dynamic(() => import('./game').then((mod) => mod.Game), { ssr: false })
+
+const themeColor = '#007ec6'
 
 const useStyles = () => {
   const theme = useTheme()
@@ -73,7 +75,7 @@ const useStyles = () => {
 
       &::before {
         mix-blend-mode: multiply;
-        background-color: rgba(0, 0, 0, 0.4);
+        background-color: rgba(0, 0, 0, 0.2);
         transform: translate3d(0, 0, 0);
       }
 
@@ -112,7 +114,7 @@ const useStyles = () => {
         ${background2};
         color: #fff;
       `,
-      schedule: css`
+      info: css`
         margin-bottom: 0.6rem;
 
         @media ${theme.breakpoints.portrait} {
@@ -142,8 +144,8 @@ export default function Book02Content() {
             <LogoTSSH
               colors={{
                 primary: '#231815',
-                secondary: '#007ec6',
-                tertiary: '#007ec6',
+                secondary: themeColor,
+                tertiary: themeColor,
               }}
               css={styles.titleImage}
             />
@@ -152,7 +154,7 @@ export default function Book02Content() {
             {books.vol01.titleMultiline.map((x, i) => <span key={i}>{x}</span>)}
           </layout.ContentTitle>
           <layout.Content css={styles.content}>
-            <Schedule css={styles.schedule} />
+            <Info css={styles.info} boothItemId='4750952' />
             <Members />
           </layout.Content>
         </layout.Inner1>

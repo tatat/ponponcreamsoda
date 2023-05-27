@@ -5,12 +5,14 @@ import { css, keyframes, useTheme } from '@emotion/react'
 import { useCallback, useMemo, useState } from 'react'
 import LogoTSSH from '@/components/LogoTSSH'
 import BackgroundVideo from '@/components/BackgroundVideo'
-import Schedule from '@/components/Schedule'
+import Info from '@/components/Info'
 import Members from '@/components/Members'
 import Loading from '@/components/Loading'
 import * as layout from '@/components/layout-1'
 import { books } from '@/constants'
 import Menu from '@/components/Menu'
+
+const themeColor = '#f6ca1b'
 
 const useStyles = () => {
   const theme = useTheme()
@@ -128,7 +130,7 @@ const useStyles = () => {
         ${background2};
         color: #fff;
       `,
-      schedule: css`
+      info: css`
         margin-bottom: 0.6rem;
 
         @media ${theme.breakpoints.portrait} {
@@ -213,7 +215,7 @@ export default function Book02Content() {
             <LogoTSSH
               colors={{
                 primary: '#231815',
-                secondary: '#f6ca1b',
+                secondary: themeColor,
                 tertiary: '#bcb7ad',
               }}
               css={styles.titleImage}
@@ -223,7 +225,7 @@ export default function Book02Content() {
             {books.vol02.titleMultiline.map((x, i) => <span key={i}>{x}</span>)}
           </layout.ContentTitle>
           <layout.Content css={styles.content}>
-            <Schedule css={styles.schedule} />
+            <Info css={styles.info} boothItemId='4750855' />
             <Members />
           </layout.Content>
         </layout.Inner1>

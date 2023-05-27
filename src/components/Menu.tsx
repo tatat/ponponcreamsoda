@@ -7,6 +7,7 @@ import Link from 'next/link'
 import Logo from './Logo'
 import { useMenu } from '@/hooks/use-menu'
 import { motion, AnimatePresence } from 'framer-motion'
+import { boothUrl } from '@/constants'
 
 const useMenuItemAnimations = (count: number, delay: number) => {
   return useMemo(() => Array.from({ length: count }, (_, x) => delay * x).map((x, i, self) => ({
@@ -165,8 +166,8 @@ export default function Menu({ className, color = '#333333' }: Props): React.Rea
               </Link>
             </motion.li>
             <motion.li {...menuItemAnimations[1]}>
-              <a onClick={toggleMenu} href="https://twitter.com/CreamsodaPon" target="_blank" rel="noopener noreferrer">
-                <span>Twitter</span>
+              <a onClick={toggleMenu} href={boothUrl} target="_blank" rel="noopener noreferrer">
+                <span>BOOTH</span>
               </a>
             </motion.li>
             <motion.li {...menuItemAnimations[2]}>
@@ -175,7 +176,9 @@ export default function Menu({ className, color = '#333333' }: Props): React.Rea
               </a>
             </motion.li>
             <motion.li {...menuItemAnimations[3]}>
-              <span />
+              <a onClick={toggleMenu} href="https://twitter.com/CreamsodaPon" target="_blank" rel="noopener noreferrer">
+                <span>Twitter</span>
+              </a>
             </motion.li>
             <motion.li {...menuItemAnimations[4]}>
               <span />

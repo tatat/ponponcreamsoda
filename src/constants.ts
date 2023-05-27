@@ -8,3 +8,5 @@ export const books = {
     titleMultiline: ['劈ヶ原衛星第二高校', 'イラスト本'],
   },
 }
+
+export const boothUrl = 'https://ponponcreamsoda.booth.pm/'

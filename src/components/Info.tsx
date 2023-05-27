@@ -3,12 +3,15 @@
 
 import { css, useTheme } from '@emotion/react'
 import { useMemo } from 'react'
+import { boothUrl } from '@/constants'
 
 export type Props = {
   className?: string;
+  linkColor?: string;
+  boothItemId?: string;
 }
 
-export default function Schedule({ className }: Props): React.ReactElement {
+export default function Info({ className, linkColor, boothItemId }: Props): React.ReactElement {
   const theme = useTheme()
 
   const styles = useMemo(() => ({
@@ -25,6 +28,15 @@ export default function Schedule({ className }: Props): React.ReactElement {
         }
       }
 
+      a {
+        color: ${linkColor ?? 'inherit'};
+        text-decoration: none;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+
       @media ${theme.breakpoints.portrait} {
         font-size: 1rem;
 
@@ -33,11 +45,20 @@ export default function Schedule({ className }: Props): React.ReactElement {
         }
       }
     `,
-  }), [theme])
+  }), [theme, linkColor])
 
   return (
     <div css={styles.container} className={className}>
-      <p>COMITIA 144 N55a</p>
+      <p>
+        <span>通信販売: </span>
+        <a
+          href={`${boothUrl}${boothItemId ? `items/${boothItemId}` : ''}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span>BOOTH</span>
+        </a>
+      </p>
     </div>
   )
 }
