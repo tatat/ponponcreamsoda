@@ -36,7 +36,7 @@ const useStyles = () => {
         position: absolute;
         left: 0;
         height: 100vw;
-        width: 100vw;
+        width: 100%;
       }
     `,
     logoImage: css`
@@ -57,7 +57,7 @@ const useStyles = () => {
       @media ${theme.breakpoints.portrait} {
         padding-top: 100vw;
         grid-auto-rows: calc(100vw - 1px);
-        grid-template-columns: 100vw;
+        grid-template-columns: 100%;
       }
     `,
     menuItem: css`
