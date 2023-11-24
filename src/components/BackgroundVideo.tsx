@@ -5,6 +5,7 @@ import { SerializedStyles, css } from '@emotion/react'
 import { Breakpoint, useBreakpoint } from '@/hooks/use-breakpoint'
 import { arrayWrap } from '@/helpers'
 import { useEffect, useRef } from 'react'
+import CSS from 'csstype'
 
 type SizeConfig = {
   width: number;
@@ -34,6 +35,10 @@ export type Props = {
   onCanPlay?: () => void;
   onLoadStart?: () => void;
   videoContainerCss?: SerializedStyles;
+  videoCss?: SerializedStyles;
+  overlayCss?: SerializedStyles;
+  fit?: CSS.Property.ObjectFit;
+  children?: React.ReactNode;
 }
 
 const styles = {
@@ -52,11 +57,19 @@ const styles = {
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 0;
   `,
   video: css`
-    object-fit: cover;
     width: 100%;
     height: 100%;
+  `,
+  overlay: css`
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
   `,
 }
 
@@ -68,6 +81,10 @@ export default function BackgroundVideo({
   onCanPlay,
   onLoadStart,
   videoContainerCss,
+  videoCss,
+  overlayCss,
+  fit = 'cover',
+  children,
 }: Props): React.ReactElement {
   const videoRef = useRef<HTMLVideoElement | null>(null)
 
@@ -132,7 +149,10 @@ export default function BackgroundVideo({
       <div css={css(styles.videoContainer, videoContainerCss)}>
         <video
           ref={videoRef}
-          css={styles.video}
+          css={css(styles.video, {
+            objectFit: fit,
+            aspectRatio: `${params.size.width} / ${params.size.height}`,
+          }, videoCss)}
           width={params.size.width}
           height={params.size.height}
           poster={params.poster}
@@ -145,6 +165,11 @@ export default function BackgroundVideo({
           ))}
         </video>
       </div>
+      {(children || overlayCss) && (
+        <div css={css(styles.overlay, overlayCss)}>
+          {children}
+        </div>
+      )}
     </div>
   )
 }

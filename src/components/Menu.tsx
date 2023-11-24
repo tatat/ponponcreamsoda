@@ -2,7 +2,7 @@
 'use client'
 
 import { css, useTheme } from '@emotion/react'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo } from 'react'
 import Link from 'next/link'
 import Logo from './Logo'
 import { useMenu } from '@/hooks/use-menu'
@@ -36,9 +36,10 @@ const useMenuItemAnimations = (count: number, delay: number) => {
 export type Props = {
   className?: string;
   color?: string;
+  secondaryColor?: string;
 }
 
-export default function Menu({ className, color = '#333333' }: Props): React.ReactElement {
+export default function Menu({ className, color = '#333333', secondaryColor = '#bbbbbb' }: Props): React.ReactElement {
   const theme = useTheme()
 
   const { opened, setOpened, containerRef } = useMenu<HTMLDivElement>()
@@ -127,7 +128,7 @@ export default function Menu({ className, color = '#333333' }: Props): React.Rea
         width: 100%;
         height: 100%;
         text-decoration-line: none;
-        color: #bbbbbb;
+        color: ${secondaryColor};
         background-color: #ffffff;
         box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
         transition: color 0.1s linear, text-shadow 0.1s linear, width 0.1s linear, height 0.1s linear;
@@ -140,13 +141,13 @@ export default function Menu({ className, color = '#333333' }: Props): React.Rea
       }
 
       li > a:hover {
-        color: #333333;
+        color: ${color};
         text-shadow: 0 0 2px rgba(0, 0, 0, 0.1);
         width: 96%;
         height: 96%;
       }
     `,
-  }), [color, theme])
+  }), [color, secondaryColor, theme])
 
   const menuItemAnimations = useMenuItemAnimations(6, 0.05)
 

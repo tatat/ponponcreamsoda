@@ -208,7 +208,7 @@ export default function Book02Content() {
         onLoadStart={handleLoadStart}
       />
       <Loading css={styles.loading} visible={isLoading} />
-      <Menu />
+      <Menu secondaryColor={themeColor} />
       <layout.Inner>
         <layout.Inner1>
           <layout.Title css={styles.title}>
