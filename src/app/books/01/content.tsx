@@ -137,7 +137,7 @@ export default function Book02Content() {
           portrait: '/images/book01-1080x1920.jpg',
         }}
       />
-      <Menu />
+      <Menu secondaryColor={themeColor} />
       <layout.Inner>
         <layout.Inner1>
           <layout.Title css={styles.title}>
