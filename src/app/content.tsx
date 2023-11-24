@@ -110,10 +110,10 @@ export default function HomeContent() {
       </h1>
       <Menu color="#bbbbbb" />
       <div css={styles.menu}>
-        <div css={styles.menuItem}>
+      <div css={styles.menuItem}>
           <div css={styles.menuItemInner}>
-            <Link href="/books/01/">
-              <img src="/images/menu-book01.jpg" alt={books.vol01.title} />
+            <Link href="/books/03/">
+              <img src="/images/menu-book03.jpg" alt={books.vol03.title} />
             </Link>
           </div>
         </div>
@@ -121,6 +121,13 @@ export default function HomeContent() {
           <div css={styles.menuItemInner}>
             <Link href="/books/02/">
               <img src="/images/menu-book02.jpg" alt={books.vol02.title} />
+            </Link>
+          </div>
+        </div>
+        <div css={styles.menuItem}>
+          <div css={styles.menuItemInner}>
+            <Link href="/books/01/">
+              <img src="/images/menu-book01.jpg" alt={books.vol01.title} />
             </Link>
           </div>
         </div>
