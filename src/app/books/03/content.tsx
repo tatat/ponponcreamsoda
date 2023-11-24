@@ -46,6 +46,7 @@ const useStyles = () => {
         transform: translate3d(0, 0, 0);
       `,
       loading: css`
+        z-index: 10;
         position: absolute;
         top: 0;
         left: 0;
