@@ -3,7 +3,7 @@
 
 import { css, useTheme } from '@emotion/react'
 import { useMemo } from 'react'
-import Logo from '@/components/Logo'
+import LogoKana from '@/components/LogoKana'
 import { books } from '@/constants'
 import Link from 'next/link'
 import Menu from '@/components/Menu'
@@ -106,7 +106,7 @@ export default function HomeContent() {
   return (
     <main css={styles.container}>
       <h1 css={styles.logo}>
-        <Logo colors={{ primary: '#ffffff' }} css={styles.logoImage} />
+        <LogoKana id='main-logo' colors={{ primary: '#ffffff' }} css={styles.logoImage} />
       </h1>
       <Menu color="#bbbbbb" />
       <div css={styles.menu}>
