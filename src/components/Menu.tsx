@@ -155,7 +155,7 @@ export default function Menu({ className, color = '#333333', secondaryColor = '#
     <div ref={containerRef} css={styles.container} className={className}>
       <div css={styles.main}>
         <button css={styles.mainInner} onClick={toggleMenu}>
-          <Logo css={styles.logo} colors={{ primary: color }} />
+          <Logo id='menu-logo' css={styles.logo} colors={{ primary: color }} />
         </button>
       </div>
       <AnimatePresence>
