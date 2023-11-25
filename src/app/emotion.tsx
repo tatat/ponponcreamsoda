@@ -6,25 +6,55 @@ import { useServerInsertedHTML } from 'next/navigation'
 import { useState } from 'react'
 import { theme } from '@/theme'
 
-type RootStyleRegistryProps = {
-  children: React.ReactNode;
-}
-
-export default function RootStyleRegistry({ children }: RootStyleRegistryProps): React.ReactElement {
-  const [cache] = useState(() => {
-    const cache = createCache({ key: 'css' })
+export default function RootStyleRegistry({ children }: { children: React.ReactNode }) {
+  const [{ cache, flush }] = useState(() => {
+    const cache = createCache({ key: 'emotion-cache' })
 
     cache.compat = true
 
-    return cache
+    const prevInsert = cache.insert
+
+    let inserted: string[] = []
+
+    cache.insert = (...args) => {
+      const serialized = args[1]
+
+      if (cache.inserted[serialized.name] === undefined) {
+        inserted.push(serialized.name)
+      }
+
+      return prevInsert(...args)
+    }
+
+    const flush = () => {
+      const prevInserted = inserted
+
+      inserted = []
+
+      return prevInserted
+    }
+
+    return { cache, flush }
   })
 
   useServerInsertedHTML(() => {
+    const names = flush()
+
+    if (names.length === 0) {
+      return null
+    }
+
+    let styles = ''
+
+    for (const name of names) {
+      styles += cache.inserted[name]
+    }
+
     return (
       <style
-        data-emotion={`${cache.key} ${Object.keys(cache.inserted).join(' ')}`}
+        data-emotion={`${cache.key} ${names.join(' ')}`}
         dangerouslySetInnerHTML={{
-          __html: Object.values(cache.inserted).join(' '),
+          __html: styles,
         }}
       />
     )
@@ -32,9 +62,7 @@ export default function RootStyleRegistry({ children }: RootStyleRegistryProps):
 
   return (
     <CacheProvider value={cache}>
-      <ThemeProvider theme={theme}>
-        {children}
-      </ThemeProvider>
+      <ThemeProvider theme={theme}>{children}</ThemeProvider>
     </CacheProvider>
   )
 }

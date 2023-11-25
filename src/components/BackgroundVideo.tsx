@@ -1,4 +1,3 @@
-/** @jsxImportSource @emotion/react */
 'use client'
 
 import { SerializedStyles, css } from '@emotion/react'
