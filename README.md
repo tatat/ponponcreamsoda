@@ -1,3 +1,1 @@
-# Pon Pon Creamsoda
-
-<img src="./public/images/logo.svg" alt="Pon Pon Creamsoda" width="100%" />
+<img src="./public/images/logo-kana.svg" alt="Pon Pon Creamsoda" width="100%" />
