@@ -1,6 +1,6 @@
 'use client'
 
-import Phaser from 'phaser'
+import * as Phaser from 'phaser'
 import React, { useEffect, useRef } from 'react'
 import { siteOrigin } from '@/config'
 import { css } from '@emotion/react'
@@ -90,6 +90,7 @@ export const Game: React.FC = () => {
         default: 'matter',
         matter: {
           gravity: {
+            x: 0,
             y: 0.1,
           },
           // debug: true,
