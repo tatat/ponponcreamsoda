@@ -48,7 +48,7 @@ export default function Info({ className, linkColor, boothItemId }: Props): Reac
 
   return (
     <div css={styles.container} className={className}>
-      <p>COMITIA 146: V21b</p>
+      <p>COMITIA 148: I36a</p>
       <p>
         <span>通信販売: </span>
         <a
