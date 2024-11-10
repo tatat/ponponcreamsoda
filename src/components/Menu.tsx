@@ -148,7 +148,8 @@ export default function Menu({ className, color = '#333333', secondaryColor = '#
     `,
   }), [color, secondaryColor, theme])
 
-  const menuItemAnimations = useMenuItemAnimations(6, 0.05)
+  const menuItemAnimations = useMenuItemAnimations(8, 0.05)
+  const menuItemAnimationsCopy = [...menuItemAnimations]
 
   return (
     <div ref={containerRef} css={styles.container} className={className}>
@@ -160,30 +161,38 @@ export default function Menu({ className, color = '#333333', secondaryColor = '#
       <AnimatePresence>
         {opened && (
           <ul css={styles.list}>
-            <motion.li {...menuItemAnimations[0]}>
+            <motion.li {...menuItemAnimationsCopy.shift()}>
               <Link onClick={toggleMenu} href="/">
                 <span>Home</span>
               </Link>
             </motion.li>
-            <motion.li {...menuItemAnimations[1]}>
+            <motion.li {...menuItemAnimationsCopy.shift()}>
+              <Link onClick={toggleMenu} href="/gallery/">
+                <span>Gallery</span>
+              </Link>
+            </motion.li>
+            <motion.li {...menuItemAnimationsCopy.shift()}>
               <a onClick={toggleMenu} href={boothUrl} target="_blank" rel="noopener noreferrer">
                 <span>BOOTH</span>
               </a>
             </motion.li>
-            <motion.li {...menuItemAnimations[2]}>
+            <motion.li {...menuItemAnimationsCopy.shift()}>
               <a onClick={toggleMenu} href="https://www.youtube.com/@ponponcreamsoda" target="_blank" rel="noopener noreferrer">
                 <span>YouTube</span>
               </a>
             </motion.li>
-            <motion.li {...menuItemAnimations[3]}>
+            <motion.li {...menuItemAnimationsCopy.shift()}>
               <a onClick={toggleMenu} href="https://twitter.com/CreamsodaPon" target="_blank" rel="noopener noreferrer">
                 <span>Twitter</span>
               </a>
             </motion.li>
-            <motion.li {...menuItemAnimations[4]}>
+            <motion.li {...menuItemAnimationsCopy.shift()}>
               <span />
             </motion.li>
-            <motion.li {...menuItemAnimations[5]}>
+            <motion.li {...menuItemAnimationsCopy.shift()}>
+              <span />
+            </motion.li>
+            <motion.li {...menuItemAnimationsCopy.shift()}>
               <span />
             </motion.li>
           </ul>

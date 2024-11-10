@@ -18,6 +18,7 @@ jobs:
       - run: cp .env.sample .env && yarn install && yarn build
         env:
           NEXT_PUBLIC_SITE_ORIGIN: ${{ vars.SITE_ORIGIN }}
+          NEXT_PUBLIC_GALLERY_DRIVE_FILDER_ID: ${{ vars.GALLERY_DRIVE_FILDER_ID }}
       - uses: w9jds/firebase-action@master
         with:
           args: deploy
