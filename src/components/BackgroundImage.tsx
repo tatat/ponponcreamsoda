@@ -3,25 +3,27 @@
 import { css } from '@emotion/react'
 import { Breakpoint, useBreakpoint } from '@/hooks/use-breakpoint'
 
-type ConfigWithDefault<T> = ({
-  default?: undefined;
-} & {
-  [K in Breakpoint]: T;
-}) | ({
-  default: T;
-} & {
-  [K in Breakpoint]?: T;
-})
+type ConfigWithDefault<T> =
+  | ({
+      default?: undefined
+    } & {
+      [K in Breakpoint]: T
+    })
+  | ({
+      default: T
+    } & {
+      [K in Breakpoint]?: T
+    })
 
 export type Props = {
-  src: ConfigWithDefault<string>;
-  className?: string;
+  src: ConfigWithDefault<string>
+  className?: string
 }
 
 export default function BackgroundImage({ src, className }: Props): React.ReactElement {
   const params = useBreakpoint((breakpoint) => {
     if (breakpoint) {
-      const getFrom = <T, >(p: ConfigWithDefault<T>): T => (p[breakpoint] ?? p['default']) as T
+      const getFrom = <T,>(p: ConfigWithDefault<T>): T => (p[breakpoint] ?? p['default']) as T
       const url = getFrom(src)
 
       return {

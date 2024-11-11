@@ -3,8 +3,8 @@
 import { css, keyframes } from '@emotion/react'
 
 export type Props = {
-  visible: boolean;
-  className?: string;
+  visible: boolean
+  className?: string
 }
 
 const animation = keyframes`
@@ -35,11 +35,7 @@ const styles = {
 
 export default function Loading({ className, visible }: Props): React.ReactElement {
   return (
-    <div
-      css={styles.container}
-      className={className}
-      style={{ display: visible ? 'block' : 'none' }}
-    >
+    <div css={styles.container} className={className} style={{ display: visible ? 'block' : 'none' }}>
       <div css={styles.inner} />
     </div>
   )

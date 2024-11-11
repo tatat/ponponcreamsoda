@@ -4,62 +4,65 @@ import { css, useTheme } from '@emotion/react'
 import { useMemo } from 'react'
 
 export type Props = {
-  className?: string;
+  className?: string
 }
 
 export default function Members({ className }: Props): React.ReactElement {
   const theme = useTheme()
 
-  const styles = useMemo(() => ({
-    container: css`
-      ${theme.styles.text};
-      position: relative;
+  const styles = useMemo(
+    () => ({
+      container: css`
+        ${theme.styles.text};
+        position: relative;
 
-      a {
-        color: inherit;
-        text-decoration-line: none;
-        white-space: nowrap;
+        a {
+          color: inherit;
+          text-decoration-line: none;
+          white-space: nowrap;
 
-        &:hover {
-          text-decoration-line: underline;
-          text-decoration-thickness: 1px;
+          &:hover {
+            text-decoration-line: underline;
+            text-decoration-thickness: 1px;
+          }
         }
-      }
-    `,
-    groupName: css`
-      font-size: 1.6rem;
-      font-weight: bold;
+      `,
+      groupName: css`
+        font-size: 1.6rem;
+        font-weight: bold;
 
-      @media ${theme.breakpoints.portrait} {
-        font-size: 1.3rem;
-      }
-    `,
-    members: css`
-      margin: 0;
-      padding: 0;
-      font-size: 0.9rem;
-      display: flex;
+        @media ${theme.breakpoints.portrait} {
+          font-size: 1.3rem;
+        }
+      `,
+      members: css`
+        margin: 0;
+        padding: 0;
+        font-size: 0.9rem;
+        display: flex;
 
-      > * {
-        display: block;
+        > * {
+          display: block;
 
-        &:first-child {
+          &:first-child {
+            &::before {
+              content: none;
+            }
+          }
+
           &::before {
-            content: none;
+            content: '|';
+            margin: 0 0.5em;
           }
         }
 
-        &::before {
-          content: "|";
-          margin: 0 0.5em;
+        @media ${theme.breakpoints.portrait} {
+          font-size: 0.8rem;
         }
-      }
-
-      @media ${theme.breakpoints.portrait} {
-        font-size: 0.8rem;
-      }
-    `,
-  }), [theme])
+      `,
+    }),
+    [theme],
+  )
 
   return (
     <div css={styles.container} className={className}>

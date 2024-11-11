@@ -41,7 +41,7 @@ const useStyles = () => {
         position: absolute;
         top: 0;
         left: 0;
-        content: "";
+        content: '';
         width: 100%;
         height: 100%;
       }
@@ -74,7 +74,7 @@ const useStyles = () => {
         position: absolute;
         top: 0;
         left: 0;
-        content: "";
+        content: '';
         width: 100%;
         height: 100%;
       }
@@ -221,10 +221,12 @@ export default function Book02Content() {
             />
           </layout.Title>
           <layout.ContentTitle css={styles.contentTitle}>
-            {books.vol02.titleMultiline.map((x, i) => <span key={i}>{x}</span>)}
+            {books.vol02.titleMultiline.map((x, i) => (
+              <span key={i}>{x}</span>
+            ))}
           </layout.ContentTitle>
           <layout.Content css={styles.content}>
-            <Info css={styles.info} boothItemId='4750855' />
+            <Info css={styles.info} boothItemId="4750855" />
             <Members />
           </layout.Content>
         </layout.Inner1>

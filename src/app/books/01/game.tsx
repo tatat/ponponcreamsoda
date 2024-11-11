@@ -5,29 +5,18 @@ import React, { useEffect, useRef } from 'react'
 import { siteOrigin } from '@/config'
 import { css } from '@emotion/react'
 
-const objectNames = [
-  '01',
-  '02',
-  '03',
-  '04',
-  '05',
-  '06',
-  '07',
-  '08',
-  '09',
-  '10',
-]
+const objectNames = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10']
 
 class Scene extends Phaser.Scene {
-  preload () {
+  preload() {
     this.load.setBaseURL(siteOrigin)
 
-    objectNames.forEach(n => {
+    objectNames.forEach((n) => {
       this.load.image(n, `images/book01/${n}.png`)
     })
   }
 
-  create () {
+  create() {
     this.matter.world.setBounds()
 
     const { top, left } = this.matter.world.walls
@@ -41,7 +30,7 @@ class Scene extends Phaser.Scene {
     }
 
     Array.from({ length: 3 }).forEach(() => {
-      objectNames.forEach(n => {
+      objectNames.forEach((n) => {
         const block = this.matter.add.image(
           Phaser.Math.Between(x.min + 100, x.max - 100),
           Phaser.Math.Between(y.min, y.max / 2),
@@ -49,9 +38,9 @@ class Scene extends Phaser.Scene {
           undefined,
           {
             restitution: 1,
-          }
+          },
         )
-        const width = block.width / 2 * 0.2
+        const width = (block.width / 2) * 0.2
 
         block.setScale(0.2)
         block.setCircle(width * 0.7)

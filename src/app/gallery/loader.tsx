@@ -2,8 +2,11 @@ import { css } from '@emotion/react'
 
 export const Loader = () => {
   return (
-      <div css={css`
-        &, &:before, &:after {
+    <div
+      css={css`
+        &,
+        &:before,
+        &:after {
           border-radius: 50%;
           width: 10px;
           height: 10px;
@@ -12,7 +15,7 @@ export const Loader = () => {
         }
 
         & {
-          color: #FFF;
+          color: #fff;
           font-size: 7px;
           position: relative;
           text-indent: -9999em;
@@ -36,9 +39,16 @@ export const Loader = () => {
         }
 
         @keyframes bblFadInOut {
-          0%, 80%, 100% { box-shadow: 0 2.5em 0 -1.3em }
-          40% { box-shadow: 0 2.5em 0 0 }
+          0%,
+          80%,
+          100% {
+            box-shadow: 0 2.5em 0 -1.3em;
+          }
+          40% {
+            box-shadow: 0 2.5em 0 0;
+          }
         }
-      `} />
+      `}
+    />
   )
 }

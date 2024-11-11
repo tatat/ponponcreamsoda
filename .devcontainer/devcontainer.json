@@ -2,10 +2,7 @@
   "image": "mcr.microsoft.com/devcontainers/typescript-node:18",
   "customizations": {
     "vscode": {
-      "extensions": [
-        "styled-components.vscode-styled-components",
-        "dbaeumer.vscode-eslint"
-      ]
+      "extensions": ["styled-components.vscode-styled-components", "dbaeumer.vscode-eslint"]
     }
   },
   // Since forwardPorts not yet supported by the CLI.

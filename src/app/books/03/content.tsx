@@ -85,8 +85,8 @@ const useStyles = () => {
 }
 
 type MainVideoProps = Omit<BackgroundVideoProps, 'size' | 'src' | 'poster'> & {
-  width: number;
-  height: number;
+  width: number
+  height: number
 }
 
 const MainVideo = ({ width, height, ...props }: MainVideoProps) => {
@@ -153,7 +153,9 @@ export default function Book03Content() {
             />
           </layout.Title>
           <layout.ContentTitle css={styles.contentTitle}>
-            {books.vol03.titleMultiline.map((x, i) => <span key={i}>{x}</span>)}
+            {books.vol03.titleMultiline.map((x, i) => (
+              <span key={i}>{x}</span>
+            ))}
           </layout.ContentTitle>
           <layout.Content css={styles.content}>
             <Info css={styles.info} />
@@ -167,7 +169,7 @@ export default function Book03Content() {
             css={styles.background}
             onCanPlay={handleCanPlay}
             onLoadStart={handleLoadStart}
-            fit='contain'
+            fit="contain"
           />
         </layout.Inner2>
       </layout.Inner>

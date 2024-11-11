@@ -39,7 +39,5 @@ export async function generateMetadata(_props: unknown, parent: ResolvingMetadat
 }
 
 export default function Book02() {
-  return (
-    <Book02Content />
-  )
+  return <Book02Content />
 }

@@ -37,7 +37,7 @@ export const listDriveFiles = async (folderId: string, options?: ListOptions): P
     q: `"${folderId}" in parents`,
     trashed: 'false',
     orderBy: 'modifiedTime desc,createdTime desc',
-    fields: 'nextPageToken,files(kind,id,name,mimeType,imageMediaMetadata),kind,incompleteSearch'
+    fields: 'nextPageToken,files(kind,id,name,mimeType,imageMediaMetadata),kind,incompleteSearch',
   })
 
   if (options?.pageToken) {
@@ -57,10 +57,13 @@ export const listDriveFiles = async (folderId: string, options?: ListOptions): P
 
   if (data.nextPageToken) {
     if (options?.abortController?.signal.aborted) {
-      return  data.files
+      return data.files
     }
 
-    const nextPageFiles = await listDriveFiles(folderId, { pageToken: data.nextPageToken, abortController: options?.abortController })
+    const nextPageFiles = await listDriveFiles(folderId, {
+      pageToken: data.nextPageToken,
+      abortController: options?.abortController,
+    })
 
     return [...data.files, ...nextPageFiles]
   }

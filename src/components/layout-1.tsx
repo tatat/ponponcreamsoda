@@ -54,10 +54,13 @@ export const Title = styled.div`
 `
 
 export type ContentTitleProps = React.ComponentProps<'div'> & {
-  children: React.ReactNode;
+  children: React.ReactNode
 }
 
-export const ContentTitle = React.forwardRef<HTMLDivElement, ContentTitleProps>(function ContentTitle({ children, ...props }, ref) {
+export const ContentTitle = React.forwardRef<HTMLDivElement, ContentTitleProps>(function ContentTitle(
+  { children, ...props },
+  ref,
+) {
   const theme = useTheme()
 
   return (

@@ -7,37 +7,39 @@ import { useEffect, useRef } from 'react'
 import CSS from 'csstype'
 
 type SizeConfig = {
-  width: number;
-  height: number;
+  width: number
+  height: number
 }
 
 type SourceConfig = {
-  url: string;
-  type: string;
+  url: string
+  type: string
 }
 
-type ConfigWithDefault<T> = ({
-  default?: undefined;
-} & {
-  [K in Breakpoint]: T;
-}) | ({
-  default: T;
-} & {
-  [K in Breakpoint]?: T;
-})
+type ConfigWithDefault<T> =
+  | ({
+      default?: undefined
+    } & {
+      [K in Breakpoint]: T
+    })
+  | ({
+      default: T
+    } & {
+      [K in Breakpoint]?: T
+    })
 
 export type Props = {
-  size: ConfigWithDefault<SizeConfig>;
-  src: ConfigWithDefault<SourceConfig | SourceConfig[]>;
-  poster?: ConfigWithDefault<string>;
-  className?: string;
-  onCanPlay?: () => void;
-  onLoadStart?: () => void;
-  videoContainerCss?: SerializedStyles;
-  videoCss?: SerializedStyles;
-  overlayCss?: SerializedStyles;
-  fit?: CSS.Property.ObjectFit;
-  children?: React.ReactNode;
+  size: ConfigWithDefault<SizeConfig>
+  src: ConfigWithDefault<SourceConfig | SourceConfig[]>
+  poster?: ConfigWithDefault<string>
+  className?: string
+  onCanPlay?: () => void
+  onLoadStart?: () => void
+  videoContainerCss?: SerializedStyles
+  videoCss?: SerializedStyles
+  overlayCss?: SerializedStyles
+  fit?: CSS.Property.ObjectFit
+  children?: React.ReactNode
 }
 
 const styles = {
@@ -89,7 +91,7 @@ export default function BackgroundVideo({
 
   const params = useBreakpoint((breakpoint) => {
     if (breakpoint) {
-      const getFrom = <T, >(p: ConfigWithDefault<T>): T => (p[breakpoint] ?? p['default']) as T
+      const getFrom = <T,>(p: ConfigWithDefault<T>): T => (p[breakpoint] ?? p['default']) as T
 
       return {
         src: arrayWrap(getFrom(src)),
@@ -128,30 +130,29 @@ export default function BackgroundVideo({
     video.addEventListener('canplay', handleCanPlay)
     video.load()
 
-    video.play()
-      .catch((error) => {
-        console.error(error)
-      })
+    video.play().catch((error) => {
+      console.error(error)
+    })
 
     return () => {
       video.removeEventListener('loadstart', handleLoadStart)
       video.removeEventListener('canplay', handleCanPlay)
     }
-  }, [
-    params,
-    onCanPlay,
-    onLoadStart,
-  ])
+  }, [params, onCanPlay, onLoadStart])
 
   return (
     <div css={styles.container} className={className}>
       <div css={css(styles.videoContainer, videoContainerCss)}>
         <video
           ref={videoRef}
-          css={css(styles.video, {
-            objectFit: fit,
-            aspectRatio: `${params.size.width} / ${params.size.height}`,
-          }, videoCss)}
+          css={css(
+            styles.video,
+            {
+              objectFit: fit,
+              aspectRatio: `${params.size.width} / ${params.size.height}`,
+            },
+            videoCss,
+          )}
           width={params.size.width}
           height={params.size.height}
           poster={params.poster}
@@ -164,11 +165,7 @@ export default function BackgroundVideo({
           ))}
         </video>
       </div>
-      {(children || overlayCss) && (
-        <div css={css(styles.overlay, overlayCss)}>
-          {children}
-        </div>
-      )}
+      {(children || overlayCss) && <div css={css(styles.overlay, overlayCss)}>{children}</div>}
     </div>
   )
 }

@@ -1,15 +1,10 @@
-import React, {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { isDescendantOrSelfOf } from '@/helpers'
 
 export const useMenu = <E extends Element = Element>(): {
-  opened: boolean;
-  setOpened: React.Dispatch<React.SetStateAction<boolean>>;
-  containerRef: React.MutableRefObject<E | null>;
+  opened: boolean
+  setOpened: React.Dispatch<React.SetStateAction<boolean>>
+  containerRef: React.MutableRefObject<E | null>
 } => {
   const [opened, setOpened] = useState(false)
   const containerRef = useRef<E | null>(null)
@@ -40,9 +35,12 @@ export const useMenu = <E extends Element = Element>(): {
     }
   }, [opened])
 
-  return useMemo(() => ({
-    opened,
-    setOpened,
-    containerRef,
-  }), [opened, setOpened])
+  return useMemo(
+    () => ({
+      opened,
+      setOpened,
+      containerRef,
+    }),
+    [opened, setOpened],
+  )
 }

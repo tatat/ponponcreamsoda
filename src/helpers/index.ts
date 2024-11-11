@@ -6,7 +6,7 @@ export const arrayWrap = <T>(value: T | T[] | undefined): T[] => {
   return Array.isArray(value) ? value : [value]
 }
 
-export function isDescendantOrSelfOf (element: Element, node: unknown): boolean {
+export function isDescendantOrSelfOf(element: Element, node: unknown): boolean {
   let current = node
 
   while (current) {

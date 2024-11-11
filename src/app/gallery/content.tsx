@@ -12,7 +12,6 @@ import { Loader } from './loader'
 
 const useStyles = () => {
   return useMemo(() => {
-
     const fadeIn = keyframes`
       from {
         opacity: 0;
@@ -246,10 +245,7 @@ const GalleryThumbnails = () => {
 
   return (
     <div css={styles.thumbnailContainer}>
-      {isLoading
-        ? <Loader />
-        : images.map((image) => <GalleryThumbnail key={image.id} image={image} />)
-        }
+      {isLoading ? <Loader /> : images.map((image) => <GalleryThumbnail key={image.id} image={image} />)}
     </div>
   )
 }
@@ -311,14 +307,7 @@ const GalleryContentInner = () => {
   const searchParams = useSearchParams()
   const imageId = searchParams.get('id')
 
-  return (
-    <div css={styles.containerInner}>
-      {imageId
-        ? <GalleryImage imageId={imageId} />
-        : <GalleryThumbnails />
-      }
-    </div>
-  )
+  return <div css={styles.containerInner}>{imageId ? <GalleryImage imageId={imageId} /> : <GalleryThumbnails />}</div>
 }
 
 export default function GalleryContent() {

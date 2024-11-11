@@ -38,7 +38,5 @@ export async function generateMetadata(_props: unknown, parent: ResolvingMetadat
 }
 
 export default function Home() {
-  return (
-    <HomeContent />
-  )
+  return <HomeContent />
 }

@@ -13,7 +13,7 @@ export const metadata = {
 }
 
 type RootLayoutProps = {
-  children: React.ReactNode;
+  children: React.ReactNode
 }
 
 export default function RootLayout({ children }: RootLayoutProps): React.ReactElement {
@@ -21,10 +21,7 @@ export default function RootLayout({ children }: RootLayoutProps): React.ReactEl
     <html lang="ja">
       <body>
         <RootStyleRegistry>
-          <FirebaseProvider
-            config={firebaseConfig}
-            inactivateAnalytics={inactivateAnalytics}
-          >
+          <FirebaseProvider config={firebaseConfig} inactivateAnalytics={inactivateAnalytics}>
             {children}
           </FirebaseProvider>
         </RootStyleRegistry>
