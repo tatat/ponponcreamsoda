@@ -7,6 +7,18 @@ export type DriveFile = {
   mimeType: string
 } & Record<string, unknown>
 
+export type DriveImageFile = {
+  kind: string
+  id: string
+  name: string
+  mimeType: string
+  imageMediaMetadata: {
+    width: number
+    height: number
+    rotation: number
+  } & Record<string, unknown>
+}
+
 export type DriveFileList = {
   nextPageToken?: string
   kind: string
@@ -25,6 +37,7 @@ export const listDriveFiles = async (folderId: string, options?: ListOptions): P
     q: `"${folderId}" in parents`,
     trashed: 'false',
     orderBy: 'modifiedTime desc,createdTime desc',
+    fields: 'nextPageToken,files(kind,id,name,mimeType,imageMediaMetadata),kind,incompleteSearch'
   })
 
   if (options?.pageToken) {
@@ -55,10 +68,10 @@ export const listDriveFiles = async (folderId: string, options?: ListOptions): P
   return data.files
 }
 
-export const listDriveImages = async (folderId: string, options?: ListOptions): Promise<DriveFile[]> => {
+export const listDriveImages = async (folderId: string, options?: ListOptions): Promise<DriveImageFile[]> => {
   const files = await listDriveFiles(folderId, options)
 
-  return files.filter((file) => file.mimeType.startsWith('image/'))
+  return files.filter((file): file is DriveImageFile => file.mimeType.startsWith('image/'))
 }
 
 export const buildDriveImageThumbnailUrl = (id: string, size?: string): string => {
