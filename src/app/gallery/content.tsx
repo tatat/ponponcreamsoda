@@ -3,6 +3,7 @@
 import { galleryDriveFolderId } from '@/config'
 import { css } from '@emotion/react'
 import { useMemo, useState, useEffect } from 'react'
+import { Suspense } from 'react'
 import Menu from '@/components/Menu'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
@@ -127,20 +128,30 @@ const GalleryImage = ({ imageId }: { imageId: string }) => {
   )
 }
 
-export default function GalleryContent() {
+const GalleryContentInner = () => {
   const styles = useStyles()
   const searchParams = useSearchParams()
   const imageId = searchParams.get('id')
 
   return (
+    <div css={styles.containerInner}>
+      {imageId
+        ? <GalleryImage imageId={imageId} />
+        : <GalleryThumbnails />
+      }
+    </div>
+  )
+}
+
+export default function GalleryContent() {
+  const styles = useStyles()
+
+  return (
     <div css={styles.container}>
       <Menu />
-      <div css={styles.containerInner}>
-        {imageId
-          ? <GalleryImage imageId={imageId} />
-          : <GalleryThumbnails />
-        }
-      </div>
+      <Suspense>
+        <GalleryContentInner />
+      </Suspense>
     </div>
   )
 }
