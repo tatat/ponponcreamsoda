@@ -1,8 +1,8 @@
 'use client'
 
 import { galleryDriveFolderId } from '@/config'
-import { css } from '@emotion/react'
-import { useMemo, useState, useEffect } from 'react'
+import { css, useTheme } from '@emotion/react'
+import { useMemo, useState, useEffect, useCallback } from 'react'
 import { Suspense } from 'react'
 import Menu from '@/components/Menu'
 import { useSearchParams } from 'next/navigation'
@@ -10,6 +10,8 @@ import Link from 'next/link'
 import { listDriveImages, DriveFile, buildDriveImageThumbnailUrl, buildDriveImageUrl } from './utils'
 
 const useStyles = () => {
+  const theme = useTheme()
+
   return useMemo(() => {
     return {
       container: css`
@@ -21,6 +23,7 @@ const useStyles = () => {
         min-height: 100%;
       `,
       loading: css`
+        ${theme.styles.text};
         color: #fff;
       `,
       thumbnailContainer: css`
@@ -45,30 +48,43 @@ const useStyles = () => {
         width: 100%;
       `,
       imageContainer: css`
+        position: relative;
         display: flex;
         justify-content: center;
         align-items: center;
         padding: 10px;
-        min-height: 100lvh;
         box-sizing: border-box;
+        overflow: auto;
+      `,
+      imageContainerInner: css`
+        display: block;
+        border-style: none;
+        background-color: transparent;
+        cursor: pointer;
+        height: 100%;
+        padding: 0;
+        margin: 0;
       `,
       image: css`
         max-width: 100%;
+        max-height: 100%;
       `,
     }
-  }, [])
+  }, [theme])
 }
 
 type ImageFile = {
   id: string
-  url: string
+  url1x: string
+  url2x: string
   name: string
 }
 
 const driveFileToImageFile = (driveFile: DriveFile): ImageFile => {
   return {
     id: driveFile.id,
-    url: buildDriveImageThumbnailUrl(driveFile.id, 'h360'),
+    url1x: buildDriveImageThumbnailUrl(driveFile.id, 'h360'),
+    url2x: buildDriveImageThumbnailUrl(driveFile.id, 'h720'),
     name: driveFile.name,
   }
 }
@@ -108,7 +124,13 @@ const GalleryThumbnails = () => {
         : images.map((image) => {
             return (
               <Link css={styles.thumbnail} key={image.id} href={`?id=${image.id}`}>
-                <img css={styles.thumbnailImage} src={image.url} alt={image.name} title={image.name} />
+                <img
+                  css={styles.thumbnailImage}
+                  src={image.url1x}
+                  srcSet={`${image.url1x} 1x, ${image.url2x} 2x`}
+                  alt={image.name}
+                  title={image.name}
+                />
               </Link>
             )
           })
@@ -120,10 +142,22 @@ const GalleryThumbnails = () => {
 const GalleryImage = ({ imageId }: { imageId: string }) => {
   const styles = useStyles()
   const imageUrl = buildDriveImageUrl(imageId)
+  const [isFull, setIsFull] = useState(false)
+
+  const handleClick = useCallback<React.MouseEventHandler>((e) => {
+    e.preventDefault()
+    setIsFull((prev) => !prev)
+  }, [])
 
   return (
-    <div css={styles.imageContainer}>
-      <img css={styles.image} src={imageUrl} alt={imageId} />
+    <div css={styles.imageContainer} style={{ height: isFull ? '100%' : '100lvh' }}>
+      <button css={styles.imageContainerInner} onClick={handleClick}>
+        <img
+          css={styles.image}
+          src={imageUrl}
+          alt={imageId}
+        />
+      </button>
     </div>
   )
 }
