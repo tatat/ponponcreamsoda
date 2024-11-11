@@ -39,6 +39,7 @@ const useStyles = () => {
       `,
       thumbnail: css`
         position: relative;
+        display: block;
 
         @media (max-width: 430px) {
           width: 100%;
@@ -46,6 +47,7 @@ const useStyles = () => {
       `,
       thumbnailImage: css`
         width: 100%;
+        display: block;
       `,
       imageContainer: css`
         position: relative;
@@ -68,6 +70,7 @@ const useStyles = () => {
       image: css`
         max-width: 100%;
         max-height: 100%;
+        display: block;
       `,
     }
   }, [theme])
