@@ -51,11 +51,16 @@ const useStyles = () => {
         width: auto;
         height: 360px;
 
+        &:hover img {
+          transform: scale(1.1);
+        }
+
         img {
           animation: ${fadeIn} 1s ease-in-out 0s forwards;
           opacity: 0;
           display: block;
           background-color: #fff;
+          transition: transform 0.2s ease-in-out;
         }
 
         @media (max-width: 430px) {
