@@ -36,7 +36,7 @@ export const listDriveFiles = async (folderId: string, options?: ListOptions): P
     key: firebaseConfig.apiKey,
     q: `"${folderId}" in parents`,
     trashed: 'false',
-    orderBy: 'modifiedTime desc,createdTime desc',
+    orderBy: 'name,modifiedTime desc,createdTime desc',
     fields: 'nextPageToken,files(kind,id,name,mimeType,imageMediaMetadata),kind,incompleteSearch',
   })
 
