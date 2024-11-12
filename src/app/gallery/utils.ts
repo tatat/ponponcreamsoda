@@ -71,10 +71,31 @@ export const listDriveFiles = async (folderId: string, options?: ListOptions): P
   return data.files
 }
 
-export const listDriveImages = async (folderId: string, options?: ListOptions): Promise<DriveImageFile[]> => {
-  const files = await listDriveFiles(folderId, options)
+const _driveImageListCache = {
+  createdAt: 0,
+  data: [] as DriveImageFile[],
+}
 
-  return files.filter((file): file is DriveImageFile => file.mimeType.startsWith('image/'))
+export const listDriveImages = async (
+  folderId: string,
+  options?: ListOptions & { cacheTtl?: number },
+): Promise<DriveImageFile[]> => {
+  const cacheTtl = options?.cacheTtl ?? 1000 * 60 * 5
+  const cacheExpiredAt = _driveImageListCache.createdAt + cacheTtl
+
+  if (Date.now() < cacheExpiredAt) {
+    console.log('[listDriveImages] cache hit')
+
+    return _driveImageListCache.data
+  }
+
+  const files = await listDriveFiles(folderId, options)
+  const data = files.filter((file): file is DriveImageFile => file.mimeType.startsWith('image/'))
+
+  _driveImageListCache.createdAt = Date.now()
+  _driveImageListCache.data = data
+
+  return data
 }
 
 export const buildDriveImageThumbnailUrl = (id: string, size?: string): string => {
@@ -98,7 +119,17 @@ export type GetOptions = {
   abortController?: AbortController
 }
 
+const _driveImageThumbnailCache: Record<string, string | undefined> = {}
+
 export const getDriveImageThumbnailUrl = async (id: string, options?: GetOptions): Promise<string> => {
+  const cache = _driveImageThumbnailCache[id]
+
+  if (cache) {
+    console.log('[getDriveImageThumbnailUrl] cache hit:', id)
+
+    return cache
+  }
+
   const query = new URLSearchParams({
     key: firebaseConfig.apiKey,
     fields: 'thumbnailLink',
@@ -128,8 +159,11 @@ export const getDriveImageThumbnailUrl = async (id: string, options?: GetOptions
   }
 
   const data = await response.json()
+  const thumbnailUrl = data.thumbnailLink.replace(/=s\d+$/, '=s0')
 
-  return data.thumbnailLink.replace(/=s\d+$/, '=s0')
+  _driveImageThumbnailCache[id] = thumbnailUrl
+
+  return thumbnailUrl
 }
 
 const _driveImageFileCache: Record<string, string | undefined> = {}
@@ -139,6 +173,8 @@ export const getDriveImageFileUrl = async (id: string, options?: GetOptions): Pr
   const cache = _driveImageFileCache[id]
 
   if (cache) {
+    console.log('[getDriveImageFileUrl] cache hit:', id)
+
     return cache
   }
 
