@@ -90,5 +90,45 @@ export const buildDriveImageThumbnailUrl = (id: string, size?: string): string =
 }
 
 export const buildDriveImageUrl = (id: string): string => {
-  return `https://lh3.googleusercontent.com/d/${id}`
+  return `https://lh3.googleusercontent.com/d/${encodeURIComponent(id)}`
+}
+
+export type GetOptions = {
+  abortController?: AbortController
+}
+
+export const getDriveImageFileUrl = async (id: string, options?: GetOptions): Promise<string> => {
+  const query = new URLSearchParams({
+    key: firebaseConfig.apiKey,
+    alt: 'media',
+  })
+
+  const url = `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(id)}?${query.toString()}`
+  const response = await fetch(url, { signal: options?.abortController?.signal })
+
+  if (!response.ok) {
+    console.error(response)
+
+    throw new Error('Failed to fetch file')
+  }
+
+  const blob = await response.blob()
+  const objectURL = URL.createObjectURL(blob)
+
+  return objectURL
+}
+
+export const nextTick = async <T>(
+  func: () => T | Promise<T>,
+  abortController?: AbortController,
+): Promise<T | undefined> => {
+  await new Promise((resolve) => {
+    setTimeout(resolve, 0)
+  })
+
+  if (abortController?.signal.aborted) {
+    return
+  }
+
+  return func()
 }
