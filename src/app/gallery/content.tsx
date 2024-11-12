@@ -7,7 +7,13 @@ import { Suspense } from 'react'
 import Menu from '@/components/Menu'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { listDriveImages, DriveImageFile, buildDriveImageThumbnailUrl, buildDriveImageUrl } from './utils'
+import {
+  listDriveImages,
+  DriveImageFile,
+  buildDriveImageThumbnailUrl,
+  buildDriveImageUrl,
+  getDriveImageFileUrl,
+} from './utils'
 import { Loader } from './loader'
 
 const useStyles = () => {
@@ -267,32 +273,37 @@ const GalleryImage = ({ imageId }: { imageId: string }) => {
 
   useEffect(() => {
     const abortController = new AbortController()
-    const img = new Image()
 
-    img.src = buildDriveImageUrl(imageId)
+    getDriveImageFileUrl(imageId, { abortController })
+      .then((url) => {
+        const img = new Image()
 
-    const append = () => {
-      if (!containerInnerRef.current) {
-        return
-      }
+        img.src = url
 
-      containerInnerRef.current.innerHTML = ''
-      containerInnerRef.current.appendChild(img)
-    }
+        const append = () => {
+          if (!containerInnerRef.current) {
+            return
+          }
 
-    if (img.complete) {
-      append()
+          containerInnerRef.current.innerHTML = ''
+          containerInnerRef.current.appendChild(img)
+        }
 
-      return
-    }
+        if (img.complete) {
+          append()
 
-    img.onload = () => {
-      if (abortController.signal.aborted) {
-        return
-      }
+          return
+        }
 
-      append()
-    }
+        img.onload = () => {
+          if (abortController.signal.aborted) {
+            return
+          }
+
+          append()
+        }
+      })
+      .catch(console.error)
 
     return () => {
       abortController.abort('The component is unmounted')
