@@ -94,10 +94,19 @@ export const buildDriveImageUrl = (id: string): string => {
 }
 
 export type GetOptions = {
+  fallback?: boolean
   abortController?: AbortController
 }
 
+const _driveImageFileCache: Record<string, string | undefined> = {}
+
 export const getDriveImageFileUrl = async (id: string, options?: GetOptions): Promise<string> => {
+  const cache = _driveImageFileCache[id]
+
+  if (cache) {
+    return cache
+  }
+
   const query = new URLSearchParams({
     key: firebaseConfig.apiKey,
     alt: 'media',
@@ -109,11 +118,17 @@ export const getDriveImageFileUrl = async (id: string, options?: GetOptions): Pr
   if (!response.ok) {
     console.error(response)
 
+    if (options?.fallback === true) {
+      return buildDriveImageUrl(id)
+    }
+
     throw new Error('Failed to fetch file')
   }
 
   const blob = await response.blob()
   const objectURL = URL.createObjectURL(blob)
+
+  _driveImageFileCache[id] = objectURL
 
   return objectURL
 }

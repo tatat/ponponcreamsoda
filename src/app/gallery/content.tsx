@@ -79,18 +79,22 @@ const useStyles = () => {
         align-items: center;
         padding: 10px;
         box-sizing: border-box;
-        overflow: auto;
       `,
       imageContainerInner: css`
-        display: block;
+        display: flex;
+        justify-content: center;
+        align-items: center;
         border-style: none;
         background-color: transparent;
+        outline: none;
         cursor: pointer;
         height: 100%;
+        width: 100%;
         padding: 0;
         margin: 0;
 
         img {
+          object-fit: contain;
           max-width: 100%;
           max-height: 100%;
           display: block;
@@ -269,7 +273,7 @@ const GalleryImage = ({ imageId }: { imageId: string }) => {
     const abortController = new AbortController()
 
     nextTick(async () => {
-      return getDriveImageFileUrl(imageId, { abortController }).then((url) => {
+      return getDriveImageFileUrl(imageId, { abortController, fallback: true }).then((url) => {
         const img = new Image()
 
         img.src = url
@@ -305,7 +309,7 @@ const GalleryImage = ({ imageId }: { imageId: string }) => {
   }, [imageId])
 
   return (
-    <div css={styles.imageContainer} style={{ height: isFull ? '100%' : '100lvh' }}>
+    <div css={styles.imageContainer} style={{ height: isFull ? undefined : '100lvh' }}>
       <button ref={containerInnerRef} css={styles.imageContainerInner} onClick={handleClick} />
     </div>
   )
