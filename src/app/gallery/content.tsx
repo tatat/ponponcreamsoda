@@ -7,13 +7,7 @@ import { Suspense } from 'react'
 import Menu from '@/components/Menu'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import {
-  listDriveImages,
-  DriveImageFile,
-  buildDriveImageThumbnailUrl,
-  buildDriveImageUrl,
-  getDriveImageFileUrl,
-} from './utils'
+import { listDriveImages, DriveImageFile, buildDriveImageThumbnailUrl, getDriveImageFileUrl, nextTick } from './utils'
 import { Loader } from './loader'
 
 const useStyles = () => {
@@ -274,8 +268,8 @@ const GalleryImage = ({ imageId }: { imageId: string }) => {
   useEffect(() => {
     const abortController = new AbortController()
 
-    getDriveImageFileUrl(imageId, { abortController })
-      .then((url) => {
+    nextTick(async () => {
+      return getDriveImageFileUrl(imageId, { abortController }).then((url) => {
         const img = new Image()
 
         img.src = url
@@ -303,7 +297,7 @@ const GalleryImage = ({ imageId }: { imageId: string }) => {
           append()
         }
       })
-      .catch(console.error)
+    }, abortController).catch(console.error)
 
     return () => {
       abortController.abort('The component is unmounted')

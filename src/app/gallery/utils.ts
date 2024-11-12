@@ -117,3 +117,18 @@ export const getDriveImageFileUrl = async (id: string, options?: GetOptions): Pr
 
   return objectURL
 }
+
+export const nextTick = async <T>(
+  func: () => T | Promise<T>,
+  abortController?: AbortController,
+): Promise<T | undefined> => {
+  await new Promise((resolve) => {
+    setTimeout(resolve, 0)
+  })
+
+  if (abortController?.signal.aborted) {
+    return
+  }
+
+  return func()
+}
