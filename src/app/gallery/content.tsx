@@ -162,7 +162,6 @@ const GalleryThumbnail = ({ image }: { image: ImageFile }) => {
     img.src = image.url1x
     img.srcset = `${image.url1x} 1x, ${image.url2x} 2x`
     img.alt = image.name
-    img.title = image.name
 
     const append = () => {
       if (!containerRef.current) {
