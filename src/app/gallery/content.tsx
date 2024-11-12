@@ -7,7 +7,13 @@ import { Suspense } from 'react'
 import Menu from '@/components/Menu'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { listDriveImages, DriveImageFile, buildDriveImageThumbnailUrl, getDriveImageFileUrl, nextTick } from './utils'
+import {
+  listDriveImages,
+  DriveImageFile,
+  buildDriveImageThumbnailUrl,
+  getDriveImageThumbnailUrl,
+  nextTick,
+} from './utils'
 import { Loader } from './loader'
 
 const useStyles = () => {
@@ -273,7 +279,7 @@ const GalleryImage = ({ imageId }: { imageId: string }) => {
     const abortController = new AbortController()
 
     nextTick(async () => {
-      return getDriveImageFileUrl(imageId, { abortController, fallback: true }).then((url) => {
+      return getDriveImageThumbnailUrl(imageId, { abortController, fallback: true }).then((url) => {
         const img = new Image()
 
         img.src = url

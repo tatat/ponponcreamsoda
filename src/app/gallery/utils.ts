@@ -98,8 +98,43 @@ export type GetOptions = {
   abortController?: AbortController
 }
 
+export const getDriveImageThumbnailUrl = async (id: string, options?: GetOptions): Promise<string> => {
+  const query = new URLSearchParams({
+    key: firebaseConfig.apiKey,
+    fields: 'thumbnailLink',
+  })
+
+  const url = `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(id)}?${query.toString()}`
+  const response = await (async () => {
+    try {
+      return await fetch(url, {
+        signal: options?.abortController?.signal,
+      })
+    } catch (error) {
+      console.error(error)
+
+      return null
+    }
+  })()
+
+  if (response == null || !response.ok) {
+    console.error({ response })
+
+    if (options?.fallback === true) {
+      return buildDriveImageUrl(id)
+    }
+
+    throw new Error('Failed to fetch thumbnail')
+  }
+
+  const data = await response.json()
+
+  return data.thumbnailLink.replace(/=s\d+$/, '=s0')
+}
+
 const _driveImageFileCache: Record<string, string | undefined> = {}
 
+// NOTE: alt=media frequently fails to fetch the file
 export const getDriveImageFileUrl = async (id: string, options?: GetOptions): Promise<string> => {
   const cache = _driveImageFileCache[id]
 
@@ -113,13 +148,23 @@ export const getDriveImageFileUrl = async (id: string, options?: GetOptions): Pr
   })
 
   const url = `https://www.googleapis.com/drive/v3/files/${encodeURIComponent(id)}?${query.toString()}`
-  const response = await fetch(url, { signal: options?.abortController?.signal })
+  const response = await (async () => {
+    try {
+      return await fetch(url, {
+        signal: options?.abortController?.signal,
+      })
+    } catch (error) {
+      console.error(error)
 
-  if (!response.ok) {
-    console.error(response)
+      return null
+    }
+  })()
+
+  if (response == null || !response.ok) {
+    console.error({ response })
 
     if (options?.fallback === true) {
-      return buildDriveImageUrl(id)
+      return getDriveImageThumbnailUrl(id, options)
     }
 
     throw new Error('Failed to fetch file')
@@ -137,9 +182,7 @@ export const nextTick = async <T>(
   func: () => T | Promise<T>,
   abortController?: AbortController,
 ): Promise<T | undefined> => {
-  await new Promise((resolve) => {
-    setTimeout(resolve, 0)
-  })
+  await new Promise((resolve) => setTimeout(resolve, 0))
 
   if (abortController?.signal.aborted) {
     return
