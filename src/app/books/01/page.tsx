@@ -1,13 +1,13 @@
 import { siteOrigin } from '@/config'
-import Book02Content from './content'
+import Book01Content from './content'
 import type { Metadata, ResolvingMetadata } from 'next'
-import { books } from '@/constants'
+import { bookInfo } from './config'
 
 export async function generateMetadata(_props: unknown, parent: ResolvingMetadata): Promise<Metadata> {
   const metadata = await parent
   const siteName = metadata.title?.absolute ?? 'Pon Pon Creamsoda'
-  const title = `${books.vol01.title} | ${siteName}`
-  const description = `同人サークル Pon Pon Creamsoda 「${books.vol01.title}」販促サイト`
+  const title = `${bookInfo.title} | ${siteName}`
+  const description = `同人サークル Pon Pon Creamsoda 「${bookInfo.title}」販促サイト`
   const url = `${siteOrigin}/books/01/`
 
   const images = {
@@ -38,6 +38,6 @@ export async function generateMetadata(_props: unknown, parent: ResolvingMetadat
   }
 }
 
-export default function Book02() {
-  return <Book02Content />
+export default function Book01() {
+  return <Book01Content />
 }

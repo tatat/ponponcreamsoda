@@ -8,12 +8,10 @@ import Info from '@/components/Info'
 import Members from '@/components/Members'
 import * as layout from '@/components/layout-1'
 import dynamic from 'next/dynamic'
-import { books } from '@/constants'
 import Menu from '@/components/Menu'
+import { themeColor, bookInfo } from './config'
 
 const Game = dynamic(() => import('./game').then((mod) => mod.Game), { ssr: false })
-
-const themeColor = '#007ec6'
 
 const useStyles = () => {
   const theme = useTheme()
@@ -136,7 +134,7 @@ export default function Book02Content() {
           portrait: '/images/book01-1080x1920.jpg',
         }}
       />
-      <Menu secondaryColor={themeColor} />
+      <Menu color={themeColor} />
       <layout.Inner>
         <layout.Inner1>
           <layout.Title css={styles.title}>
@@ -150,7 +148,7 @@ export default function Book02Content() {
             />
           </layout.Title>
           <layout.ContentTitle css={styles.contentTitle}>
-            {books.vol01.titleMultiline.map((x, i) => (
+            {bookInfo.titleMultiline.map((x, i) => (
               <span key={i}>{x}</span>
             ))}
           </layout.ContentTitle>

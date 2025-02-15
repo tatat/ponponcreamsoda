@@ -8,12 +8,8 @@ import Info from '@/components/Info'
 import Members from '@/components/Members'
 import Loading from '@/components/Loading'
 import * as layout from '@/components/layout-2'
-import { books } from '@/constants'
 import Menu from '@/components/Menu'
-
-const themeColor = '#f29998'
-const themeSecondaryColor = '#038579'
-const themeTertiaryColor = '#26161c'
+import { themeColor, themeSecondaryColor, themeTertiaryColor, bookInfo } from './config'
 
 const useStyles = () => {
   const theme = useTheme()
@@ -132,7 +128,7 @@ export default function Book04Content() {
   return (
     <layout.Container>
       <Loading css={styles.loading} visible={isLoading} />
-      <Menu color={themeTertiaryColor} secondaryColor={themeColor} />
+      <Menu color={themeColor} secondaryColor={themeTertiaryColor} />
       <MainVideo
         width={videoWidth}
         height={videoHeight}
@@ -155,7 +151,7 @@ export default function Book04Content() {
             />
           </layout.Title>
           <layout.ContentTitle css={styles.contentTitle}>
-            {books.vol04.titleMultiline.map((x, i) => (
+            {bookInfo.titleMultiline.map((x, i) => (
               <span key={i}>{x}</span>
             ))}
           </layout.ContentTitle>
