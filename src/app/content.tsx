@@ -117,6 +117,13 @@ export default function HomeContent() {
       <div css={styles.menu}>
         <div css={styles.menuItem}>
           <div css={styles.menuItemInner}>
+            <Link href="/books/05/">
+              <img src="/images/menu-book05.jpg" alt={books.vol05.title} />
+            </Link>
+          </div>
+        </div>
+        <div css={styles.menuItem}>
+          <div css={styles.menuItemInner}>
             <Link href="/books/04/">
               <img src="/images/menu-book04.jpg" alt={books.vol04.title} />
             </Link>
