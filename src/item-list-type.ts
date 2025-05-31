@@ -16,14 +16,20 @@ export type BookType = 'illustration' | 'manga'
 export type ItemBook = {
   name: string
   imageUrl: string
-  link?: string
+  links?: {
+    website?: string // Link to the book on the website
+    onlinePhysical?: string[] // Link to the book on online physical store
+    onlineDigital?: string[] // Link to the book on online digital store
+  }
   type: BookType // Whether it's an illustration book or manga book
   availability: AvailabilityStatus
+  price: string
 }
 
 export type ItemSticker = {
   imageUrl: string
   availability: VenueOnlyAvailability
+  price: string
 }
 
 export type ItemOther = {

@@ -15,13 +15,16 @@ export const itemList = {
         {
           name: '漫画本（モノクロ）5',
           imageUrl: '/images/item-list/book-05.jpg',
-          link: '/books/05',
+          links: {
+            website: '/books/05',
+          },
           type: 'illustration',
           availability: {
             venue: 'available',
             onlinePhysical: 'preparing',
             onlineDigital: 'preparing',
           },
+          price: '500yen',
         },
       ],
     },
@@ -33,46 +36,64 @@ export const itemList = {
         {
           name: '漫画本（モノクロ）1',
           imageUrl: '/images/item-list/book-01.jpg',
-          link: '/books/01',
-          type: 'manga',
-          availability: {
-            venue: 'unavailable',
-            onlinePhysical: 'available',
-            onlineDigital: 'available',
+          links: {
+            website: '/books/01',
+            onlinePhysical: ['https://ponponcreamsoda.booth.pm/items/5347449'],
+            onlineDigital: ['https://ponponcreamsoda.booth.pm/items/5893999'],
           },
-        },
-        {
-          name: 'イラスト本（フルカラー）1',
-          imageUrl: '/images/item-list/book-02.jpg',
-          link: '/books/02',
-          type: 'illustration',
+          type: 'manga',
           availability: {
             venue: 'unavailable',
             onlinePhysical: 'unavailable',
             onlineDigital: 'available',
           },
+          price: '500yen',
+        },
+        {
+          name: 'イラスト本（フルカラー）1',
+          imageUrl: '/images/item-list/book-02.jpg',
+          links: {
+            website: '/books/02',
+            onlinePhysical: ['https://ponponcreamsoda.booth.pm/items/5347486'],
+          },
+          type: 'illustration',
+          availability: {
+            venue: 'available',
+            onlinePhysical: 'available',
+            onlineDigital: 'notApplicable',
+          },
+          price: '600yen',
         },
         {
           name: '漫画本（モノクロ）2',
           imageUrl: '/images/item-list/book-03.jpg',
-          link: '/books/03',
+          links: {
+            website: '/books/03',
+            onlinePhysical: ['https://ponponcreamsoda.booth.pm/items/5347672'],
+            onlineDigital: ['https://ponponcreamsoda.booth.pm/items/5894079'],
+          },
           type: 'manga',
           availability: {
-            venue: 'unavailable',
+            venue: 'available',
             onlinePhysical: 'available',
             onlineDigital: 'available',
           },
+          price: '500yen',
         },
         {
           name: 'イラスト本（フルカラー）2',
           imageUrl: '/images/item-list/book-04.jpg',
-          link: '/books/04',
+          links: {
+            website: '/books/04',
+            onlinePhysical: ['https://ponponcreamsoda.booth.pm/items/5781200'],
+          },
           type: 'illustration',
           availability: {
-            venue: 'unavailable',
+            venue: 'available',
             onlinePhysical: 'available',
-            onlineDigital: 'available',
+            onlineDigital: 'notApplicable',
           },
+          price: '600yen',
         },
       ],
     },
@@ -86,36 +107,42 @@ export const itemList = {
           availability: {
             venue: 'available',
           },
+          price: '200yen',
         },
         {
           imageUrl: '/images/item-list/sticker-r2.png',
           availability: {
             venue: 'available',
           },
+          price: '200yen',
         },
         {
           imageUrl: '/images/item-list/sticker-d1.png',
           availability: {
             venue: 'available',
           },
+          price: '200yen',
         },
         {
           imageUrl: '/images/item-list/sticker-d2.png',
           availability: {
             venue: 'available',
           },
+          price: '200yen',
         },
         {
           imageUrl: '/images/item-list/sticker-t1.png',
           availability: {
             venue: 'available',
           },
+          price: '200yen',
         },
         {
           imageUrl: '/images/item-list/sticker-t2.png',
           availability: {
             venue: 'available',
           },
+          price: '200yen',
         },
       ],
     },
