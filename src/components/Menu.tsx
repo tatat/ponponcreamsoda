@@ -159,7 +159,7 @@ export default function Menu({ className, color = '#333333', secondaryColor = '#
     [color, secondaryColor, theme],
   )
 
-  const menuItemAnimations = useMenuItemAnimations(8, 0.05)
+  const menuItemAnimations = useMenuItemAnimations(9, 0.05)
   const menuItemAnimationsCopy = [...menuItemAnimations]
 
   return (
@@ -183,6 +183,11 @@ export default function Menu({ className, color = '#333333', secondaryColor = '#
               </Link>
             </motion.li>
             <motion.li {...menuItemAnimationsCopy.shift()}>
+              <Link onClick={toggleMenu} href="/item-list/">
+                <span>Item List</span>
+              </Link>
+            </motion.li>
+            <motion.li {...menuItemAnimationsCopy.shift()}>
               <a onClick={toggleMenu} href={boothUrl} target="_blank" rel="noopener noreferrer">
                 <span>BOOTH</span>
               </a>
@@ -201,9 +206,6 @@ export default function Menu({ className, color = '#333333', secondaryColor = '#
               <a onClick={toggleMenu} href="https://twitter.com/CreamsodaPon" target="_blank" rel="noopener noreferrer">
                 <span>Twitter</span>
               </a>
-            </motion.li>
-            <motion.li {...menuItemAnimationsCopy.shift()}>
-              <span />
             </motion.li>
             <motion.li {...menuItemAnimationsCopy.shift()}>
               <span />
