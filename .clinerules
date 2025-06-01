@@ -1,0 +1,119 @@
+# Cline Rules for Pon Pon Creamsoda Project
+
+## Project Overview
+
+This is a Next.js 13+ TypeScript project for a doujin circle website with App Router, featuring books, galleries, and item listings.
+
+## Code Style Guidelines
+
+- Use TypeScript with strict typing
+- Follow Next.js 13+ App Router conventions
+- Use functional components with React hooks
+- Prefer `const` over `let` when possible
+- Use descriptive variable and function names
+- Keep components small and focused on single responsibility
+
+## File Organization
+
+- Pages should be in `src/app/` following App Router structure
+- Components should be in `src/components/`
+- Utilities and helpers in `src/helpers/`
+- Custom hooks in `src/hooks/`
+- Configuration files in root or `src/config.ts`
+
+## Next.js Specific Rules
+
+- Use `generateMetadata` for dynamic metadata generation
+- Implement proper SEO with Open Graph and Twitter cards
+- Use standard HTML `<img>` tags instead of Next.js Image component (SSG compatibility)
+- Leverage Server Components when possible
+- Use Client Components only when necessary (interactivity, hooks, browser APIs)
+- Configure `output: 'export'` in next.config.js for static export
+
+## React Component Guidelines
+
+- Export components as default exports
+- Use TypeScript interfaces for props
+- Implement proper error boundaries where needed
+- Use semantic HTML elements
+- Ensure accessibility with proper ARIA attributes
+
+## Styling
+
+- Use Emotion for CSS-in-JS styling
+- Prefer styled components over inline styles
+- Use SCSS/CSS modules for global styles when applicable
+- Follow mobile-first responsive design
+- Maintain consistent spacing and typography
+- Use CSS custom properties for theming
+- Leverage Emotion's theme provider for consistent design tokens
+
+## Import Organization
+
+- Group imports: React/Next.js, third-party libraries, local imports
+- Use absolute imports with `@/` prefix for src directory
+- Keep imports alphabetically sorted within groups
+
+## Error Handling
+
+- Implement proper error boundaries
+- Use try-catch blocks for async operations
+- Provide meaningful error messages
+- Handle loading states appropriately
+
+## Performance
+
+- Use standard HTML `<img>` tags with proper attributes for SSG compatibility
+- Optimize images manually before adding to public folder
+- Use dynamic imports for code splitting
+- Implement proper caching strategies
+- Minimize bundle size
+- Use `loading="lazy"` attribute for images below the fold
+
+## Security
+
+- Validate all user inputs
+- Use environment variables for sensitive data
+- Implement proper CSRF protection
+- Follow Next.js security best practices
+
+## Testing
+
+- Write unit tests for utility functions
+- Test components with React Testing Library
+- Ensure accessibility compliance
+- Test responsive design
+
+## Documentation
+
+- Add JSDoc comments for complex functions
+- Keep README.md updated
+- Document API endpoints and data structures
+- Maintain changelog for significant updates
+
+## Git Workflow
+
+- Use conventional commit messages
+- Keep commits atomic and focused
+- Use meaningful branch names
+- Review code before merging
+- Run `npm run lint` and `npm run format` after making changes
+- Ensure all linting errors are fixed before committing
+
+## Japanese Content
+
+- Properly handle Japanese text encoding (UTF-8)
+- Use appropriate fonts for Japanese characters
+- Consider text direction and spacing for Japanese content
+- Test Japanese text rendering across different devices
+
+## SSG (Static Site Generation) Guidelines
+
+- Configure `output: 'export'` in next.config.js for static export
+- Use standard HTML `<img>` tags instead of Next.js Image component
+- Avoid dynamic routes that require server-side rendering
+- Use `generateStaticParams` for dynamic routes that need to be pre-generated
+- Ensure all images are optimized and placed in public folder
+- Use relative paths for assets
+- Test static export with `next build && next export`
+- Avoid server-side APIs and use static data or external APIs
