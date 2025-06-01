@@ -4,6 +4,9 @@ name: Deploy
   push:
     branches:
       - main
+    paths-ignore:
+      - '*.md'
+      - '**/*.md'
 
 jobs:
   deploy:
