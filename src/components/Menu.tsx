@@ -203,8 +203,8 @@ export default function Menu({ className, color = '#333333', secondaryColor = '#
               </a>
             </motion.li>
             <motion.li {...menuItemAnimationsCopy.shift()}>
-              <a onClick={toggleMenu} href="https://twitter.com/CreamsodaPon" target="_blank" rel="noopener noreferrer">
-                <span>Twitter</span>
+              <a onClick={toggleMenu} href="https://x.com/CreamsodaPon" target="_blank" rel="noopener noreferrer">
+                <span>X</span>
               </a>
             </motion.li>
             <motion.li {...menuItemAnimationsCopy.shift()}>

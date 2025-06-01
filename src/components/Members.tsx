@@ -69,22 +69,22 @@ export default function Members({ className }: Props): React.ReactElement {
       <div css={styles.groupName}>Pon Pon Creamsoda</div>
       <ul css={styles.members}>
         <li>
-          <a href="https://twitter.com/ryuga11112" target="_blank" rel="noopener noreferrer">
+          <a href="https://x.com/ryuga11112" target="_blank" rel="noopener noreferrer">
             ryuga.
           </a>
         </li>
         <li>
-          <a href="https://twitter.com/__________t_t_" target="_blank" rel="noopener noreferrer">
+          <a href="https://x.com/__________t_t_" target="_blank" rel="noopener noreferrer">
             tatあt
           </a>
         </li>
         <li>
-          <a href="https://twitter.com/dobby_smilaugh" target="_blank" rel="noopener noreferrer">
+          <a href="https://x.com/dobby_smilaugh" target="_blank" rel="noopener noreferrer">
             Dobby.
           </a>
         </li>
         <li>
-          <a href="https://twitter.com/mumemo0827" target="_blank" rel="noopener noreferrer">
+          <a href="https://x.com/mumemo0827" target="_blank" rel="noopener noreferrer">
             むめも
           </a>
         </li>
