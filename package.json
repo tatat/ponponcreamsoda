@@ -14,31 +14,32 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@emotion/react": "^11.11.4",
-    "@emotion/styled": "^11.11.5",
-    "@types/node": "^20.12.12",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@types/node": "^22.15.29",
     "@types/react": "^18.3.2",
     "@types/react-dom": "^18.3.0",
-    "firebase": "^10.12.0",
-    "framer-motion": "^11.2.4",
-    "next": "^14.2.3",
+    "firebase": "^11.8.1",
+    "framer-motion": "^12.15.0",
+    "next": "^15.3.3",
     "normalize.css": "^8.0.1",
-    "phaser": "^3.80.1",
+    "phaser": "^3.90.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "sass": "^1.77.2",
-    "typescript": "^5.4.5"
+    "sass": "^1.89.1",
+    "typescript": "^5.8.3"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@vitest/coverage-v8": "3.1.4",
     "@vitest/ui": "^3.1.4",
-    "eslint": "^8.57.0",
-    "eslint-config-next": "^14.2.3",
-    "eslint-config-prettier": "^9.1.0",
+    "@eslint/eslintrc": "^3.3.1",
+    "eslint": "^9.23.0",
+    "eslint-config-next": "^15.3.3",
+    "eslint-config-prettier": "^10.1.5",
+    "prettier": "^3.5.3",
     "jsdom": "^26.1.0",
-    "prettier": "^3.3.3",
     "vitest": "^3.1.4"
   }
 }
