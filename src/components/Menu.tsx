@@ -3,6 +3,7 @@
 import { css, useTheme } from '@emotion/react'
 import { useCallback, useMemo } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import Logo from './Logo'
 import { useMenu } from '@/hooks/use-menu'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -44,6 +45,7 @@ export type Props = {
 
 export default function Menu({ className, color = '#333333', secondaryColor = '#bbbbbb' }: Props): React.ReactElement {
   const theme = useTheme()
+  const pathname = usePathname()
 
   const { opened, setOpened, containerRef } = useMenu<HTMLDivElement>()
 
@@ -159,7 +161,41 @@ export default function Menu({ className, color = '#333333', secondaryColor = '#
     [color, secondaryColor, theme],
   )
 
-  const menuItemAnimations = useMenuItemAnimations(9, 0.05)
+  // メニューアイテムの定義
+  const menuItems = useMemo(
+    () => [
+      { href: '/', label: 'Home' },
+      { href: '/gallery/', label: 'Gallery' },
+      { href: '/item-list/', label: 'Item List' },
+    ],
+    [],
+  )
+
+  // 現在のページを除外したメニューアイテム
+  const filteredMenuItems = useMemo(() => {
+    return menuItems.filter((item) => {
+      // 正確なパス比較のため、末尾のスラッシュを統一
+      const normalizedPathname = pathname === '/' ? '/' : pathname.replace(/\/$/, '')
+      const normalizedHref = item.href === '/' ? '/' : item.href.replace(/\/$/, '')
+      return normalizedPathname !== normalizedHref
+    })
+  }, [menuItems, pathname])
+
+  // 外部リンク
+  const externalLinks = useMemo(
+    () => [
+      { href: boothUrl, label: 'BOOTH' },
+      { href: 'https://www.youtube.com/@ponponcreamsoda', label: 'YouTube' },
+      { href: 'https://x.com/CreamsodaPon', label: 'X' },
+    ],
+    [],
+  )
+
+  // 総アイテム数を偶数にするための計算
+  const contentItems = filteredMenuItems.length + externalLinks.length
+  const emptySpaces = contentItems % 2 === 0 ? 2 : 1 // 偶数にするための空スペース数
+  const totalItems = contentItems + emptySpaces
+  const menuItemAnimations = useMenuItemAnimations(totalItems, 0.05)
   const menuItemAnimationsCopy = [...menuItemAnimations]
 
   return (
@@ -172,47 +208,28 @@ export default function Menu({ className, color = '#333333', secondaryColor = '#
       <AnimatePresence>
         {opened && (
           <ul css={styles.list}>
-            <motion.li {...menuItemAnimationsCopy.shift()}>
-              <Link onClick={toggleMenu} href="/">
-                <span>Home</span>
-              </Link>
-            </motion.li>
-            <motion.li {...menuItemAnimationsCopy.shift()}>
-              <Link onClick={toggleMenu} href="/gallery/">
-                <span>Gallery</span>
-              </Link>
-            </motion.li>
-            <motion.li {...menuItemAnimationsCopy.shift()}>
-              <Link onClick={toggleMenu} href="/item-list/">
-                <span>Item List</span>
-              </Link>
-            </motion.li>
-            <motion.li {...menuItemAnimationsCopy.shift()}>
-              <a onClick={toggleMenu} href={boothUrl} target="_blank" rel="noopener noreferrer">
-                <span>BOOTH</span>
-              </a>
-            </motion.li>
-            <motion.li {...menuItemAnimationsCopy.shift()}>
-              <a
-                onClick={toggleMenu}
-                href="https://www.youtube.com/@ponponcreamsoda"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <span>YouTube</span>
-              </a>
-            </motion.li>
-            <motion.li {...menuItemAnimationsCopy.shift()}>
-              <a onClick={toggleMenu} href="https://x.com/CreamsodaPon" target="_blank" rel="noopener noreferrer">
-                <span>X</span>
-              </a>
-            </motion.li>
-            <motion.li {...menuItemAnimationsCopy.shift()}>
-              <span />
-            </motion.li>
-            <motion.li {...menuItemAnimationsCopy.shift()}>
-              <span />
-            </motion.li>
+            {/* 現在のページを除外した内部リンク */}
+            {filteredMenuItems.map((item) => (
+              <motion.li key={item.href} {...menuItemAnimationsCopy.shift()}>
+                <Link onClick={toggleMenu} href={item.href}>
+                  <span>{item.label}</span>
+                </Link>
+              </motion.li>
+            ))}
+            {/* 外部リンク */}
+            {externalLinks.map((link) => (
+              <motion.li key={link.href} {...menuItemAnimationsCopy.shift()}>
+                <a onClick={toggleMenu} href={link.href} target="_blank" rel="noopener noreferrer">
+                  <span>{link.label}</span>
+                </a>
+              </motion.li>
+            ))}
+            {/* 空のスペース（偶数調整用） */}
+            {Array.from({ length: emptySpaces }, (_, index) => (
+              <motion.li key={`empty-${index}`} {...menuItemAnimationsCopy.shift()}>
+                <span />
+              </motion.li>
+            ))}
           </ul>
         )}
       </AnimatePresence>
