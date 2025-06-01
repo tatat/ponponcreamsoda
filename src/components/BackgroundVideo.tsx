@@ -3,7 +3,7 @@
 import { SerializedStyles, css } from '@emotion/react'
 import { Breakpoint, useBreakpoint } from '@/hooks/use-breakpoint'
 import { arrayWrap } from '@/helpers'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useCallback, useMemo } from 'react'
 import CSS from 'csstype'
 
 type SizeConfig = {
@@ -112,47 +112,68 @@ export default function BackgroundVideo({
     }
   })
 
+  // メモ化されたイベントハンドラー
+  const handleLoadStart = useCallback(() => {
+    onLoadStart?.()
+  }, [onLoadStart])
+
+  const handleCanPlay = useCallback(() => {
+    onCanPlay?.()
+  }, [onCanPlay])
+
+  // src の変更を検知するためのメモ化
+  const srcUrls = useMemo(() => {
+    return params.src.map((config) => config.url).join(',')
+  }, [params.src])
+
+  const srcLength = useMemo(() => params.src.length, [params.src])
+
   useEffect(() => {
     const video = videoRef.current
 
-    if (!video) {
+    if (!video || srcLength === 0) {
       return
     }
-
-    if (params.src.length === 0) {
-      return
-    }
-
-    const handleLoadStart = () => onLoadStart?.()
-    const handleCanPlay = () => onCanPlay?.()
 
     video.addEventListener('loadstart', handleLoadStart)
     video.addEventListener('canplay', handleCanPlay)
-    video.load()
 
+    // src が変更された時のみ load と play を実行
+    video.load()
     video.play().catch((error) => {
-      console.error(error)
+      console.error('Video play failed:', error)
     })
 
     return () => {
       video.removeEventListener('loadstart', handleLoadStart)
       video.removeEventListener('canplay', handleCanPlay)
     }
-  }, [params, onCanPlay, onLoadStart])
+  }, [srcUrls, srcLength, handleLoadStart, handleCanPlay])
+
+  // 動的スタイルのメモ化
+  const videoStyles = useMemo(
+    () =>
+      css(
+        styles.video,
+        {
+          objectFit: fit,
+          aspectRatio: `${params.size.width} / ${params.size.height}`,
+        },
+        videoCss,
+      ),
+    [fit, params.size.width, params.size.height, videoCss],
+  )
+
+  const videoContainerStyles = useMemo(() => css(styles.videoContainer, videoContainerCss), [videoContainerCss])
+
+  const overlayStyles = useMemo(() => css(styles.overlay, overlayCss), [overlayCss])
 
   return (
     <div css={styles.container} className={className}>
-      <div css={css(styles.videoContainer, videoContainerCss)}>
+      <div css={videoContainerStyles}>
         <video
           ref={videoRef}
-          css={css(
-            styles.video,
-            {
-              objectFit: fit,
-              aspectRatio: `${params.size.width} / ${params.size.height}`,
-            },
-            videoCss,
-          )}
+          css={videoStyles}
           width={params.size.width}
           height={params.size.height}
           poster={params.poster}
@@ -165,7 +186,7 @@ export default function BackgroundVideo({
           ))}
         </video>
       </div>
-      {(children || overlayCss) && <div css={css(styles.overlay, overlayCss)}>{children}</div>}
+      {(children || overlayCss) && <div css={overlayStyles}>{children}</div>}
     </div>
   )
 }
