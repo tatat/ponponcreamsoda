@@ -23,11 +23,11 @@ npm start
 ## Testing
 
 ```bash
-# Run tests in watch mode
+# Run tests once
 npm test
 
-# Run tests once
-npm run test:run
+# Run tests in watch mode
+npm run test:watch
 
 # Run tests with coverage
 npm run test:coverage
