@@ -91,14 +91,11 @@ This is a Next.js 13+ TypeScript project for a doujin circle website with App Ro
 - Document API endpoints and data structures
 - Maintain changelog for significant updates
 
-## Git Workflow
+## Development
 
-- Use conventional commit messages
-- Keep commits atomic and focused
-- Use meaningful branch names
-- Review code before merging
 - Run `npm run lint` and `npm run format` after making changes
 - Ensure all linting errors are fixed before committing
+- Test changes thoroughly before deployment
 
 ## Japanese Content
 
