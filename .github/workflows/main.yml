@@ -18,7 +18,7 @@ jobs:
       - run: cp .env.sample .env && npm ci && npm run test && npm run build
         env:
           NEXT_PUBLIC_SITE_ORIGIN: ${{ vars.SITE_ORIGIN }}
-          NEXT_PUBLIC_GALLERY_DRIVE_FILDER_ID: ${{ vars.GALLERY_DRIVE_FILDER_ID }}
+          NEXT_PUBLIC_GALLERY_DRIVE_FOLDER_ID: ${{ vars.GALLERY_DRIVE_FOLDER_ID }}
       - uses: w9jds/firebase-action@master
         with:
           args: deploy

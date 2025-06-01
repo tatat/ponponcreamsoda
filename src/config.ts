@@ -20,4 +20,4 @@ export const firebaseConfig = {
   measurementId: ensureDefined(process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID),
 }
 
-export const galleryDriveFolderId = ensureDefined(process.env.NEXT_PUBLIC_GALLERY_DRIVE_FILDER_ID)
+export const galleryDriveFolderId = ensureDefined(process.env.NEXT_PUBLIC_GALLERY_DRIVE_FOLDER_ID)
