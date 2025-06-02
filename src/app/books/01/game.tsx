@@ -4,6 +4,7 @@ import * as Phaser from 'phaser'
 import React, { useEffect, useRef } from 'react'
 import { siteOrigin } from '@/config'
 import { css } from '@emotion/react'
+import { assertNonNullable } from '@/helpers/assertions'
 
 const objectNames = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10']
 
@@ -20,13 +21,17 @@ class Scene extends Phaser.Scene {
     this.matter.world.setBounds()
 
     const { top, left } = this.matter.world.walls
+
+    assertNonNullable(top, 'Top wall is not available')
+    assertNonNullable(left, 'Left wall is not available')
+
     const x = {
       min: 0,
-      max: top?.bounds.max.x ?? 0,
+      max: top.bounds.max.x,
     }
     const y = {
       min: 0,
-      max: left?.bounds.max.y ?? 0,
+      max: left.bounds.max.y,
     }
 
     Array.from({ length: 3 }).forEach(() => {
