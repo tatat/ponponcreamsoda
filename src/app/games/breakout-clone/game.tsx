@@ -1717,18 +1717,23 @@ export const BreakoutGame: React.FC<BreakoutGameParams> = ({ debugMode: propDebu
             top: 16px;
             right: 16px;
             z-index: 200;
-            background: rgba(45, 55, 72, 0.9);
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            color: #e2e8f0;
-            padding: 8px 16px;
+            background: #f5f5f5;
+            border: none;
+            border-radius: 2px;
+            color: #333333;
+            padding: 12px 20px;
             cursor: pointer;
             font-size: 14px;
-            font-weight: bold;
-            transition: all 0.2s ease;
+            font-weight: 500;
+            transition: background-color 0.2s ease;
+            box-shadow: none;
 
             &:hover {
-              background: rgba(0, 0, 0, 0.6);
+              background: #e0e0e0;
+            }
+
+            &:active {
+              background: #d0d0d0;
             }
           `}
         >

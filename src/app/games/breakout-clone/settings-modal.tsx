@@ -58,7 +58,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
       <div
         css={css`
           background: #2d3748;
-          border-radius: 12px;
+          border-radius: 2px;
           width: 100%;
           max-width: 600px;
           max-height: 80vh;
@@ -85,7 +85,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
               font-weight: bold;
             `}
           >
-            バーチャルパッド設定
+            ゲーム設定
           </h2>
           <button
             onClick={handleCancel}
@@ -101,7 +101,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
               display: flex;
               align-items: center;
               justify-content: center;
-              border-radius: 4px;
+              border-radius: 2px;
               &:hover {
                 background: rgba(160, 174, 192, 0.2);
               }
@@ -120,7 +120,24 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
             color: #e2e8f0;
           `}
         >
-          <div>
+          {/* バーチャルパッド設定セクション */}
+          <div
+            css={css`
+              margin-bottom: 32px;
+            `}
+          >
+            <h3
+              css={css`
+                color: #e2e8f0;
+                margin: 0 0 16px 0;
+                font-size: 18px;
+                font-weight: bold;
+                padding-bottom: 8px;
+                border-bottom: 1px solid #718096;
+              `}
+            >
+              バーチャルパッド設定
+            </h3>
             <label
               css={css`
                 display: flex;
@@ -129,7 +146,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
                 margin-bottom: 20px;
                 padding: 16px;
                 background: #4a5568;
-                border-radius: 8px;
+                border-radius: 2px;
                 border: 1px solid #718096;
               `}
             >
@@ -163,7 +180,22 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
                 </div>
               </div>
             </label>
+          </div>
 
+          {/* 開発用設定セクション */}
+          <div>
+            <h3
+              css={css`
+                color: #e2e8f0;
+                margin: 0 0 16px 0;
+                font-size: 18px;
+                font-weight: bold;
+                padding-bottom: 8px;
+                border-bottom: 1px solid #718096;
+              `}
+            >
+              開発用設定
+            </h3>
             <label
               css={css`
                 display: flex;
@@ -172,7 +204,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
                 margin-bottom: 20px;
                 padding: 16px;
                 background: #4a5568;
-                border-radius: 8px;
+                border-radius: 2px;
                 border: 1px solid #718096;
               `}
             >
@@ -244,7 +276,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
             css={css`
               background: #fc8181;
               border: none;
-              border-radius: 6px;
+              border-radius: 2px;
               color: #ffffff;
               padding: 10px 20px;
               cursor: pointer;
@@ -270,7 +302,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
               css={css`
                 background: #718096;
                 border: none;
-                border-radius: 6px;
+                border-radius: 2px;
                 color: #ffffff;
                 padding: 10px 20px;
                 cursor: pointer;
@@ -290,7 +322,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
               css={css`
                 background: #ffffff;
                 border: none;
-                border-radius: 6px;
+                border-radius: 2px;
                 color: #000000;
                 padding: 10px 20px;
                 cursor: pointer;
