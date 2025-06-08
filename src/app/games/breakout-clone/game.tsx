@@ -8,6 +8,7 @@ import { GameSettings, loadSettings } from './settings'
 import { SettingsModal } from './settings-modal'
 import { Starfield } from './starfield'
 import { BrickGenerator } from './brick-generator'
+import { BossManager } from './boss-manager'
 import { constants } from './constants'
 
 /**
@@ -37,6 +38,9 @@ class BreakoutScene extends Phaser.Scene {
   private pauseText!: Phaser.GameObjects.Text
   private brickSpawnTimer!: Phaser.Time.TimerEvent
   private brickGenerator!: BrickGenerator
+  private bossManager!: BossManager
+  private specialBalls: Phaser.Physics.Arcade.Sprite[] = [] // Special balls for every 30 seconds
+  private specialBallTimer: Phaser.Time.TimerEvent | null = null // Timer for special ball generation
   private isJumping = false
   private jumpVelocity = -225
   private gravity = 600
@@ -58,15 +62,6 @@ class BreakoutScene extends Phaser.Scene {
   private isRightPressed = false
   private gameSettings: GameSettings = loadSettings()
   private starfield!: Starfield
-  // Boss battle system
-  private isBossBattle = false
-  private boss: Phaser.Physics.Arcade.Sprite | null = null
-  private bossHits = 0
-  private bossMaxHits = 5 // Will be calculated based on boss number
-  private bossFloatTween: Phaser.Tweens.Tween | null = null
-  private bossNumber = 0 // Track which boss this is (0 = first boss)
-  private specialBalls: Phaser.Physics.Arcade.Sprite[] = [] // Special balls for every 30 seconds
-  private specialBallTimer: Phaser.Time.TimerEvent | null = null // Timer for special ball generation
 
   constructor() {
     super({ key: 'BreakoutScene' })
@@ -168,6 +163,12 @@ class BreakoutScene extends Phaser.Scene {
       brickNames: constants.BRICK_NAMES,
     })
     this.brickGenerator.initializeBrickAspectRatios()
+
+    // Initialize boss manager
+    this.bossManager = new BossManager(this, this.brickGenerator, this.bricks)
+    this.bossManager.onBossDefeated = () => {
+      this.createBricksWithFadeIn()
+    }
 
     this.createBricks()
 
@@ -378,7 +379,7 @@ class BreakoutScene extends Phaser.Scene {
   }
 
   private addNewBrick() {
-    if (this.isGameOver || !this.isGameStarted || this.isPaused || this.isBossBattle) {
+    if (this.isGameOver || !this.isGameStarted || this.isPaused || this.bossManager.isBossBattleActive()) {
       return
     }
 
@@ -493,16 +494,39 @@ class BreakoutScene extends Phaser.Scene {
     this.brickGenerator.updateOccupiedSpaces()
 
     // Check for boss battle trigger
-    this.checkBossBattle()
+    const bossTriggered = this.bossManager.checkBossBattle(this.score)
+    if (bossTriggered) {
+      // Add boss collision for main ball and special balls
+      this.time.delayedCall(1100, () => {
+        this.bossManager.addBossCollision(this.ball, this.specialBalls)
+      })
+    }
 
     // Check for special ball trigger (30 second timer)
     this.checkSpecialBall()
 
     // If all bricks are destroyed, get bonus points and respawn bricks
     // However, disable all-clear check during boss battles
-    if (this.bricks.children.size === 0 && !this.isBossBattle) {
+    if (this.bricks.children.size === 0 && !this.bossManager.isBossBattleActive()) {
       this.allBricksCleared()
     }
+  }
+
+  private createBricksWithFadeIn() {
+    // Recreate normal bricks with fade in
+    this.createBricks()
+
+    // Fade in all new bricks
+    this.bricks.children.entries.forEach((brick) => {
+      const brickSprite = brick as Phaser.Physics.Arcade.Sprite
+      brickSprite.setAlpha(0)
+      this.tweens.add({
+        targets: brickSprite,
+        alpha: 1,
+        duration: 1000,
+        ease: 'Power2',
+      })
+    })
   }
 
   private ballDied() {
@@ -823,19 +847,8 @@ class BreakoutScene extends Phaser.Scene {
     this.isLeftPressed = false
     this.isRightPressed = false
 
-    // Reset boss battle state
-    this.isBossBattle = false
-    if (this.boss) {
-      this.boss.destroy()
-      this.boss = null
-    }
-    this.bossHits = 0
-    this.bossMaxHits = 5
-    if (this.bossFloatTween) {
-      this.bossFloatTween.destroy()
-      this.bossFloatTween = null
-    }
-    this.bossNumber = 0
+    // Reset boss manager
+    this.bossManager.reset()
 
     // Reset special balls
     this.specialBalls.forEach((ball) => ball.destroy())
@@ -1158,17 +1171,6 @@ class BreakoutScene extends Phaser.Scene {
     this.input.on('pointerdown', gameOverTouchHandler)
   }
 
-  private checkBossBattle() {
-    // Check if we should trigger a boss battle
-    // Boss battles occur at cumulative thresholds based on bonus scores
-    if (this.isBossBattle) return
-
-    const nextBossThreshold = this.calculateNextBossThreshold()
-    if (this.score >= nextBossThreshold) {
-      this.startBossBattle()
-    }
-  }
-
   private checkSpecialBall() {
     // Start special ball timer if not already running
     if (!this.specialBallTimer && this.isGameStarted && !this.isGameOver && !this.isPaused) {
@@ -1183,268 +1185,6 @@ class BreakoutScene extends Phaser.Scene {
       callback: this.createSpecialBall,
       callbackScope: this,
       loop: true,
-    })
-  }
-
-  private calculateNextBossThreshold(): number {
-    // Calculate cumulative threshold for next boss
-    // 1st boss: 1000
-    // 2nd boss: 1000 + 500 + 1000 = 2500
-    // 3rd boss: 1000 + 500 + 1000 + 600 + 1000 = 4100
-    // Pattern: 1000 + sum of all previous bonuses + 1000 for each subsequent boss
-
-    let threshold = 1000 // First boss always at 1000
-
-    for (let i = 1; i <= this.bossNumber; i++) {
-      // Add bonus score for boss i (500 for first, +100 for each subsequent)
-      const bossBonus = 400 + i * 100 // Boss 1: 500, Boss 2: 600, Boss 3: 700, etc.
-      threshold += bossBonus
-
-      // Add 1000 points for the next boss requirement
-      threshold += 1000
-    }
-
-    return threshold
-  }
-
-  private startBossBattle() {
-    this.isBossBattle = true
-    this.bossHits = 0
-    this.bossNumber++ // Increment boss number
-
-    // Calculate boss max hits: 5 for first boss, then +1 for each subsequent boss
-    this.bossMaxHits = 4 + this.bossNumber // Boss 1: 5 hits, Boss 2: 6 hits, etc.
-
-    // Hide all existing bricks with fade out effect
-    this.bricks.children.entries.forEach((brick) => {
-      const brickSprite = brick as Phaser.Physics.Arcade.Sprite
-      this.tweens.add({
-        targets: brickSprite,
-        alpha: 0,
-        duration: 1000,
-        ease: 'Power2',
-        onComplete: () => {
-          brickSprite.destroy()
-        },
-      })
-    })
-
-    // Create boss after bricks fade out
-    this.time.delayedCall(1000, () => {
-      this.createBoss()
-    })
-
-    // Show boss battle message
-    const bossText = this.add.text(constants.GAME_CENTER_X, constants.GAME_CENTER_Y - 200, 'BOSS BATTLE!', {
-      fontSize: '48px',
-      color: '#ff6b6b',
-      align: 'center',
-    })
-    bossText.setOrigin(0.5)
-    bossText.setDepth(102)
-
-    this.tweens.add({
-      targets: bossText,
-      alpha: 0,
-      duration: 3000,
-      ease: 'Power2',
-      onComplete: () => {
-        bossText.destroy()
-      },
-    })
-  }
-
-  private createBoss() {
-    // Random boss image from available character images
-    const bossImages = constants.BRICK_NAMES
-    const randomBossImage = bossImages[Math.floor(Math.random() * bossImages.length)]
-    const bossTexture = `brick-${randomBossImage}-300` // Use 300px size for boss
-
-    // Create boss at center top area
-    this.boss = this.physics.add.sprite(constants.GAME_CENTER_X, 200, bossTexture)
-
-    // Get aspect ratio information for proper scaling
-    const aspectInfo = this.brickGenerator.getBrickAspectRatio(`brick-${randomBossImage}`)
-    if (aspectInfo) {
-      // Calculate proper dimensions while maintaining aspect ratio
-      let bossWidth, bossHeight
-      if (aspectInfo.aspectRatio >= 1) {
-        // Horizontal or square image
-        bossWidth = 300
-        bossHeight = 300 / aspectInfo.aspectRatio
-      } else {
-        // Vertical image
-        bossWidth = 300 * aspectInfo.aspectRatio
-        bossHeight = 300
-      }
-      this.boss.setDisplaySize(bossWidth, bossHeight)
-      // Set collision box to be slightly smaller than display size for better gameplay
-      this.boss.setSize(bossWidth * 0.8, bossHeight * 0.8)
-    } else {
-      // Fallback to square if aspect ratio info is not available
-      this.boss.setDisplaySize(300, 300)
-      this.boss.setSize(240, 240) // 80% of display size for collision
-    }
-
-    // Refresh the physics body to apply the new size
-    this.boss.refreshBody()
-
-    this.boss.setImmovable(true)
-    this.boss.setDepth(10)
-
-    // Add floating animation
-    this.bossFloatTween = this.tweens.add({
-      targets: this.boss,
-      y: 250,
-      duration: 2000,
-      yoyo: true,
-      repeat: -1,
-      ease: 'Sine.easeInOut',
-    })
-
-    // Add horizontal floating movement
-    this.tweens.add({
-      targets: this.boss,
-      x: constants.GAME_CENTER_X + 100,
-      duration: 3000,
-      yoyo: true,
-      repeat: -1,
-      ease: 'Sine.easeInOut',
-    })
-
-    // Add boss collision with ball
-    this.physics.add.collider(this.ball, this.boss, this.hitBoss, undefined, this)
-
-    // Add boss collision with all existing special balls
-    this.specialBalls.forEach((specialBall) => {
-      if (this.boss) {
-        this.physics.add.collider(specialBall, this.boss, this.hitBoss, undefined, this)
-      }
-    })
-
-    // Clear occupied spaces since all bricks are gone
-    this.brickGenerator.clearOccupiedSpaces()
-  }
-
-  private hitBoss: Phaser.Types.Physics.Arcade.ArcadePhysicsCallback = (ball, boss) => {
-    assertSpriteLight(boss)
-    const bossSprite = boss
-
-    this.bossHits++
-
-    // Flash effect when hit
-    this.tweens.add({
-      targets: bossSprite,
-      tint: 0xff0000,
-      duration: 100,
-      yoyo: true,
-      ease: 'Power2',
-    })
-
-    // Show hit counter
-    const hitText = this.add.text(bossSprite.x, bossSprite.y - 50, `${this.bossHits}/${this.bossMaxHits}`, {
-      fontSize: '24px',
-      color: '#ff6b6b',
-      align: 'center',
-    })
-    hitText.setOrigin(0.5)
-    hitText.setDepth(105)
-
-    this.tweens.add({
-      targets: hitText,
-      y: hitText.y - 30,
-      alpha: 0,
-      duration: 1000,
-      ease: 'Power2',
-      onComplete: () => {
-        hitText.destroy()
-      },
-    })
-
-    // Check if boss is defeated
-    if (this.bossHits >= this.bossMaxHits) {
-      // Immediately disable boss collision when defeated
-      bossSprite.disableBody()
-      this.defeatBoss()
-    }
-  }
-
-  private defeatBoss() {
-    if (!this.boss) return
-
-    // Boss collision already disabled in hitBoss method
-
-    // Stop floating animations
-    if (this.bossFloatTween) {
-      this.bossFloatTween.destroy()
-      this.bossFloatTween = null
-    }
-
-    // Boss defeat animation
-    this.tweens.add({
-      targets: this.boss,
-      scaleX: 2,
-      scaleY: 2,
-      alpha: 0,
-      rotation: Math.PI * 2,
-      duration: 2000,
-      ease: 'Power2',
-      onComplete: () => {
-        if (this.boss) {
-          this.boss.destroy()
-          this.boss = null
-        }
-      },
-    })
-
-    // Add bonus score: 500 for first boss, then +100 for each subsequent boss
-    const bonusScore = 400 + this.bossNumber * 100 // Boss 1: 500, Boss 2: 600, Boss 3: 700, etc.
-    this.score += bonusScore
-    this.scoreText.setText('Score: ' + this.score)
-
-    // Show victory message and bonus
-    const victoryText = this.add.text(
-      constants.GAME_CENTER_X,
-      constants.GAME_CENTER_Y,
-      `BOSS DEFEATED!\n+${bonusScore} BONUS!`,
-      {
-        fontSize: '36px',
-        color: '#ffd700',
-        align: 'center',
-      },
-    )
-    victoryText.setOrigin(0.5)
-    victoryText.setDepth(102)
-
-    this.tweens.add({
-      targets: victoryText,
-      alpha: 0,
-      duration: 3000,
-      ease: 'Power2',
-      onComplete: () => {
-        victoryText.destroy()
-      },
-    })
-
-    // Reset boss battle state and restore normal bricks
-    this.time.delayedCall(2000, () => {
-      this.isBossBattle = false
-      this.bossHits = 0
-
-      // Recreate normal bricks with fade in
-      this.createBricks()
-
-      // Fade in all new bricks
-      this.bricks.children.entries.forEach((brick) => {
-        const brickSprite = brick as Phaser.Physics.Arcade.Sprite
-        brickSprite.setAlpha(0)
-        this.tweens.add({
-          targets: brickSprite,
-          alpha: 1,
-          duration: 1000,
-          ease: 'Power2',
-        })
-      })
     })
   }
 
@@ -1473,8 +1213,11 @@ class BreakoutScene extends Phaser.Scene {
     // Add collision with paddle, bricks, and boss
     this.physics.add.collider(specialBall, this.paddle, this.hitPaddle, undefined, this)
     this.physics.add.collider(specialBall, this.bricks, this.hitBrick, undefined, this)
-    if (this.boss) {
-      this.physics.add.collider(specialBall, this.boss, this.hitBoss, undefined, this)
+
+    // Add boss collision if boss exists
+    const bossSprite = this.bossManager.getBossSprite()
+    if (bossSprite) {
+      this.physics.add.collider(specialBall, bossSprite, this.bossManager.createHitBossCallback(), undefined, this)
     }
 
     // Launch special ball with random angle
