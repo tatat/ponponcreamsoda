@@ -288,6 +288,31 @@ class BreakoutScene extends Phaser.Scene {
 
     // Apply initial settings
     this.applySettings(this.gameSettings)
+
+    // Add visibility change listener for auto-pause
+    this.setupVisibilityListener()
+  }
+
+  private setupVisibilityListener() {
+    // Auto-pause when window becomes inactive/hidden
+    const handleVisibilityChange = () => {
+      if (document.hidden || !document.hasFocus()) {
+        // Auto-pause if game is running
+        if (this.isGameStarted && !this.isGameOver && !this.isPaused) {
+          this.togglePause()
+        }
+      }
+    }
+
+    // Listen for visibility changes
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    window.addEventListener('blur', handleVisibilityChange)
+
+    // Clean up listeners when scene is destroyed
+    this.events.on('destroy', () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      window.removeEventListener('blur', handleVisibilityChange)
+    })
   }
 
   update() {
@@ -881,7 +906,6 @@ class BreakoutScene extends Phaser.Scene {
       this.specialBallTimer = null
     }
 
-    // Resume physics if it was paused
     this.physics.resume()
 
     // Stop brick spawn timer if it exists
@@ -1294,6 +1318,11 @@ class BreakoutScene extends Phaser.Scene {
   }
 
   private playRandomHitSound() {
+    // Don't play sound if window is not visible/active to prevent queued audio playback
+    if (document.hidden || !document.hasFocus()) {
+      return
+    }
+
     // Play a random hit sound from the array
     if (this.hitSounds.length > 0) {
       const randomIndex = Math.floor(Math.random() * this.hitSounds.length)
