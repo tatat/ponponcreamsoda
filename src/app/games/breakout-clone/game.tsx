@@ -549,7 +549,8 @@ class BreakoutScene extends Phaser.Scene {
     this.checkSpecialBall()
 
     // 全部のブロックが破壊された場合、ボーナスポイントを取得してブロックを復活
-    if (this.bricks.children.size === 0) {
+    // ただし、ボスバトル中は全消しチェックを無効にする
+    if (this.bricks.children.size === 0 && !this.isBossBattle) {
       this.allBricksCleared()
     }
   }
