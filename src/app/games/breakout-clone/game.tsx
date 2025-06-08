@@ -9,6 +9,7 @@ import { SettingsModal } from './settings-modal'
 import { Starfield } from './starfield'
 import { BrickGenerator } from './brick-generator'
 import { BossManager } from './boss-manager'
+import { ControlsManager, ControlsCallbacks } from './controls-manager'
 import { constants } from './constants'
 
 /**
@@ -18,9 +19,6 @@ class BreakoutScene extends Phaser.Scene {
   private paddle!: Phaser.Physics.Arcade.Sprite
   private ball!: Phaser.Physics.Arcade.Sprite
   private bricks!: Phaser.Physics.Arcade.StaticGroup
-  private cursors!: Phaser.Types.Input.Keyboard.CursorKeys
-  private spaceKey!: Phaser.Input.Keyboard.Key
-  private shiftKey!: Phaser.Input.Keyboard.Key
   private score = 0
   private lives = 3
   private startTime = 0
@@ -45,21 +43,7 @@ class BreakoutScene extends Phaser.Scene {
   private jumpVelocity = -225
   private gravity = 600
   private jumpDuration = 0
-  private controls: {
-    jump?: Phaser.GameObjects.Graphics
-    pause?: Phaser.GameObjects.Graphics
-    restart?: Phaser.GameObjects.Graphics
-    fastMove?: Phaser.GameObjects.Graphics
-    left?: Phaser.GameObjects.Graphics
-    right?: Phaser.GameObjects.Graphics
-  } = {}
-  private controlTexts: {
-    fastMove?: Phaser.GameObjects.Text
-    jump?: Phaser.GameObjects.Text
-  } = {}
-  private isFastMovePressed = false
-  private isLeftPressed = false
-  private isRightPressed = false
+  private controlsManager!: ControlsManager
   private gameSettings: GameSettings = loadSettings()
   private starfield!: Starfield
   private hitSounds: Phaser.Sound.BaseSound[] = []
@@ -189,11 +173,32 @@ class BreakoutScene extends Phaser.Scene {
 
     // Collision detection will be set when the game starts
 
-    // Create input
-    assertNonNullable(this.input.keyboard, 'Keyboard input is not available')
-    this.cursors = this.input.keyboard.createCursorKeys()
-    this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE)
-    this.shiftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT)
+    // Initialize controls manager
+    const controlsCallbacks: ControlsCallbacks = {
+      onStartGame: () => {
+        if (!this.isGameStarted && !this.isGameOver) {
+          this.startGame()
+        }
+      },
+      onJump: () => {
+        if (!this.isGameStarted && !this.isGameOver) {
+          this.startGame()
+        } else if (this.isGameStarted && !this.isJumping && !this.isPaused) {
+          this.startJump()
+        }
+      },
+      onPause: () => {
+        if (this.isGameStarted && !this.isGameOver) {
+          this.togglePause()
+        }
+      },
+      onRestart: () => {
+        this.restartGame()
+      },
+    }
+
+    this.controlsManager = new ControlsManager(this, controlsCallbacks)
+    this.controlsManager.initialize()
 
     // Create UI text
     const textColor = '#ffffff'
@@ -272,16 +277,6 @@ class BreakoutScene extends Phaser.Scene {
     this.pauseText.setDepth(101)
     this.pauseText.setData('overlay', fullScreenOverlay)
 
-    // Add restart key
-    assertNonNullable(this.input.keyboard, 'Keyboard input is not available')
-    this.input.keyboard.on('keydown-R', this.restartGame, this)
-    // Add space key for jumping during gameplay
-    this.input.keyboard.on('keydown-SPACE', this.handleSpaceKeyPress, this)
-    // Add pause key
-    this.input.keyboard.on('keydown-P', this.handlePauseKeyPress, this)
-
-    // Setup touch controls for all devices
-    this.setupTouchControls()
     this.updateTexts()
 
     // Initialize hit sounds array
@@ -320,25 +315,8 @@ class BreakoutScene extends Phaser.Scene {
   }
 
   update() {
-    // Paddle movement (disabled during game over or pause)
-    if (!this.isGameOver && !this.isPaused) {
-      // Check if Shift is held or fast move button is pressed for acceleration
-      const isAccelerated = this.shiftKey.isDown || this.isFastMovePressed
-      const baseSpeed = 400
-      const acceleratedSpeed = baseSpeed * 1.75 // 1.75x speed when Shift is held or fast move button is pressed
-      const speed = isAccelerated ? acceleratedSpeed : baseSpeed
-
-      if (this.cursors.left.isDown || this.isLeftPressed) {
-        this.paddle.setVelocityX(-speed)
-      } else if (this.cursors.right.isDown || this.isRightPressed) {
-        this.paddle.setVelocityX(speed)
-      } else {
-        this.paddle.setVelocityX(0)
-      }
-    } else {
-      // Stop paddle movement during game over
-      this.paddle.setVelocityX(0)
-    }
+    // Update paddle movement
+    this.updatePaddleMovement()
 
     if (this.isGameOver || this.isPaused) {
       return
@@ -384,6 +362,46 @@ class BreakoutScene extends Phaser.Scene {
       this.paddle.setGravityY(0)
     }
 
+    // Check if ball falls below paddle
+    if (this.ball.y > constants.BALL_DEATH_Y) {
+      // Check before ball completely leaves screen
+      this.ballDied()
+    }
+
+    // Check if special balls fall below paddle (just remove them, no life loss)
+    for (let i = this.specialBalls.length - 1; i >= 0; i--) {
+      const specialBall = this.specialBalls[i]
+      if (specialBall.y > constants.BALL_DEATH_Y) {
+        specialBall.destroy()
+        this.specialBalls.splice(i, 1)
+      }
+    }
+  }
+
+  private updatePaddleMovement() {
+    // Get movement input from ControlsManager
+    const movementInput = this.controlsManager.getMovementInput()
+
+    // Paddle movement (disabled during game over or pause)
+    if (!this.isGameOver && !this.isPaused) {
+      // Check if fast move is pressed for acceleration
+      const isAccelerated = movementInput.isFastMovePressed
+      const baseSpeed = 400
+      const acceleratedSpeed = baseSpeed * 1.75 // 1.75x speed when fast move is pressed
+      const speed = isAccelerated ? acceleratedSpeed : baseSpeed
+
+      if (movementInput.isLeftPressed) {
+        this.paddle.setVelocityX(-speed)
+      } else if (movementInput.isRightPressed) {
+        this.paddle.setVelocityX(speed)
+      } else {
+        this.paddle.setVelocityX(0)
+      }
+    } else {
+      // Stop paddle movement during game over or pause
+      this.paddle.setVelocityX(0)
+    }
+
     // Keep paddle within bounds (considering paddle width)
     const paddleHalfWidth = 50 // Paddle width is 100px so half is 50px
     const leftBound = paddleHalfWidth
@@ -400,21 +418,6 @@ class BreakoutScene extends Phaser.Scene {
       // Restrict only rightward movement (allow leftward movement)
       if ((this.paddle.body?.velocity.x ?? 0) > 0) {
         this.paddle.setVelocityX(0)
-      }
-    }
-
-    // Check if ball falls below paddle
-    if (this.ball.y > constants.BALL_DEATH_Y) {
-      // Check before ball completely leaves screen
-      this.ballDied()
-    }
-
-    // Check if special balls fall below paddle (just remove them, no life loss)
-    for (let i = this.specialBalls.length - 1; i >= 0; i--) {
-      const specialBall = this.specialBalls[i]
-      if (specialBall.y > constants.BALL_DEATH_Y) {
-        specialBall.destroy()
-        this.specialBalls.splice(i, 1)
       }
     }
   }
@@ -717,21 +720,6 @@ class BreakoutScene extends Phaser.Scene {
     }
   }
 
-  private handleSpaceKeyPress() {
-    if (!this.isGameStarted && !this.isGameOver) {
-      this.startGame()
-    } else if (this.isGameStarted && !this.isJumping && !this.isPaused) {
-      // Paddle jumping - only when game is started and not already jumping
-      this.startJump()
-    }
-  }
-
-  private handlePauseKeyPress() {
-    if (this.isGameStarted && !this.isGameOver) {
-      this.togglePause()
-    }
-  }
-
   private togglePause() {
     this.isPaused = !this.isPaused
 
@@ -870,10 +858,8 @@ class BreakoutScene extends Phaser.Scene {
     this.isJumping = false
     this.jumpDuration = 0
 
-    // Reset mobile control states
-    this.isFastMovePressed = false
-    this.isLeftPressed = false
-    this.isRightPressed = false
+    // Reset controls manager state
+    this.controlsManager.resetState()
 
     // Reset boss manager
     this.bossManager.reset()
@@ -930,250 +916,6 @@ class BreakoutScene extends Phaser.Scene {
     this.createBricks()
   }
 
-  private setupTouchControls() {
-    // Enable touch input
-    this.input.addPointer(2) // Allow up to 3 touch points
-
-    // Create mobile buttons
-    this.createMobileButtons()
-  }
-
-  private createMobileButtons() {
-    const buttonSize = 108 // Base size for interaction area
-    const interactionSize = buttonSize // Same as visual size
-    const rightButtonSize = Math.round(buttonSize * 1.2) // 20% larger for right side buttons
-    const buttonMargin = 15 // Margin for edge placement
-    const buttonSpacing = 15 // Spacing between adjacent buttons (same as margin)
-
-    // Pause button (right top) with pause symbol
-    this.controls.pause = this.add.graphics()
-    this.controls.pause.fillStyle(0x000000, 0.3) // Semi-transparent black fill
-    this.controls.pause.fillRect(
-      constants.GAME_WIDTH - buttonMargin - rightButtonSize,
-      buttonMargin,
-      rightButtonSize,
-      rightButtonSize,
-    )
-
-    // Draw pause symbol (two vertical lines)
-    this.controls.pause.lineStyle(4, 0xffffff, 0.8)
-    const pauseX = constants.GAME_WIDTH - buttonMargin - rightButtonSize / 2
-    const pauseY = buttonMargin + rightButtonSize / 2
-    this.controls.pause.lineBetween(pauseX - 8, pauseY - 12, pauseX - 8, pauseY + 12)
-    this.controls.pause.lineBetween(pauseX + 8, pauseY - 12, pauseX + 8, pauseY + 12)
-    this.controls.pause.setDepth(110)
-    this.controls.pause.setInteractive(
-      new Phaser.Geom.Rectangle(
-        constants.GAME_WIDTH - buttonMargin - rightButtonSize,
-        buttonMargin,
-        rightButtonSize,
-        rightButtonSize,
-      ),
-      Phaser.Geom.Rectangle.Contains,
-    )
-
-    // Left button - full height rectangle with spacing
-    const controlAreaWidth = constants.GAME_WIDTH / 4
-    const leftRightSpacing = 2 // Spacing between left and right buttons
-    const leftButtonWidth = (controlAreaWidth - leftRightSpacing) / 2
-    const leftButtonHeight = constants.GAME_HEIGHT
-    const leftButtonX = 0
-    const leftButtonY = 0
-
-    this.controls.left = this.add.graphics()
-    this.controls.left.fillStyle(0x000000, 0.1) // Very transparent fill
-    this.controls.left.fillRect(leftButtonX, leftButtonY, leftButtonWidth, leftButtonHeight)
-
-    // Draw left triangle 100px from bottom
-    const leftCenterX = leftButtonX + leftButtonWidth / 2
-    const leftCenterY = leftButtonY + leftButtonHeight - 100
-    this.controls.left.fillStyle(0xffffff, 0.6)
-    this.controls.left.beginPath()
-    this.controls.left.moveTo(leftCenterX - 15, leftCenterY)
-    this.controls.left.lineTo(leftCenterX + 10, leftCenterY - 15)
-    this.controls.left.lineTo(leftCenterX + 10, leftCenterY + 15)
-    this.controls.left.closePath()
-    this.controls.left.fillPath()
-    this.controls.left.setDepth(110)
-    this.controls.left.setInteractive(
-      new Phaser.Geom.Rectangle(leftButtonX, leftButtonY, leftButtonWidth, leftButtonHeight),
-      Phaser.Geom.Rectangle.Contains,
-    )
-
-    // Right button - full height rectangle with spacing
-    const rightButtonWidth = (controlAreaWidth - leftRightSpacing) / 2
-    const rightButtonHeight = constants.GAME_HEIGHT
-    const rightButtonX = leftButtonWidth + leftRightSpacing
-    const rightButtonY = 0
-
-    this.controls.right = this.add.graphics()
-    this.controls.right.fillStyle(0x000000, 0.1) // Very transparent fill
-    this.controls.right.fillRect(rightButtonX, rightButtonY, rightButtonWidth, rightButtonHeight)
-
-    // Draw right triangle 100px from bottom
-    const rightCenterX = rightButtonX + rightButtonWidth / 2
-    const rightCenterY = rightButtonY + rightButtonHeight - 100
-    this.controls.right.fillStyle(0xffffff, 0.6)
-    this.controls.right.beginPath()
-    this.controls.right.moveTo(rightCenterX + 15, rightCenterY)
-    this.controls.right.lineTo(rightCenterX - 10, rightCenterY - 15)
-    this.controls.right.lineTo(rightCenterX - 10, rightCenterY + 15)
-    this.controls.right.closePath()
-    this.controls.right.fillPath()
-    this.controls.right.setDepth(110)
-    this.controls.right.setInteractive(
-      new Phaser.Geom.Rectangle(rightButtonX, rightButtonY, rightButtonWidth, rightButtonHeight),
-      Phaser.Geom.Rectangle.Contains,
-    )
-
-    // Fast move button (right side, bottom)
-    this.controls.fastMove = this.add.graphics()
-    this.controls.fastMove.fillStyle(0x000000, 0.3) // Semi-transparent black fill
-    this.controls.fastMove.fillRect(
-      constants.GAME_WIDTH - buttonMargin - rightButtonSize,
-      constants.GAME_HEIGHT - buttonMargin - rightButtonSize,
-      rightButtonSize,
-      rightButtonSize,
-    )
-
-    this.controls.fastMove.setDepth(110)
-    this.controls.fastMove.setInteractive(
-      new Phaser.Geom.Rectangle(
-        constants.GAME_WIDTH - buttonMargin - rightButtonSize,
-        constants.GAME_HEIGHT - buttonMargin - rightButtonSize,
-        rightButtonSize,
-        rightButtonSize,
-      ),
-      Phaser.Geom.Rectangle.Contains,
-    )
-
-    // Fast move button text
-    this.controlTexts.fastMove = this.add.text(
-      constants.GAME_WIDTH - buttonMargin - rightButtonSize / 2,
-      constants.GAME_HEIGHT - buttonMargin - rightButtonSize / 2,
-      'FAST',
-      {
-        fontSize: '18px',
-        color: '#ffffff',
-        align: 'center',
-      },
-    )
-    this.controlTexts.fastMove.setOrigin(0.5)
-    this.controlTexts.fastMove.setDepth(111)
-
-    // Jump button (right side, above fast button with increased spacing)
-    this.controls.jump = this.add.graphics()
-    this.controls.jump.fillStyle(0x000000, 0.3) // Semi-transparent black fill
-    this.controls.jump.fillRect(
-      constants.GAME_WIDTH - buttonMargin - rightButtonSize,
-      constants.GAME_HEIGHT - buttonMargin - rightButtonSize * 2 - buttonSpacing,
-      rightButtonSize,
-      rightButtonSize,
-    )
-
-    this.controls.jump.setDepth(110)
-    this.controls.jump.setInteractive(
-      new Phaser.Geom.Rectangle(
-        constants.GAME_WIDTH - buttonMargin - rightButtonSize,
-        constants.GAME_HEIGHT - buttonMargin - rightButtonSize * 2 - buttonSpacing,
-        rightButtonSize,
-        rightButtonSize,
-      ),
-      Phaser.Geom.Rectangle.Contains,
-    )
-
-    // Jump button text
-    this.controlTexts.jump = this.add.text(
-      constants.GAME_WIDTH - buttonMargin - rightButtonSize / 2,
-      constants.GAME_HEIGHT - buttonMargin - rightButtonSize * 1.5 - buttonSpacing,
-      'JUMP',
-      {
-        fontSize: '18px',
-        color: '#ffffff',
-        align: 'center',
-      },
-    )
-    this.controlTexts.jump.setOrigin(0.5)
-    this.controlTexts.jump.setDepth(111)
-
-    // Button event handlers
-    this.controls.jump?.on('pointerdown', () => {
-      if (!this.isGameStarted && !this.isGameOver) {
-        this.startGame()
-      } else if (this.isGameStarted && !this.isJumping && !this.isPaused) {
-        this.startJump()
-      }
-    })
-
-    this.controls.pause?.on('pointerdown', () => {
-      if (this.isGameStarted && !this.isGameOver) {
-        this.togglePause()
-      }
-    })
-
-    // Fast move button event handlers
-    this.controls.fastMove?.on('pointerdown', () => {
-      this.isFastMovePressed = true
-    })
-
-    this.controls.fastMove?.on('pointerup', () => {
-      this.isFastMovePressed = false
-    })
-
-    this.controls.fastMove?.on('pointerout', () => {
-      this.isFastMovePressed = false
-    })
-
-    // Left and Right button event handlers
-    this.controls.left?.on('pointerdown', () => {
-      this.isLeftPressed = true
-    })
-
-    this.controls.left?.on('pointerup', () => {
-      this.isLeftPressed = false
-    })
-
-    this.controls.left?.on('pointerout', () => {
-      this.isLeftPressed = false
-    })
-
-    this.controls.right?.on('pointerdown', () => {
-      this.isRightPressed = true
-    })
-
-    this.controls.right?.on('pointerup', () => {
-      this.isRightPressed = false
-    })
-
-    this.controls.right?.on('pointerout', () => {
-      this.isRightPressed = false
-    })
-
-    // Tap anywhere to start (when game not started)
-    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-      if (!this.isGameStarted && !this.isGameOver) {
-        // Only if not clicking on buttons
-        const jumpButtonBounds = new Phaser.Geom.Circle(
-          constants.GAME_WIDTH - buttonMargin - buttonSize / 2,
-          constants.GAME_HEIGHT - buttonMargin - buttonSize / 2,
-          interactionSize / 2,
-        )
-        const pauseButtonBounds = new Phaser.Geom.Circle(
-          buttonMargin + buttonSize / 2,
-          buttonMargin + buttonSize / 2,
-          interactionSize / 2,
-        )
-
-        if (
-          !Phaser.Geom.Circle.Contains(jumpButtonBounds, pointer.x, pointer.y) &&
-          !Phaser.Geom.Circle.Contains(pauseButtonBounds, pointer.x, pointer.y)
-        ) {
-          this.startGame()
-        }
-      }
-    })
-  }
-
   private updateTexts() {
     // Update start text for all devices (keyboard + virtual pad controls)
     this.startText.setText(
@@ -1187,15 +929,12 @@ class BreakoutScene extends Phaser.Scene {
   }
 
   private setupGameOverTouchRestart() {
-    // Add touch restart for game over (without removing existing listeners)
-    const gameOverTouchHandler = () => {
+    // Use ControlsManager for game over touch restart
+    this.controlsManager.setupGameOverTouchRestart(() => {
       if (this.isGameOver) {
         this.restartGame()
       }
-    }
-
-    // Add the game over specific handler
-    this.input.on('pointerdown', gameOverTouchHandler)
+    })
   }
 
   private checkSpecialBall() {
@@ -1334,18 +1073,7 @@ class BreakoutScene extends Phaser.Scene {
     this.currentScale = newSettings.musicalScale
 
     // Toggle Virtual Pad visibility
-    Object.values(this.controls).forEach((control) => {
-      if (control) {
-        control.setVisible(newSettings.showVirtualPad)
-      }
-    })
-
-    // Toggle Virtual Pad text visibility
-    Object.values(this.controlTexts).forEach((text) => {
-      if (text) {
-        text.setVisible(newSettings.showVirtualPad)
-      }
-    })
+    this.controlsManager.setVirtualPadVisibility(newSettings.showVirtualPad)
   }
 
   // Method to pause game when settings modal opens
