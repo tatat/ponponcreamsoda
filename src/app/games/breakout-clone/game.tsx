@@ -62,6 +62,7 @@ class BreakoutScene extends Phaser.Scene {
   private isRightPressed = false
   private gameSettings: GameSettings = loadSettings()
   private starfield!: Starfield
+  private hitSounds: Phaser.Sound.BaseSound[] = []
 
   constructor() {
     super({ key: 'BreakoutScene' })
@@ -74,6 +75,13 @@ class BreakoutScene extends Phaser.Scene {
         this.load.image(`brick-${name}-${size}`, `/games/breakout-clone/images/i-${name}-${size}@2x.png`)
       })
     })
+
+    // Load hit sound effects (01.mp3 to 12.mp3)
+    for (let i = 1; i <= 12; i++) {
+      const soundKey = `hit${i.toString().padStart(2, '0')}`
+      const soundPath = `/games/breakout-clone/sounds/hit/${i.toString().padStart(2, '0')}.mp3`
+      this.load.audio(soundKey, soundPath)
+    }
 
     // Create graphics for game objects using proper sizes
     this.createGameGraphics()
@@ -142,13 +150,19 @@ class BreakoutScene extends Phaser.Scene {
     this.ball = this.physics.add.sprite(constants.GAME_CENTER_X, constants.BALL_START_Y, 'ball')
     this.ball.setDisplaySize(16, 16)
     this.ball.setTint(0xffffff) // White
-    this.ball.setCollideWorldBounds(true) // Enable world bounds collision
+    // Enable world bounds collision (with the 4th parameter onWorldBounds to true)
+    this.ball.setCollideWorldBounds(true, undefined, undefined, true)
     // Manually disable bottom collision by setting world bounds
     this.physics.world.setBounds(0, 0, constants.GAME_WIDTH, constants.GAME_HEIGHT, true, true, true, false)
     this.ball.setBounce(1, 1)
     this.ball.setCircle(8) // Make it a circle with radius 8
     // Don't start the ball moving yet
     this.ball.setVelocity(0, 0)
+
+    // Add world bounds collision event for wall hit sounds
+    this.physics.world.on('worldbounds', () => {
+      this.playRandomHitSound()
+    })
 
     // Create bricks
     this.bricks = this.physics.add.staticGroup()
@@ -268,6 +282,9 @@ class BreakoutScene extends Phaser.Scene {
     // Setup touch controls for all devices
     this.setupTouchControls()
     this.updateTexts()
+
+    // Initialize hit sounds array
+    this.initializeHitSounds()
 
     // Apply initial settings
     this.applySettings(this.gameSettings)
@@ -447,6 +464,9 @@ class BreakoutScene extends Phaser.Scene {
     const ballSprite = ball
     const paddleSprite = paddle
 
+    // Play random hit sound
+    this.playRandomHitSound()
+
     // If paddle is moving, reflect its velocity in the ball's bounce angle
     assertNonNullable(paddleSprite.body, 'Paddle body is not available')
     assertNonNullable(ballSprite.body, 'Ball body is not available')
@@ -482,6 +502,9 @@ class BreakoutScene extends Phaser.Scene {
 
     brickSprite.destroy()
 
+    // Play random hit sound
+    this.playRandomHitSound()
+
     // Add points based on base size
     const points = this.getScoreBySize(baseSize)
     this.score += points
@@ -498,7 +521,7 @@ class BreakoutScene extends Phaser.Scene {
     if (bossTriggered) {
       // Add boss collision for main ball and special balls
       this.time.delayedCall(1100, () => {
-        this.bossManager.addBossCollision(this.ball, this.specialBalls)
+        this.bossManager.addBossCollision(this.ball, this.specialBalls, () => this.playRandomHitSound())
       })
     }
 
@@ -1217,7 +1240,13 @@ class BreakoutScene extends Phaser.Scene {
     // Add boss collision if boss exists
     const bossSprite = this.bossManager.getBossSprite()
     if (bossSprite) {
-      this.physics.add.collider(specialBall, bossSprite, this.bossManager.createHitBossCallback(), undefined, this)
+      this.physics.add.collider(
+        specialBall,
+        bossSprite,
+        this.bossManager.createHitBossCallback(() => this.playRandomHitSound()),
+        undefined,
+        this,
+      )
     }
 
     // Launch special ball with random angle
@@ -1251,6 +1280,25 @@ class BreakoutScene extends Phaser.Scene {
 
     // Add to special balls array
     this.specialBalls.push(specialBall)
+  }
+
+  private initializeHitSounds() {
+    // Initialize hit sounds array with all loaded hit sounds
+    this.hitSounds = []
+    for (let i = 1; i <= 12; i++) {
+      const soundKey = `hit${i.toString().padStart(2, '0')}`
+      const sound = this.sound.add(soundKey, { volume: 0.3 })
+      this.hitSounds.push(sound)
+    }
+  }
+
+  private playRandomHitSound() {
+    // Play a random hit sound from the array
+    if (this.hitSounds.length > 0) {
+      const randomIndex = Math.floor(Math.random() * this.hitSounds.length)
+      const selectedSound = this.hitSounds[randomIndex]
+      selectedSound.play()
+    }
   }
 
   // Method to apply settings

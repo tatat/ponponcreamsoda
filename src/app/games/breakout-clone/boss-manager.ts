@@ -96,9 +96,14 @@ export class BossManager {
     return bossSprite
   }
 
-  createHitBossCallback(): Phaser.Types.Physics.Arcade.ArcadePhysicsCallback {
+  createHitBossCallback(playHitSound?: () => void): Phaser.Types.Physics.Arcade.ArcadePhysicsCallback {
     return () => {
       if (!this.currentBoss) return
+
+      // Play hit sound if provided
+      if (playHitSound) {
+        playHitSound()
+      }
 
       const isDefeated = this.currentBoss.hit()
 
@@ -153,16 +158,26 @@ export class BossManager {
     return bonusScore
   }
 
-  addBossCollision(ball: Phaser.Physics.Arcade.Sprite, specialBalls: Phaser.Physics.Arcade.Sprite[]) {
+  addBossCollision(
+    ball: Phaser.Physics.Arcade.Sprite,
+    specialBalls: Phaser.Physics.Arcade.Sprite[],
+    playHitSound?: () => void,
+  ) {
     const bossSprite = this.getBossSprite()
     if (!bossSprite) return
 
     // Add collision with main ball
-    this.scene.physics.add.collider(ball, bossSprite, this.createHitBossCallback(), undefined, this.scene)
+    this.scene.physics.add.collider(ball, bossSprite, this.createHitBossCallback(playHitSound), undefined, this.scene)
 
     // Add collision with special balls
     specialBalls.forEach((specialBall) => {
-      this.scene.physics.add.collider(specialBall, bossSprite, this.createHitBossCallback(), undefined, this.scene)
+      this.scene.physics.add.collider(
+        specialBall,
+        bossSprite,
+        this.createHitBossCallback(playHitSound),
+        undefined,
+        this.scene,
+      )
     })
   }
 
