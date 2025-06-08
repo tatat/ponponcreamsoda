@@ -442,21 +442,21 @@ class BreakoutScene extends Phaser.Scene {
   }
 
   private showPointsEffect(x: number, y: number, points: number) {
-    // ポイント表示テキストを作成
+    // Create point display text
     const pointsText = this.add.text(x, y, `+${points}`, {
       fontSize: '24px',
-      color: '#00ff88', // 明るい緑
+      color: '#00ff88', // Bright green
       align: 'center',
     })
     pointsText.setOrigin(0.5)
-    pointsText.setDepth(105) // 他のエフェクトより前面に表示
+    pointsText.setDepth(105) // Display in front of other effects
 
-    // ポイントテキストのアニメーション
+    // Point text animation
     this.tweens.add({
       targets: pointsText,
-      y: y - 60, // 上に移動
-      alpha: 0, // フェードアウト
-      scaleX: 1.5, // 少し拡大
+      y: y - 60, // Move up
+      alpha: 0, // Fade out
+      scaleX: 1.5, // Slightly enlarge
       scaleY: 1.5,
       duration: 1200,
       ease: 'Power2',
@@ -470,10 +470,10 @@ class BreakoutScene extends Phaser.Scene {
     rect1: { x: number; y: number; width: number; height: number },
     rect2: { x: number; y: number; width: number; height: number },
   ): boolean {
-    // 程よいスペースを確保するためのマージンを追加
-    const margin = 8 // 8pxのスペースを確保
+    // Add margin to ensure reasonable spacing
+    const margin = 8 // Ensure 8px spacing
 
-    // マージンを含めた範囲で重複チェック
+    // Check overlap including margin
     const rect1WithMargin = {
       x: rect1.x - margin,
       y: rect1.y - margin,
@@ -481,7 +481,7 @@ class BreakoutScene extends Phaser.Scene {
       height: rect1.height + margin * 2,
     }
 
-    // 重複判定（マージンを含めて完全に重ならないようにする）
+    // Overlap detection (completely non-overlapping including margin)
     return !(
       rect1WithMargin.x + rect1WithMargin.width <= rect2.x ||
       rect2.x + rect2.width <= rect1WithMargin.x ||
@@ -496,18 +496,18 @@ class BreakoutScene extends Phaser.Scene {
     const ballSprite = ball
     const paddleSprite = paddle
 
-    // パドルが動いている場合、その速度を跳ね返り角度に反映
+    // If paddle is moving, reflect its velocity in the ball's bounce angle
     assertNonNullable(paddleSprite.body, 'Paddle body is not available')
     assertNonNullable(ballSprite.body, 'Ball body is not available')
     const paddleVelocityX = paddleSprite.body.velocity.x
     const currentBallVelocityX = ballSprite.body.velocity.x
     const currentBallVelocityY = ballSprite.body.velocity.y
 
-    // パドルの動きを考慮した新しいX速度を計算
-    // パドルの速度の30%を加算して、より自然な跳ね返りにする
+    // Calculate new X velocity considering paddle movement
+    // Add 30% of paddle velocity for more natural bounce
     const newVelocityX = currentBallVelocityX + paddleVelocityX * 0.3
 
-    // Y速度は上向きを保証（最低でも-150の速度）
+    // Ensure Y velocity is upward (minimum -150 velocity)
     const newVelocityY = Math.min(currentBallVelocityY, -150)
 
     ballSprite.setVelocity(newVelocityX, newVelocityY)
@@ -519,11 +519,11 @@ class BreakoutScene extends Phaser.Scene {
     const brickX = brickSprite.x
     const brickY = brickSprite.y
 
-    // ブロックのテクスチャ名からベースサイズを取得
+    // Get base size from brick texture name
     const textureName = brickSprite.texture.key
-    // テクスチャ名から直接ベースサイズを抽出（例: "brick-d1-100" -> 100）
+    // Extract base size directly from texture name (e.g., "brick-d1-100" -> 100)
     const sizeMatch = textureName.match(/-([0-9]+)$/)
-    let baseSize = 50 // デフォルト
+    let baseSize = 50 // Default
 
     if (sizeMatch) {
       baseSize = parseInt(sizeMatch[1], 10)
@@ -531,12 +531,12 @@ class BreakoutScene extends Phaser.Scene {
 
     brickSprite.destroy()
 
-    // ベースサイズに応じた得点を加算
+    // Add points based on base size
     const points = this.getScoreBySize(baseSize)
     this.score += points
     this.scoreText.setText('Score: ' + this.score)
 
-    // ポイント表示エフェクト
+    // Point display effect
     this.showPointsEffect(brickX, brickY, points)
 
     // Update occupied spaces using BrickGenerator
@@ -548,49 +548,49 @@ class BreakoutScene extends Phaser.Scene {
     // Check for special ball trigger (30 second timer)
     this.checkSpecialBall()
 
-    // 全部のブロックが破壊された場合、ボーナスポイントを取得してブロックを復活
-    // ただし、ボスバトル中は全消しチェックを無効にする
+    // If all bricks are destroyed, get bonus points and respawn bricks
+    // However, disable all-clear check during boss battles
     if (this.bricks.children.size === 0 && !this.isBossBattle) {
       this.allBricksCleared()
     }
   }
 
   private ballDied() {
-    // 既に死亡処理中の場合は何もしない
+    // Do nothing if already processing death
     if (this.isGameOver) {
       return
     }
 
-    // ボールの位置を記録
+    // Record ball position
     const ballX = this.ball.x
     const ballY = this.ball.y
 
-    // ボールを停止して画面外に移動（再度条件に引っかからないように）
+    // Stop ball and move off-screen (to avoid retriggering condition)
     this.ball.setVelocity(0, 0)
-    this.ball.setPosition(BreakoutConstants.GAME_CENTER_X, BreakoutConstants.BALL_START_Y) // 安全な位置に移動
-    this.ball.disableBody() // ボールの物理を無効にする
+    this.ball.setPosition(BreakoutConstants.GAME_CENTER_X, BreakoutConstants.BALL_START_Y) // Move to safe position
+    this.ball.disableBody() // Disable ball physics
 
-    // ライフを減らして次の処理
+    // Reduce lives and proceed to next process
     this.lives--
     this.livesText.setText('Lives: ' + this.lives)
 
-    // 最後のライフの場合は即座にボールを非表示
+    // Hide ball immediately if it's the last life
     if (this.lives <= 0) {
       this.ball.setVisible(false)
     }
 
-    // 死亡エフェクト: 爆発のような円形エフェクト
+    // Death effect: explosion-like circular effect
     const explosionGraphics = this.add.graphics()
     explosionGraphics.setDepth(103)
 
-    // 複数の円で爆発エフェクトを作成
+    // Create explosion effect with multiple circles
     const colors = [0xff6b6b, 0xff9f43, 0xfeca57, 0xff6348]
     for (let i = 0; i < 4; i++) {
       explosionGraphics.fillStyle(colors[i], 0.7)
       explosionGraphics.fillCircle(ballX, ballY, 5)
     }
 
-    // 爆発アニメーション
+    // Explosion animation
     this.tweens.add({
       targets: explosionGraphics,
       scaleX: 8,
@@ -603,16 +603,16 @@ class BreakoutScene extends Phaser.Scene {
       },
     })
 
-    // 「MISS!」テキストエフェクト
+    // "MISS!" text effect
     const missText = this.add.text(ballX, ballY - 50, 'MISS!', {
       fontSize: '32px',
-      color: '#ff6b6b', // 赤
+      color: '#ff6b6b', // Red
       align: 'center',
     })
     missText.setOrigin(0.5)
     missText.setDepth(104)
 
-    // MISSテキストのアニメーション
+    // MISS text animation
     this.tweens.add({
       targets: missText,
       y: ballY - 100,
@@ -624,10 +624,10 @@ class BreakoutScene extends Phaser.Scene {
       },
     })
 
-    // 画面を少し揺らす
+    // Shake screen slightly
     this.cameras.main.shake(300, 0.01)
 
-    // 少し遅延してから次の処理
+    // Proceed to next process with slight delay
     this.time.delayedCall(1000, () => {
       if (this.lives <= 0) {
         this.gameOver()
@@ -638,25 +638,25 @@ class BreakoutScene extends Phaser.Scene {
   }
 
   private allBricksCleared() {
-    // ボーナスポイントを取得（100ポイント）
+    // Get bonus points (100 points)
     this.score += 100
     this.scoreText.setText('Score: ' + this.score)
 
-    // ボーナス取得のエフェクトを表示
+    // Display bonus acquisition effect
     const bonusText = this.add.text(
       BreakoutConstants.GAME_CENTER_X,
       BreakoutConstants.GAME_CENTER_Y - 112,
       '+100 BONUS!',
       {
         fontSize: '48px',
-        color: '#ffd700', // ゴールド
+        color: '#ffd700', // Gold
         align: 'center',
       },
     )
     bonusText.setOrigin(0.5)
     bonusText.setDepth(102)
 
-    // ボーナステキストのアニメーション
+    // Bonus text animation
     this.tweens.add({
       targets: bonusText,
       y: BreakoutConstants.GAME_CENTER_Y - 162,
@@ -668,17 +668,17 @@ class BreakoutScene extends Phaser.Scene {
       },
     })
 
-    // 全部のブリックを復活させる
+    // Respawn all bricks
     this.brickGenerator.clearOccupiedSpaces()
     this.createBricks()
   }
 
   private resetBall() {
     this.ball.setPosition(BreakoutConstants.GAME_CENTER_X, BreakoutConstants.BALL_START_Y)
-    this.ball.setVelocity(0, 0) // ボールを停止
+    this.ball.setVelocity(0, 0) // Stop ball
     this.ball.disableBody()
 
-    // 1秒後に自動的に当たり判定を有効にしてボールを再開
+    // Automatically enable collision detection and restart ball after 1 second
     this.time.delayedCall(1000, () => {
       this.ball.enableBody()
       this.resumeGame()
@@ -697,20 +697,20 @@ class BreakoutScene extends Phaser.Scene {
       // Enable ball physics body before starting
       this.ball.enableBody()
 
-      // ボールが動き出す瞬間に当たり判定を有効にする
+      // Enable collision detection the moment ball starts moving
       this.physics.add.collider(this.ball, this.paddle, this.hitPaddle, undefined, this)
       this.physics.add.collider(this.ball, this.bricks, this.hitBrick, undefined, this)
 
-      // ランダムな角度でボールを発射
+      // Launch ball at random angle
       const speed = 250
-      const angle = Phaser.Math.Between(-45, 45) // -45度から45度のランダム角度
+      const angle = Phaser.Math.Between(-45, 45) // Random angle from -45 to 45 degrees
       const radians = Phaser.Math.DegToRad(angle)
       const velocityX = Math.sin(radians) * speed
-      const velocityY = -Math.cos(radians) * speed // 上向きを保証
+      const velocityY = -Math.cos(radians) * speed // Ensure upward direction
 
       this.ball.setVelocity(velocityX, velocityY)
 
-      // ブロック追加タイマーを開始（5秒間隔）
+      // Start brick addition timer (5 second intervals)
       this.brickSpawnTimer = this.time.addEvent({
         delay: 5000,
         callback: this.addNewBrick,
@@ -783,16 +783,16 @@ class BreakoutScene extends Phaser.Scene {
   }
 
   private resumeGame() {
-    // 当たり判定を再度有効にしてボールを動かす
+    // Re-enable collision detection and move ball
     this.physics.add.collider(this.ball, this.paddle, this.hitPaddle, undefined, this)
     this.physics.add.collider(this.ball, this.bricks, this.hitBrick, undefined, this)
 
-    // ランダムな角度でボールを発射
+    // Launch ball at random angle
     const speed = 250
-    const angle = Phaser.Math.Between(-45, 45) // -45度から45度のランダム角度
+    const angle = Phaser.Math.Between(-45, 45) // Random angle from -45 to 45 degrees
     const radians = Phaser.Math.DegToRad(angle)
     const velocityX = Math.sin(radians) * speed
-    const velocityY = -Math.cos(radians) * speed // 上向きを保証
+    const velocityY = -Math.cos(radians) * speed // Ensure upward direction
 
     this.ball.setVelocity(velocityX, velocityY)
   }
@@ -818,27 +818,27 @@ class BreakoutScene extends Phaser.Scene {
   private gameOver() {
     this.isGameOver = true
     this.ball.setVelocity(0, 0)
-    this.ball.setVisible(false) // ボールを非表示にする
+    this.ball.setVisible(false) // Hide ball
 
-    // 特殊ボールも全て削除
+    // Destroy all special balls
     this.specialBalls.forEach((ball) => ball.destroy())
     this.specialBalls = []
 
-    // 特殊ボールタイマーも停止
+    // Stop special ball timer
     if (this.specialBallTimer) {
       this.specialBallTimer.destroy()
       this.specialBallTimer = null
     }
 
-    // パドルを落下させる演出
-    this.paddle.setImmovable(false) // パドルを動かせるようにする
-    this.paddle.setGravityY(800) // 重力を適用
-    this.paddle.setVelocityY(0) // 初期速度をリセット
+    // Make paddle fall with animation
+    this.paddle.setImmovable(false) // Make paddle movable
+    this.paddle.setGravityY(800) // Apply gravity
+    this.paddle.setVelocityY(0) // Reset initial velocity
     this.isJumping = false
 
-    // パドルが落ちてから少し遅延してゲームオーバー表示
+    // Display game over after paddle falls with slight delay
     this.time.delayedCall(1500, () => {
-      // ゲームオーバー時に取得ポイントと経過時間の記録を表示
+      // Display acquired points and elapsed time record on game over
       const finalSeconds = (this.elapsedTimeMs / 1000).toFixed(1)
       this.gameOverText.setText(
         `GAME OVER\nFinal Score: ${this.score}\nTime: ${finalSeconds}s\nPress R or tap to restart`,
@@ -851,7 +851,7 @@ class BreakoutScene extends Phaser.Scene {
       this.setupGameOverTouchRestart()
     })
 
-    // ブロック追加タイマーを停止
+    // Stop brick addition timer
     if (this.brickSpawnTimer) {
       this.brickSpawnTimer.destroy()
     }
@@ -918,7 +918,7 @@ class BreakoutScene extends Phaser.Scene {
     if (overlay) overlay.setVisible(true)
 
     // Update UI
-    // デバッグモード時は初期スコアを900に設定
+    // Set initial score to 900 in debug mode
     if (this.gameSettings.debugMode) {
       this.score = 900
     }
@@ -930,9 +930,9 @@ class BreakoutScene extends Phaser.Scene {
     this.paddle.setPosition(BreakoutConstants.GAME_CENTER_X, BreakoutConstants.PADDLE_GROUND_Y)
     this.paddle.setVelocity(0, 0)
     this.paddle.setGravityY(0) // Initially disable gravity
-    this.paddle.setImmovable(true) // パドルを固定に戻す
+    this.paddle.setImmovable(true) // Return paddle to fixed state
     this.isJumping = false
-    this.ball.setVisible(true) // ボールを再表示
+    this.ball.setVisible(true) // Show ball again
 
     // Reset ball to initial state (don't auto-start like resetBall() does)
     this.ball.setPosition(BreakoutConstants.GAME_CENTER_X, BreakoutConstants.BALL_START_Y)
@@ -1579,18 +1579,18 @@ class BreakoutScene extends Phaser.Scene {
     this.specialBalls.push(specialBall)
   }
 
-  // 設定を適用するメソッド
+  // Method to apply settings
   public applySettings(newSettings: GameSettings) {
     this.gameSettings = newSettings
 
-    // Virtual Padの表示/非表示切り替え
+    // Toggle Virtual Pad visibility
     Object.values(this.controls).forEach((control) => {
       if (control) {
         control.setVisible(newSettings.showVirtualPad)
       }
     })
 
-    // Virtual Padのテキストも表示/非表示切り替え
+    // Toggle Virtual Pad text visibility
     Object.values(this.controlTexts).forEach((text) => {
       if (text) {
         text.setVisible(newSettings.showVirtualPad)
@@ -1609,7 +1609,7 @@ export const BreakoutGame: React.FC<BreakoutGameParams> = ({ debugMode: propDebu
   const [settings, setSettings] = useState<GameSettings>(() => loadSettings())
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
 
-  // デバッグモードは設定から取得、propsがあればそれを優先
+  // Get debug mode from settings, prioritize props if provided
   const debugMode = propDebugMode !== undefined ? propDebugMode : settings.debugMode
 
   useEffect(() => {
@@ -1624,19 +1624,19 @@ export const BreakoutGame: React.FC<BreakoutGameParams> = ({ debugMode: propDebu
         parent: gameContainerRef.current,
         width: BreakoutConstants.GAME_WIDTH,
         height: BreakoutConstants.GAME_HEIGHT,
-        autoRound: false, // より滑らかなスケーリング
+        autoRound: false, // Smoother scaling
       },
       render: {
         pixelArt: false,
         antialias: true,
         antialiasGL: true,
-        roundPixels: false, // より滑らかなレンダリング
-        powerPreference: 'high-performance', // 高性能GPU使用
-        mipmapFilter: 'LINEAR_MIPMAP_LINEAR', // 高品質ミップマップ
-        batchSize: 4096, // バッチサイズを増加
+        roundPixels: false, // Smoother rendering
+        powerPreference: 'high-performance', // Use high-performance GPU
+        mipmapFilter: 'LINEAR_MIPMAP_LINEAR', // High-quality mipmaps
+        batchSize: 4096, // Increase batch size
       },
       scene: BreakoutScene,
-      backgroundColor: '#0a0a1a', // 深い宇宙の色
+      backgroundColor: '#0a0a1a', // Deep space color
       physics: {
         default: 'arcade',
         arcade: {
@@ -1661,16 +1661,16 @@ export const BreakoutGame: React.FC<BreakoutGameParams> = ({ debugMode: propDebu
     const previousDebugMode = settings.debugMode
     setSettings(newSettings)
 
-    // デバッグモードが変更された場合はゲームをリセット
+    // Reset game if debug mode changed
     if (newSettings.debugMode !== previousDebugMode) {
-      // ゲームを破棄して再作成
+      // Destroy and recreate game
       if (gameRef.current) {
         gameRef.current.destroy(true)
         gameRef.current = null
       }
-      // useEffectが再実行されてゲームが再作成される
+      // useEffect will re-run and recreate the game
     } else {
-      // デバッグモード以外の設定変更の場合は通常の設定適用
+      // For other setting changes, apply normal settings
       if (gameRef.current) {
         const scene = gameRef.current.scene.getScene('BreakoutScene') as BreakoutScene
         if (scene) {
@@ -1696,7 +1696,7 @@ export const BreakoutGame: React.FC<BreakoutGameParams> = ({ debugMode: propDebu
           position: relative;
         `}
       >
-        {/* 設定ボタン */}
+        {/* Settings button */}
         <button
           onClick={() => setIsSettingsOpen(true)}
           css={css`
@@ -1737,7 +1737,7 @@ export const BreakoutGame: React.FC<BreakoutGameParams> = ({ debugMode: propDebu
         />
       </div>
 
-      {/* 設定モーダル */}
+      {/* Settings modal */}
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
