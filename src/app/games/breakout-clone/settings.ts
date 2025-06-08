@@ -1,6 +1,23 @@
+export type MusicalScale =
+  | 'chromatic'
+  | 'major'
+  | 'minor'
+  | 'pentatonic'
+  | 'blues'
+  | 'dorian'
+  | 'mixolydian'
+  | 'wholeTone'
+  | 'diminished'
+
+export type BaseKey = 'C' | 'C#' | 'D' | 'D#' | 'E' | 'F' | 'F#' | 'G' | 'G#' | 'A' | 'A#' | 'B'
+
 export interface GameSettings {
   // Control settings
   showVirtualPad: boolean
+  // Audio settings
+  soundEnabled: boolean
+  musicalScale: MusicalScale
+  baseKey: BaseKey
   // Debug settings
   debugMode: boolean
 }
@@ -8,6 +25,10 @@ export interface GameSettings {
 export const defaultSettings: GameSettings = {
   // Control settings
   showVirtualPad: true,
+  // Audio settings
+  soundEnabled: true,
+  musicalScale: 'major',
+  baseKey: 'C',
   // Debug settings
   debugMode: false,
 }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { css } from '@emotion/react'
-import { GameSettings, saveSettings, resetSettings } from './settings'
+import { GameSettings, saveSettings, resetSettings, MusicalScale, BaseKey } from './settings'
 
 interface SettingsModalProps {
   isOpen: boolean
@@ -180,6 +180,178 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
                 </div>
               </div>
             </label>
+          </div>
+
+          {/* 音楽設定セクション */}
+          <div
+            css={css`
+              margin-bottom: 32px;
+            `}
+          >
+            <h3
+              css={css`
+                color: #e2e8f0;
+                margin: 0 0 16px 0;
+                font-size: 18px;
+                font-weight: bold;
+                padding-bottom: 8px;
+                border-bottom: 1px solid #718096;
+              `}
+            >
+              音楽設定
+            </h3>
+            <div
+              css={css`
+                padding: 16px;
+                background: #4a5568;
+                border-radius: 2px;
+                border: 1px solid #718096;
+                margin-bottom: 16px;
+              `}
+            >
+              <div
+                css={css`
+                  font-weight: bold;
+                  font-size: 16px;
+                  margin-bottom: 8px;
+                `}
+              >
+                サウンド設定
+              </div>
+              <div
+                css={css`
+                  font-size: 12px;
+                  color: #a0aec0;
+                  margin-bottom: 12px;
+                `}
+              >
+                ゲーム内のサウンド効果を有効/無効にします
+              </div>
+              <label
+                css={css`
+                  display: flex;
+                  align-items: center;
+                  cursor: pointer;
+                `}
+              >
+                <input
+                  type="checkbox"
+                  checked={localSettings.soundEnabled}
+                  onChange={(e) => updateSetting('soundEnabled', e.target.checked)}
+                  css={css`
+                    margin-right: 12px;
+                    accent-color: #ffffff;
+                    transform: scale(1.2);
+                  `}
+                />
+                <span>サウンドを有効にする</span>
+              </label>
+            </div>
+
+            <div
+              css={css`
+                padding: 16px;
+                background: #4a5568;
+                border-radius: 2px;
+                border: 1px solid #718096;
+              `}
+            >
+              <div
+                css={css`
+                  font-weight: bold;
+                  font-size: 16px;
+                  margin-bottom: 8px;
+                `}
+              >
+                音楽スケール
+              </div>
+              <div
+                css={css`
+                  font-size: 12px;
+                  color: #a0aec0;
+                  margin-bottom: 12px;
+                `}
+              >
+                ヒット音で使用する音楽スケールを選択します
+              </div>
+              <select
+                value={localSettings.musicalScale}
+                onChange={(e) => updateSetting('musicalScale', e.target.value as MusicalScale)}
+                css={css`
+                  width: 100%;
+                  padding: 8px 12px;
+                  background: #2d3748;
+                  border: 1px solid #718096;
+                  border-radius: 2px;
+                  color: #e2e8f0;
+                  font-size: 14px;
+                  margin-bottom: 16px;
+                  &:focus {
+                    outline: none;
+                    border-color: #ffffff;
+                  }
+                `}
+              >
+                <option value="chromatic">クロマティック（全12音）</option>
+                <option value="major">メジャースケール（長調）</option>
+                <option value="minor">マイナースケール（短調）</option>
+                <option value="pentatonic">ペンタトニック（5音階）</option>
+                <option value="blues">ブルーススケール</option>
+                <option value="dorian">ドリアンスケール</option>
+                <option value="mixolydian">ミクソリディアンスケール</option>
+                <option value="wholeTone">全音階</option>
+                <option value="diminished">ディミニッシュスケール</option>
+              </select>
+
+              <div
+                css={css`
+                  font-weight: bold;
+                  font-size: 16px;
+                  margin-bottom: 8px;
+                `}
+              >
+                ベースキー（根音）
+              </div>
+              <div
+                css={css`
+                  font-size: 12px;
+                  color: #a0aec0;
+                  margin-bottom: 12px;
+                `}
+              >
+                スケールの基準となる音程を選択します
+              </div>
+              <select
+                value={localSettings.baseKey}
+                onChange={(e) => updateSetting('baseKey', e.target.value as BaseKey)}
+                css={css`
+                  width: 100%;
+                  padding: 8px 12px;
+                  background: #2d3748;
+                  border: 1px solid #718096;
+                  border-radius: 2px;
+                  color: #e2e8f0;
+                  font-size: 14px;
+                  &:focus {
+                    outline: none;
+                    border-color: #ffffff;
+                  }
+                `}
+              >
+                <option value="C">C（ド）</option>
+                <option value="C#">C#（ド#）</option>
+                <option value="D">D（レ）</option>
+                <option value="D#">D#（レ#）</option>
+                <option value="E">E（ミ）</option>
+                <option value="F">F（ファ）</option>
+                <option value="F#">F#（ファ#）</option>
+                <option value="G">G（ソ）</option>
+                <option value="G#">G#（ソ#）</option>
+                <option value="A">A（ラ）</option>
+                <option value="A#">A#（ラ#）</option>
+                <option value="B">B（シ）</option>
+              </select>
+            </div>
           </div>
 
           {/* 開発用設定セクション */}
