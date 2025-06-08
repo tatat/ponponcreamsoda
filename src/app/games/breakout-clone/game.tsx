@@ -401,29 +401,6 @@ class BreakoutScene extends Phaser.Scene {
     return weights[0].size
   }
 
-  private getOptimalTexture(baseName: string, targetSize: number): string {
-    // Available sizes
-    const availableSizes = [...constants.BRICK_SIZES] as number[]
-
-    // Select size closest to target size
-    let bestSize = availableSizes[0]
-    let minDifference = Math.abs(targetSize - bestSize)
-
-    for (const size of availableSizes) {
-      const difference = Math.abs(targetSize - size)
-      if (difference < minDifference) {
-        minDifference = difference
-        bestSize = size
-      }
-    }
-
-    // Extract image type from base name (e.g., "brick-d1" -> "d1")
-    const imageType = baseName.replace('brick-', '')
-
-    // Return optimal texture key
-    return `brick-${imageType}-${bestSize}`
-  }
-
   private getScoreBySize(size: number): number {
     // Use scoring system from BreakoutConstants
     return constants.SCORE_BY_SIZE[size as keyof typeof constants.SCORE_BY_SIZE] ?? constants.DEFAULT_SCORE
