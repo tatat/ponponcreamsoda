@@ -8,7 +8,7 @@ import { GameSettings, loadSettings } from './settings'
 import { SettingsModal } from './settings-modal'
 import { Starfield } from './starfield'
 import { BrickGenerator } from './brick-generator'
-import { BreakoutConstants } from './constants'
+import { constants } from './constants'
 
 /**
  * BreakoutScene class - Main scene for endless breakout game
@@ -74,8 +74,8 @@ class BreakoutScene extends Phaser.Scene {
 
   preload() {
     // Load pre-sized brick images (2x resolution for Retina support)
-    BreakoutConstants.BRICK_NAMES.forEach((name) => {
-      BreakoutConstants.BRICK_SIZES.forEach((size) => {
+    constants.BRICK_NAMES.forEach((name) => {
+      constants.BRICK_SIZES.forEach((size) => {
         this.load.image(`brick-${name}-${size}`, `/games/breakout-clone/i-${name}-${size}@2x.png`)
       })
     })
@@ -124,8 +124,8 @@ class BreakoutScene extends Phaser.Scene {
     // - 3 layers: 200, 80, 20 stars with sizes 1, 2, 3px
     // - Shooting stars every 8-20 seconds
     this.starfield = new Starfield(this, {
-      width: BreakoutConstants.GAME_WIDTH,
-      height: BreakoutConstants.GAME_HEIGHT,
+      width: constants.GAME_WIDTH,
+      height: constants.GAME_HEIGHT,
     })
     this.starfield.create()
 
@@ -135,7 +135,7 @@ class BreakoutScene extends Phaser.Scene {
     }
 
     // Create paddle
-    this.paddle = this.physics.add.sprite(BreakoutConstants.GAME_CENTER_X, BreakoutConstants.PADDLE_GROUND_Y, 'paddle')
+    this.paddle = this.physics.add.sprite(constants.GAME_CENTER_X, constants.PADDLE_GROUND_Y, 'paddle')
     this.paddle.setDisplaySize(100, 20)
     this.paddle.setTint(0xffffff) // White
     this.paddle.setImmovable(true)
@@ -144,21 +144,12 @@ class BreakoutScene extends Phaser.Scene {
     this.paddle.setGravityY(0)
 
     // Create ball
-    this.ball = this.physics.add.sprite(BreakoutConstants.GAME_CENTER_X, BreakoutConstants.BALL_START_Y, 'ball')
+    this.ball = this.physics.add.sprite(constants.GAME_CENTER_X, constants.BALL_START_Y, 'ball')
     this.ball.setDisplaySize(16, 16)
     this.ball.setTint(0xffffff) // White
     this.ball.setCollideWorldBounds(true) // Enable world bounds collision
     // Manually disable bottom collision by setting world bounds
-    this.physics.world.setBounds(
-      0,
-      0,
-      BreakoutConstants.GAME_WIDTH,
-      BreakoutConstants.GAME_HEIGHT,
-      true,
-      true,
-      true,
-      false,
-    )
+    this.physics.world.setBounds(0, 0, constants.GAME_WIDTH, constants.GAME_HEIGHT, true, true, true, false)
     this.ball.setBounce(1, 1)
     this.ball.setCircle(8) // Make it a circle with radius 8
     // Don't start the ball moving yet
@@ -169,12 +160,12 @@ class BreakoutScene extends Phaser.Scene {
 
     // Initialize brick generator after bricks group is created
     this.brickGenerator = new BrickGenerator(this, this.bricks, {
-      gameWidth: BreakoutConstants.GAME_WIDTH,
-      gameHeight: BreakoutConstants.GAME_HEIGHT,
-      brickAreaMargin: BreakoutConstants.BRICK_AREA_MARGIN,
-      brickAreaHeight: BreakoutConstants.BRICK_AREA_HEIGHT,
-      brickSizes: BreakoutConstants.BRICK_SIZES,
-      brickNames: BreakoutConstants.BRICK_NAMES,
+      gameWidth: constants.GAME_WIDTH,
+      gameHeight: constants.GAME_HEIGHT,
+      brickAreaMargin: constants.BRICK_AREA_MARGIN,
+      brickAreaHeight: constants.BRICK_AREA_HEIGHT,
+      brickSizes: constants.BRICK_SIZES,
+      brickNames: constants.BRICK_NAMES,
     })
     this.brickGenerator.initializeBrickAspectRatios()
 
@@ -207,14 +198,14 @@ class BreakoutScene extends Phaser.Scene {
     // Create full-screen overlay for all instruction messages
     const fullScreenOverlay = this.add.graphics()
     fullScreenOverlay.fillStyle(0x000000, 0.6)
-    fullScreenOverlay.fillRect(0, 0, BreakoutConstants.GAME_WIDTH, BreakoutConstants.GAME_HEIGHT)
+    fullScreenOverlay.fillRect(0, 0, constants.GAME_WIDTH, constants.GAME_HEIGHT)
     fullScreenOverlay.setDepth(100) // High depth to always display in front
     fullScreenOverlay.setVisible(true) // Initially visible (for start screen)
 
     // Game over text (initially hidden)
     this.gameOverText = this.add.text(
-      BreakoutConstants.GAME_CENTER_X,
-      BreakoutConstants.GAME_CENTER_Y,
+      constants.GAME_CENTER_X,
+      constants.GAME_CENTER_Y,
       'GAME OVER\nPress R to restart',
       {
         fontSize: '32px',
@@ -227,8 +218,8 @@ class BreakoutScene extends Phaser.Scene {
 
     // Start text (initially visible)
     this.startText = this.add.text(
-      BreakoutConstants.GAME_CENTER_X,
-      BreakoutConstants.GAME_CENTER_Y,
+      constants.GAME_CENTER_X,
+      constants.GAME_CENTER_Y,
       'Press SPACE to start\n\n--- CONTROLS ---\n← → : Move paddle\nSHIFT + ← → : Fast move\nSPACE : Jump (during game)\nP : Pause/Resume\nR : Restart',
       {
         fontSize: '24px',
@@ -250,8 +241,8 @@ class BreakoutScene extends Phaser.Scene {
 
     // Pause text (initially hidden)
     this.pauseText = this.add.text(
-      BreakoutConstants.GAME_CENTER_X,
-      BreakoutConstants.GAME_CENTER_Y,
+      constants.GAME_CENTER_X,
+      constants.GAME_CENTER_Y,
       'PAUSED\nPress P to resume\n\n--- CONTROLS ---\n← → : Move paddle\nSHIFT + ← → : Fast move\nSPACE : Jump\nP : Pause/Resume\nR : Restart',
       {
         fontSize: '24px',
@@ -318,9 +309,9 @@ class BreakoutScene extends Phaser.Scene {
       this.jumpDuration += this.game.loop.delta
 
       // Check if paddle should land (only when actually at ground level and falling)
-      if (this.paddle.y >= BreakoutConstants.PADDLE_GROUND_Y && (this.paddle.body?.velocity.y ?? 0) >= 0) {
+      if (this.paddle.y >= constants.PADDLE_GROUND_Y && (this.paddle.body?.velocity.y ?? 0) >= 0) {
         // Natural landing - let physics handle it smoothly
-        this.paddle.y = BreakoutConstants.PADDLE_GROUND_Y
+        this.paddle.y = constants.PADDLE_GROUND_Y
         this.paddle.setVelocityY(0)
         this.paddle.setGravityY(0)
         this.isJumping = false
@@ -339,8 +330,8 @@ class BreakoutScene extends Phaser.Scene {
 
     // Ensure paddle stays at ground level when not jumping
     if (!this.isJumping) {
-      if (this.paddle.y !== BreakoutConstants.PADDLE_GROUND_Y) {
-        this.paddle.y = BreakoutConstants.PADDLE_GROUND_Y
+      if (this.paddle.y !== constants.PADDLE_GROUND_Y) {
+        this.paddle.y = constants.PADDLE_GROUND_Y
         this.paddle.setVelocityY(0)
       }
       this.paddle.setGravityY(0)
@@ -349,7 +340,7 @@ class BreakoutScene extends Phaser.Scene {
     // Keep paddle within bounds (considering paddle width)
     const paddleHalfWidth = 50 // Paddle width is 100px so half is 50px
     const leftBound = paddleHalfWidth
-    const rightBound = BreakoutConstants.GAME_WIDTH - paddleHalfWidth
+    const rightBound = constants.GAME_WIDTH - paddleHalfWidth
 
     if (this.paddle.x <= leftBound) {
       this.paddle.x = leftBound
@@ -366,7 +357,7 @@ class BreakoutScene extends Phaser.Scene {
     }
 
     // Check if ball falls below paddle
-    if (this.ball.y > BreakoutConstants.BALL_DEATH_Y) {
+    if (this.ball.y > constants.BALL_DEATH_Y) {
       // Check before ball completely leaves screen
       this.ballDied()
     }
@@ -374,7 +365,7 @@ class BreakoutScene extends Phaser.Scene {
     // Check if special balls fall below paddle (just remove them, no life loss)
     for (let i = this.specialBalls.length - 1; i >= 0; i--) {
       const specialBall = this.specialBalls[i]
-      if (specialBall.y > BreakoutConstants.BALL_DEATH_Y) {
+      if (specialBall.y > constants.BALL_DEATH_Y) {
         specialBall.destroy()
         this.specialBalls.splice(i, 1)
       }
@@ -412,7 +403,7 @@ class BreakoutScene extends Phaser.Scene {
 
   private getOptimalTexture(baseName: string, targetSize: number): string {
     // Available sizes
-    const availableSizes = [...BreakoutConstants.BRICK_SIZES] as number[]
+    const availableSizes = [...constants.BRICK_SIZES] as number[]
 
     // Select size closest to target size
     let bestSize = availableSizes[0]
@@ -435,10 +426,7 @@ class BreakoutScene extends Phaser.Scene {
 
   private getScoreBySize(size: number): number {
     // Use scoring system from BreakoutConstants
-    return (
-      BreakoutConstants.SCORE_BY_SIZE[size as keyof typeof BreakoutConstants.SCORE_BY_SIZE] ??
-      BreakoutConstants.DEFAULT_SCORE
-    )
+    return constants.SCORE_BY_SIZE[size as keyof typeof constants.SCORE_BY_SIZE] ?? constants.DEFAULT_SCORE
   }
 
   private showPointsEffect(x: number, y: number, points: number) {
@@ -567,7 +555,7 @@ class BreakoutScene extends Phaser.Scene {
 
     // Stop ball and move off-screen (to avoid retriggering condition)
     this.ball.setVelocity(0, 0)
-    this.ball.setPosition(BreakoutConstants.GAME_CENTER_X, BreakoutConstants.BALL_START_Y) // Move to safe position
+    this.ball.setPosition(constants.GAME_CENTER_X, constants.BALL_START_Y) // Move to safe position
     this.ball.disableBody() // Disable ball physics
 
     // Reduce lives and proceed to next process
@@ -643,23 +631,18 @@ class BreakoutScene extends Phaser.Scene {
     this.scoreText.setText('Score: ' + this.score)
 
     // Display bonus acquisition effect
-    const bonusText = this.add.text(
-      BreakoutConstants.GAME_CENTER_X,
-      BreakoutConstants.GAME_CENTER_Y - 112,
-      '+100 BONUS!',
-      {
-        fontSize: '48px',
-        color: '#ffd700', // Gold
-        align: 'center',
-      },
-    )
+    const bonusText = this.add.text(constants.GAME_CENTER_X, constants.GAME_CENTER_Y - 112, '+100 BONUS!', {
+      fontSize: '48px',
+      color: '#ffd700', // Gold
+      align: 'center',
+    })
     bonusText.setOrigin(0.5)
     bonusText.setDepth(102)
 
     // Bonus text animation
     this.tweens.add({
       targets: bonusText,
-      y: BreakoutConstants.GAME_CENTER_Y - 162,
+      y: constants.GAME_CENTER_Y - 162,
       alpha: 0,
       duration: 2000,
       ease: 'Power2',
@@ -674,7 +657,7 @@ class BreakoutScene extends Phaser.Scene {
   }
 
   private resetBall() {
-    this.ball.setPosition(BreakoutConstants.GAME_CENTER_X, BreakoutConstants.BALL_START_Y)
+    this.ball.setPosition(constants.GAME_CENTER_X, constants.BALL_START_Y)
     this.ball.setVelocity(0, 0) // Stop ball
     this.ball.disableBody()
 
@@ -927,7 +910,7 @@ class BreakoutScene extends Phaser.Scene {
     this.elapsedTimeText.setText('Time: 0.0s')
 
     // Reset ball and paddle
-    this.paddle.setPosition(BreakoutConstants.GAME_CENTER_X, BreakoutConstants.PADDLE_GROUND_Y)
+    this.paddle.setPosition(constants.GAME_CENTER_X, constants.PADDLE_GROUND_Y)
     this.paddle.setVelocity(0, 0)
     this.paddle.setGravityY(0) // Initially disable gravity
     this.paddle.setImmovable(true) // Return paddle to fixed state
@@ -935,7 +918,7 @@ class BreakoutScene extends Phaser.Scene {
     this.ball.setVisible(true) // Show ball again
 
     // Reset ball to initial state (don't auto-start like resetBall() does)
-    this.ball.setPosition(BreakoutConstants.GAME_CENTER_X, BreakoutConstants.BALL_START_Y)
+    this.ball.setPosition(constants.GAME_CENTER_X, constants.BALL_START_Y)
     this.ball.setVelocity(0, 0)
     this.ball.disableBody() // Keep disabled until game starts
 
@@ -964,7 +947,7 @@ class BreakoutScene extends Phaser.Scene {
     this.controls.pause = this.add.graphics()
     this.controls.pause.fillStyle(0x000000, 0.3) // Semi-transparent black fill
     this.controls.pause.fillRect(
-      BreakoutConstants.GAME_WIDTH - buttonMargin - rightButtonSize,
+      constants.GAME_WIDTH - buttonMargin - rightButtonSize,
       buttonMargin,
       rightButtonSize,
       rightButtonSize,
@@ -972,14 +955,14 @@ class BreakoutScene extends Phaser.Scene {
 
     // Draw pause symbol (two vertical lines)
     this.controls.pause.lineStyle(4, 0xffffff, 0.8)
-    const pauseX = BreakoutConstants.GAME_WIDTH - buttonMargin - rightButtonSize / 2
+    const pauseX = constants.GAME_WIDTH - buttonMargin - rightButtonSize / 2
     const pauseY = buttonMargin + rightButtonSize / 2
     this.controls.pause.lineBetween(pauseX - 8, pauseY - 12, pauseX - 8, pauseY + 12)
     this.controls.pause.lineBetween(pauseX + 8, pauseY - 12, pauseX + 8, pauseY + 12)
     this.controls.pause.setDepth(110)
     this.controls.pause.setInteractive(
       new Phaser.Geom.Rectangle(
-        BreakoutConstants.GAME_WIDTH - buttonMargin - rightButtonSize,
+        constants.GAME_WIDTH - buttonMargin - rightButtonSize,
         buttonMargin,
         rightButtonSize,
         rightButtonSize,
@@ -988,10 +971,10 @@ class BreakoutScene extends Phaser.Scene {
     )
 
     // Left button - full height rectangle with spacing
-    const controlAreaWidth = BreakoutConstants.GAME_WIDTH / 4
+    const controlAreaWidth = constants.GAME_WIDTH / 4
     const leftRightSpacing = 2 // Spacing between left and right buttons
     const leftButtonWidth = (controlAreaWidth - leftRightSpacing) / 2
-    const leftButtonHeight = BreakoutConstants.GAME_HEIGHT
+    const leftButtonHeight = constants.GAME_HEIGHT
     const leftButtonX = 0
     const leftButtonY = 0
 
@@ -1017,7 +1000,7 @@ class BreakoutScene extends Phaser.Scene {
 
     // Right button - full height rectangle with spacing
     const rightButtonWidth = (controlAreaWidth - leftRightSpacing) / 2
-    const rightButtonHeight = BreakoutConstants.GAME_HEIGHT
+    const rightButtonHeight = constants.GAME_HEIGHT
     const rightButtonX = leftButtonWidth + leftRightSpacing
     const rightButtonY = 0
 
@@ -1045,8 +1028,8 @@ class BreakoutScene extends Phaser.Scene {
     this.controls.fastMove = this.add.graphics()
     this.controls.fastMove.fillStyle(0x000000, 0.3) // Semi-transparent black fill
     this.controls.fastMove.fillRect(
-      BreakoutConstants.GAME_WIDTH - buttonMargin - rightButtonSize,
-      BreakoutConstants.GAME_HEIGHT - buttonMargin - rightButtonSize,
+      constants.GAME_WIDTH - buttonMargin - rightButtonSize,
+      constants.GAME_HEIGHT - buttonMargin - rightButtonSize,
       rightButtonSize,
       rightButtonSize,
     )
@@ -1054,8 +1037,8 @@ class BreakoutScene extends Phaser.Scene {
     this.controls.fastMove.setDepth(110)
     this.controls.fastMove.setInteractive(
       new Phaser.Geom.Rectangle(
-        BreakoutConstants.GAME_WIDTH - buttonMargin - rightButtonSize,
-        BreakoutConstants.GAME_HEIGHT - buttonMargin - rightButtonSize,
+        constants.GAME_WIDTH - buttonMargin - rightButtonSize,
+        constants.GAME_HEIGHT - buttonMargin - rightButtonSize,
         rightButtonSize,
         rightButtonSize,
       ),
@@ -1064,8 +1047,8 @@ class BreakoutScene extends Phaser.Scene {
 
     // Fast move button text
     this.controlTexts.fastMove = this.add.text(
-      BreakoutConstants.GAME_WIDTH - buttonMargin - rightButtonSize / 2,
-      BreakoutConstants.GAME_HEIGHT - buttonMargin - rightButtonSize / 2,
+      constants.GAME_WIDTH - buttonMargin - rightButtonSize / 2,
+      constants.GAME_HEIGHT - buttonMargin - rightButtonSize / 2,
       'FAST',
       {
         fontSize: '18px',
@@ -1080,8 +1063,8 @@ class BreakoutScene extends Phaser.Scene {
     this.controls.jump = this.add.graphics()
     this.controls.jump.fillStyle(0x000000, 0.3) // Semi-transparent black fill
     this.controls.jump.fillRect(
-      BreakoutConstants.GAME_WIDTH - buttonMargin - rightButtonSize,
-      BreakoutConstants.GAME_HEIGHT - buttonMargin - rightButtonSize * 2 - buttonSpacing,
+      constants.GAME_WIDTH - buttonMargin - rightButtonSize,
+      constants.GAME_HEIGHT - buttonMargin - rightButtonSize * 2 - buttonSpacing,
       rightButtonSize,
       rightButtonSize,
     )
@@ -1089,8 +1072,8 @@ class BreakoutScene extends Phaser.Scene {
     this.controls.jump.setDepth(110)
     this.controls.jump.setInteractive(
       new Phaser.Geom.Rectangle(
-        BreakoutConstants.GAME_WIDTH - buttonMargin - rightButtonSize,
-        BreakoutConstants.GAME_HEIGHT - buttonMargin - rightButtonSize * 2 - buttonSpacing,
+        constants.GAME_WIDTH - buttonMargin - rightButtonSize,
+        constants.GAME_HEIGHT - buttonMargin - rightButtonSize * 2 - buttonSpacing,
         rightButtonSize,
         rightButtonSize,
       ),
@@ -1099,8 +1082,8 @@ class BreakoutScene extends Phaser.Scene {
 
     // Jump button text
     this.controlTexts.jump = this.add.text(
-      BreakoutConstants.GAME_WIDTH - buttonMargin - rightButtonSize / 2,
-      BreakoutConstants.GAME_HEIGHT - buttonMargin - rightButtonSize * 1.5 - buttonSpacing,
+      constants.GAME_WIDTH - buttonMargin - rightButtonSize / 2,
+      constants.GAME_HEIGHT - buttonMargin - rightButtonSize * 1.5 - buttonSpacing,
       'JUMP',
       {
         fontSize: '18px',
@@ -1169,8 +1152,8 @@ class BreakoutScene extends Phaser.Scene {
       if (!this.isGameStarted && !this.isGameOver) {
         // Only if not clicking on buttons
         const jumpButtonBounds = new Phaser.Geom.Circle(
-          BreakoutConstants.GAME_WIDTH - buttonMargin - buttonSize / 2,
-          BreakoutConstants.GAME_HEIGHT - buttonMargin - buttonSize / 2,
+          constants.GAME_WIDTH - buttonMargin - buttonSize / 2,
+          constants.GAME_HEIGHT - buttonMargin - buttonSize / 2,
           interactionSize / 2,
         )
         const pauseButtonBounds = new Phaser.Geom.Circle(
@@ -1290,16 +1273,11 @@ class BreakoutScene extends Phaser.Scene {
     })
 
     // Show boss battle message
-    const bossText = this.add.text(
-      BreakoutConstants.GAME_CENTER_X,
-      BreakoutConstants.GAME_CENTER_Y - 200,
-      'BOSS BATTLE!',
-      {
-        fontSize: '48px',
-        color: '#ff6b6b',
-        align: 'center',
-      },
-    )
+    const bossText = this.add.text(constants.GAME_CENTER_X, constants.GAME_CENTER_Y - 200, 'BOSS BATTLE!', {
+      fontSize: '48px',
+      color: '#ff6b6b',
+      align: 'center',
+    })
     bossText.setOrigin(0.5)
     bossText.setDepth(102)
 
@@ -1316,12 +1294,12 @@ class BreakoutScene extends Phaser.Scene {
 
   private createBoss() {
     // Random boss image from available character images
-    const bossImages = BreakoutConstants.BRICK_NAMES
+    const bossImages = constants.BRICK_NAMES
     const randomBossImage = bossImages[Math.floor(Math.random() * bossImages.length)]
     const bossTexture = `brick-${randomBossImage}-300` // Use 300px size for boss
 
     // Create boss at center top area
-    this.boss = this.physics.add.sprite(BreakoutConstants.GAME_CENTER_X, 200, bossTexture)
+    this.boss = this.physics.add.sprite(constants.GAME_CENTER_X, 200, bossTexture)
 
     // Get aspect ratio information for proper scaling
     const aspectInfo = this.brickGenerator.getBrickAspectRatio(`brick-${randomBossImage}`)
@@ -1365,7 +1343,7 @@ class BreakoutScene extends Phaser.Scene {
     // Add horizontal floating movement
     this.tweens.add({
       targets: this.boss,
-      x: BreakoutConstants.GAME_CENTER_X + 100,
+      x: constants.GAME_CENTER_X + 100,
       duration: 3000,
       yoyo: true,
       repeat: -1,
@@ -1464,8 +1442,8 @@ class BreakoutScene extends Phaser.Scene {
 
     // Show victory message and bonus
     const victoryText = this.add.text(
-      BreakoutConstants.GAME_CENTER_X,
-      BreakoutConstants.GAME_CENTER_Y,
+      constants.GAME_CENTER_X,
+      constants.GAME_CENTER_Y,
       `BOSS DEFEATED!\n+${bonusScore} BONUS!`,
       {
         fontSize: '36px',
@@ -1517,24 +1495,15 @@ class BreakoutScene extends Phaser.Scene {
     // Create special ball at random position
     const offsetX = Math.random() * 200 - 100 // Random offset from center
     const specialBall = this.physics.add.sprite(
-      BreakoutConstants.GAME_CENTER_X + offsetX,
-      BreakoutConstants.BALL_START_Y,
+      constants.GAME_CENTER_X + offsetX,
+      constants.BALL_START_Y,
       'specialBall',
     )
     specialBall.setDisplaySize(16, 16)
     specialBall.setTint(0x00ff88) // Fluorescent green color
     specialBall.setCollideWorldBounds(true)
     // Disable bottom collision for special ball - it just disappears when it falls
-    this.physics.world.setBounds(
-      0,
-      0,
-      BreakoutConstants.GAME_WIDTH,
-      BreakoutConstants.GAME_HEIGHT,
-      true,
-      true,
-      true,
-      false,
-    )
+    this.physics.world.setBounds(0, 0, constants.GAME_WIDTH, constants.GAME_HEIGHT, true, true, true, false)
     specialBall.setBounce(1, 1)
     specialBall.setCircle(8)
     specialBall.setDepth(5)
@@ -1622,8 +1591,8 @@ export const BreakoutGame: React.FC<BreakoutGameParams> = ({ debugMode: propDebu
       scale: {
         mode: Phaser.Scale.FIT,
         parent: gameContainerRef.current,
-        width: BreakoutConstants.GAME_WIDTH,
-        height: BreakoutConstants.GAME_HEIGHT,
+        width: constants.GAME_WIDTH,
+        height: constants.GAME_HEIGHT,
         autoRound: false, // Smoother scaling
       },
       render: {
@@ -1690,9 +1659,9 @@ export const BreakoutGame: React.FC<BreakoutGameParams> = ({ debugMode: propDebu
           width: 100%;
           height: 100%;
           position: relative;
-          max-width: ${BreakoutConstants.GAME_WIDTH}px;
-          max-height: ${BreakoutConstants.GAME_HEIGHT}px;
-          aspect-ratio: ${BreakoutConstants.GAME_WIDTH} / ${BreakoutConstants.GAME_HEIGHT};
+          max-width: ${constants.GAME_WIDTH}px;
+          max-height: ${constants.GAME_HEIGHT}px;
+          aspect-ratio: ${constants.GAME_WIDTH} / ${constants.GAME_HEIGHT};
           position: relative;
         `}
       >

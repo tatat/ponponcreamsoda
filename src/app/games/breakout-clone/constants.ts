@@ -1,7 +1,7 @@
 /**
  * Constants definition for BreakoutScene
  */
-export const BreakoutConstants = {
+export const constants = {
   // Game dimensions - change these to resize the game
   GAME_WIDTH: 1280,
   GAME_HEIGHT: 720,
