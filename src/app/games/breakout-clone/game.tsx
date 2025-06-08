@@ -63,21 +63,7 @@ class BreakoutScene extends Phaser.Scene {
   private gameSettings: GameSettings = loadSettings()
   private starfield!: Starfield
   private hitSounds: Phaser.Sound.BaseSound[] = []
-
-  // Musical scales definition (0-based index, where 0=C, 1=C#, 2=D, etc.)
-  private readonly musicalScales = {
-    chromatic: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], // All notes
-    major: [0, 2, 4, 5, 7, 9, 11], // C Major: C, D, E, F, G, A, B
-    minor: [0, 2, 3, 5, 7, 8, 10], // C Minor: C, D, Eb, F, G, Ab, Bb
-    pentatonic: [0, 2, 4, 7, 9], // C Pentatonic: C, D, E, G, A
-    blues: [0, 3, 5, 6, 7, 10], // C Blues: C, Eb, F, F#, G, Bb
-    dorian: [0, 2, 3, 5, 7, 9, 10], // C Dorian: C, D, Eb, F, G, A, Bb
-    mixolydian: [0, 2, 4, 5, 7, 9, 10], // C Mixolydian: C, D, E, F, G, A, Bb
-    wholeTone: [0, 2, 4, 6, 8, 10], // Whole tone: C, D, E, F#, G#, Bb
-    diminished: [0, 2, 3, 5, 6, 8, 9, 11], // Diminished: C, D, Eb, F, F#, G#, A, B
-  } as const
-
-  private currentScale: keyof typeof this.musicalScales = 'major'
+  private currentScale: keyof typeof constants.MUSICAL_SCALES = 'major'
 
   constructor() {
     super({ key: 'BreakoutScene' })
@@ -1336,20 +1322,29 @@ class BreakoutScene extends Phaser.Scene {
   }
 
   private playRandomHitSound() {
+    // Don't play sound if disabled in settings
+    if (!this.gameSettings.soundEnabled) {
+      return
+    }
+
     // Don't play sound if window is not visible/active to prevent queued audio playback
     if (document.hidden || !document.hasFocus()) {
       return
     }
 
-    // Play a random hit sound from the current scale
+    // Play a random hit sound from the current scale with base key transposition
     if (this.hitSounds.length > 0) {
-      const scaleNotes = this.musicalScales[this.currentScale]
+      const scaleNotes = constants.MUSICAL_SCALES[this.currentScale]
       const randomScaleIndex = Math.floor(Math.random() * scaleNotes.length)
-      const noteIndex = scaleNotes[randomScaleIndex]
+      const baseNoteIndex = scaleNotes[randomScaleIndex]
+
+      // Apply base key offset (transposition)
+      const baseKeyOffset = constants.BASE_KEY_OFFSETS[this.gameSettings.baseKey]
+      const transposedNoteIndex = (baseNoteIndex + baseKeyOffset) % 12
 
       // Ensure the note index is within bounds
-      if (noteIndex < this.hitSounds.length) {
-        const selectedSound = this.hitSounds[noteIndex]
+      if (transposedNoteIndex < this.hitSounds.length) {
+        const selectedSound = this.hitSounds[transposedNoteIndex]
         selectedSound.play()
       }
     }
