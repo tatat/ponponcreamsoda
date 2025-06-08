@@ -1226,7 +1226,8 @@ class BreakoutScene extends Phaser.Scene {
     )
     specialBall.setDisplaySize(16, 16)
     specialBall.setTint(0x00ff88) // Fluorescent green color
-    specialBall.setCollideWorldBounds(true)
+    // Enable world bounds collision (with the 4th parameter onWorldBounds to true)
+    specialBall.setCollideWorldBounds(true, undefined, undefined, true)
     // Disable bottom collision for special ball - it just disappears when it falls
     this.physics.world.setBounds(0, 0, constants.GAME_WIDTH, constants.GAME_HEIGHT, true, true, true, false)
     specialBall.setBounce(1, 1)
