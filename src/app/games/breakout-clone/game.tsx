@@ -463,30 +463,6 @@ class BreakoutScene extends Phaser.Scene {
     })
   }
 
-  private rectanglesOverlap(
-    rect1: { x: number; y: number; width: number; height: number },
-    rect2: { x: number; y: number; width: number; height: number },
-  ): boolean {
-    // Add margin to ensure reasonable spacing
-    const margin = 8 // Ensure 8px spacing
-
-    // Check overlap including margin
-    const rect1WithMargin = {
-      x: rect1.x - margin,
-      y: rect1.y - margin,
-      width: rect1.width + margin * 2,
-      height: rect1.height + margin * 2,
-    }
-
-    // Overlap detection (completely non-overlapping including margin)
-    return !(
-      rect1WithMargin.x + rect1WithMargin.width <= rect2.x ||
-      rect2.x + rect2.width <= rect1WithMargin.x ||
-      rect1WithMargin.y + rect1WithMargin.height <= rect2.y ||
-      rect2.y + rect2.height <= rect1WithMargin.y
-    )
-  }
-
   private hitPaddle: Phaser.Types.Physics.Arcade.ArcadePhysicsCallback = (ball, paddle) => {
     assertSpriteLight(ball)
     assertSpriteLight(paddle)
