@@ -1,6 +1,19 @@
+export type MusicalScale =
+  | 'chromatic'
+  | 'major'
+  | 'minor'
+  | 'pentatonic'
+  | 'blues'
+  | 'dorian'
+  | 'mixolydian'
+  | 'wholeTone'
+  | 'diminished'
+
 export interface GameSettings {
   // Control settings
   showVirtualPad: boolean
+  // Audio settings
+  musicalScale: MusicalScale
   // Debug settings
   debugMode: boolean
 }
@@ -8,6 +21,8 @@ export interface GameSettings {
 export const defaultSettings: GameSettings = {
   // Control settings
   showVirtualPad: true,
+  // Audio settings
+  musicalScale: 'major',
   // Debug settings
   debugMode: false,
 }

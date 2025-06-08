@@ -64,6 +64,21 @@ class BreakoutScene extends Phaser.Scene {
   private starfield!: Starfield
   private hitSounds: Phaser.Sound.BaseSound[] = []
 
+  // Musical scales definition (0-based index, where 0=C, 1=C#, 2=D, etc.)
+  private readonly musicalScales = {
+    chromatic: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], // All notes
+    major: [0, 2, 4, 5, 7, 9, 11], // C Major: C, D, E, F, G, A, B
+    minor: [0, 2, 3, 5, 7, 8, 10], // C Minor: C, D, Eb, F, G, Ab, Bb
+    pentatonic: [0, 2, 4, 7, 9], // C Pentatonic: C, D, E, G, A
+    blues: [0, 3, 5, 6, 7, 10], // C Blues: C, Eb, F, F#, G, Bb
+    dorian: [0, 2, 3, 5, 7, 9, 10], // C Dorian: C, D, Eb, F, G, A, Bb
+    mixolydian: [0, 2, 4, 5, 7, 9, 10], // C Mixolydian: C, D, E, F, G, A, Bb
+    wholeTone: [0, 2, 4, 6, 8, 10], // Whole tone: C, D, E, F#, G#, Bb
+    diminished: [0, 2, 3, 5, 6, 8, 9, 11], // Diminished: C, D, Eb, F, F#, G#, A, B
+  } as const
+
+  private currentScale: keyof typeof this.musicalScales = 'major'
+
   constructor() {
     super({ key: 'BreakoutScene' })
   }
@@ -288,6 +303,9 @@ class BreakoutScene extends Phaser.Scene {
 
     // Apply initial settings
     this.applySettings(this.gameSettings)
+
+    // Set initial musical scale from settings
+    this.currentScale = this.gameSettings.musicalScale
 
     // Add visibility change listener for auto-pause
     this.setupVisibilityListener()
@@ -1323,17 +1341,26 @@ class BreakoutScene extends Phaser.Scene {
       return
     }
 
-    // Play a random hit sound from the array
+    // Play a random hit sound from the current scale
     if (this.hitSounds.length > 0) {
-      const randomIndex = Math.floor(Math.random() * this.hitSounds.length)
-      const selectedSound = this.hitSounds[randomIndex]
-      selectedSound.play()
+      const scaleNotes = this.musicalScales[this.currentScale]
+      const randomScaleIndex = Math.floor(Math.random() * scaleNotes.length)
+      const noteIndex = scaleNotes[randomScaleIndex]
+
+      // Ensure the note index is within bounds
+      if (noteIndex < this.hitSounds.length) {
+        const selectedSound = this.hitSounds[noteIndex]
+        selectedSound.play()
+      }
     }
   }
 
   // Method to apply settings
   public applySettings(newSettings: GameSettings) {
     this.gameSettings = newSettings
+
+    // Update musical scale
+    this.currentScale = newSettings.musicalScale
 
     // Toggle Virtual Pad visibility
     Object.values(this.controls).forEach((control) => {
@@ -1348,6 +1375,13 @@ class BreakoutScene extends Phaser.Scene {
         text.setVisible(newSettings.showVirtualPad)
       }
     })
+  }
+
+  // Method to pause game when settings modal opens
+  public pauseForSettings() {
+    if (this.isGameStarted && !this.isGameOver && !this.isPaused) {
+      this.togglePause()
+    }
   }
 }
 
@@ -1450,7 +1484,16 @@ export const BreakoutGame: React.FC<BreakoutGameParams> = ({ debugMode: propDebu
       >
         {/* Settings button */}
         <button
-          onClick={() => setIsSettingsOpen(true)}
+          onClick={() => {
+            // Pause game when opening settings
+            if (gameRef.current) {
+              const scene = gameRef.current.scene.getScene('BreakoutScene') as BreakoutScene
+              if (scene) {
+                scene.pauseForSettings()
+              }
+            }
+            setIsSettingsOpen(true)
+          }}
           css={css`
             position: absolute;
             top: 16px;
