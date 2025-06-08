@@ -386,21 +386,6 @@ class BreakoutScene extends Phaser.Scene {
     this.brickGenerator.addNewBrick()
   }
 
-  private getWeightedRandomSize(weights: Array<{ size: number; weight: number }>): number {
-    const totalWeight = weights.reduce((sum, item) => sum + item.weight, 0)
-    let random = Math.random() * totalWeight
-
-    for (const item of weights) {
-      random -= item.weight
-      if (random <= 0) {
-        return item.size
-      }
-    }
-
-    // Fallback (normally unreachable)
-    return weights[0].size
-  }
-
   private getScoreBySize(size: number): number {
     // Use scoring system from BreakoutConstants
     return constants.SCORE_BY_SIZE[size as keyof typeof constants.SCORE_BY_SIZE] ?? constants.DEFAULT_SCORE
