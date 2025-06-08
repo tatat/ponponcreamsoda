@@ -32,4 +32,15 @@ export const BreakoutConstants = {
   BRICK_SIZES: [64, 96, 128, 160, 192, 224, 256, 300],
   // Brick image name constants
   BRICK_NAMES: ['d1', 'd2', 'r1', 'r2', 't1', 't2'],
+  // Score settings for brick sizes
+  SCORE_BY_SIZE: {
+    64: 10, // Smallest block: 10 points
+    96: 15, // Small block: 15 points
+    128: 25, // Medium block: 25 points
+    160: 40, // Large block: 40 points
+    192: 60, // Extra large block: 60 points
+    224: 90, // Super large block: 90 points
+    256: 130, // Maximum block: 130 points
+  } as const,
+  DEFAULT_SCORE: 10, // Default score for unknown sizes
 } as const

@@ -434,25 +434,11 @@ class BreakoutScene extends Phaser.Scene {
   }
 
   private getScoreBySize(size: number): number {
-    // Scoring system based on size
-    switch (size) {
-      case 64:
-        return 10 // Smallest block: 10 points
-      case 96:
-        return 15 // Small block: 15 points
-      case 128:
-        return 25 // Medium block: 25 points
-      case 160:
-        return 40 // Large block: 40 points
-      case 192:
-        return 60 // Extra large block: 60 points
-      case 224:
-        return 90 // Super large block: 90 points
-      case 256:
-        return 130 // Maximum block: 130 points
-      default:
-        return 10 // Default
-    }
+    // Use scoring system from BreakoutConstants
+    return (
+      BreakoutConstants.SCORE_BY_SIZE[size as keyof typeof BreakoutConstants.SCORE_BY_SIZE] ??
+      BreakoutConstants.DEFAULT_SCORE
+    )
   }
 
   private showPointsEffect(x: number, y: number, points: number) {
