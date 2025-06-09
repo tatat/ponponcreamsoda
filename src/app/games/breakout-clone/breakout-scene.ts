@@ -5,11 +5,12 @@ import { GameSettings, loadSettings } from './settings'
 import { Starfield } from './starfield'
 import { BrickGenerator } from './brick-generator'
 import { BossManager } from './boss-manager'
-import { ControlsManager, ControlsCallbacks } from './controls-manager'
+import { ControlsManager } from './controls-manager'
 import { constants } from './constants'
 import { BreakoutState } from './breakout-state'
 import { VisibilityManager } from './visibility-manager'
 import { UIManager } from './ui-manager'
+import { SoundManager } from './sound-manager'
 
 /**
  * BreakoutScene class - Main scene for endless breakout game
@@ -25,8 +26,7 @@ export class BreakoutScene extends Phaser.Scene {
   private controlsManager!: ControlsManager
   private gameSettings: GameSettings = loadSettings()
   private starfield!: Starfield
-  private hitSounds: Phaser.Sound.BaseSound[] = []
-  private currentScale: keyof typeof constants.MUSICAL_SCALES = 'major'
+  private soundManager!: SoundManager
   private specialBalls: Phaser.Physics.Arcade.Sprite[] = [] // Array to track special balls
   private gameState!: BreakoutState
   private visibilityManager!: VisibilityManager
@@ -45,12 +45,9 @@ export class BreakoutScene extends Phaser.Scene {
       })
     })
 
-    // Load hit sound effects (01.mp3 to 12.mp3)
-    for (let i = 1; i <= 12; i++) {
-      const soundKey = `hit${i.toString().padStart(2, '0')}`
-      const soundPath = `/games/breakout-clone/sounds/hit/${i.toString().padStart(2, '0')}.mp3`
-      this.load.audio(soundKey, soundPath)
-    }
+    // Initialize sound manager and load sounds
+    this.soundManager = new SoundManager(this, this.gameSettings)
+    this.soundManager.preload()
 
     // Create graphics for game objects using proper sizes
     this.createGameGraphics()
@@ -158,7 +155,7 @@ export class BreakoutScene extends Phaser.Scene {
     // Collision detection will be set when the game starts
 
     // Initialize controls manager
-    const controlsCallbacks: ControlsCallbacks = {
+    this.controlsManager = new ControlsManager(this, {
       onStartGame: () => {
         if (!this.gameState.isGameStarted && !this.gameState.isGameOver) {
           this.startGame()
@@ -179,23 +176,18 @@ export class BreakoutScene extends Phaser.Scene {
       onRestart: () => {
         this.restartGame()
       },
-    }
-
-    this.controlsManager = new ControlsManager(this, controlsCallbacks)
+    })
     this.controlsManager.initialize()
 
     // Initialize UI Manager
     this.uiManager = new UIManager(this, this.gameState)
     this.uiManager.initialize()
 
-    // Initialize hit sounds array
-    this.initializeHitSounds()
+    // Initialize sound manager
+    this.soundManager.initializeHitSounds()
 
     // Apply initial settings
     this.applySettings(this.gameSettings)
-
-    // Set initial musical scale from settings
-    this.currentScale = this.gameSettings.musicalScale
 
     // Add visibility change listener for auto-pause
     this.setupVisibilityListener()
@@ -218,6 +210,7 @@ export class BreakoutScene extends Phaser.Scene {
     // Clean up listeners when scene is destroyed
     this.events.on('destroy', () => {
       this.visibilityManager.stopListening()
+      this.soundManager.destroy()
     })
   }
 
@@ -807,16 +800,6 @@ export class BreakoutScene extends Phaser.Scene {
     this.addSpecialBall(specialBall)
   }
 
-  private initializeHitSounds() {
-    // Initialize hit sounds array with all loaded hit sounds
-    this.hitSounds = []
-    for (let i = 1; i <= 12; i++) {
-      const soundKey = `hit${i.toString().padStart(2, '0')}`
-      const sound = this.sound.add(soundKey, { volume: 0.3 })
-      this.hitSounds.push(sound)
-    }
-  }
-
   private playRandomHitSound() {
     // Don't play sound if disabled in settings
     if (!this.gameSettings.soundEnabled) {
@@ -824,34 +807,20 @@ export class BreakoutScene extends Phaser.Scene {
     }
 
     // Don't play sound if window is not visible/active to prevent queued audio playback
-    if (document.hidden || !document.hasFocus()) {
+    if (this.visibilityManager.isWindowHidden()) {
       return
     }
 
-    // Play a random hit sound from the current scale with base key transposition
-    if (this.hitSounds.length > 0) {
-      const scaleNotes = constants.MUSICAL_SCALES[this.currentScale]
-      const randomScaleIndex = Math.floor(Math.random() * scaleNotes.length)
-      const baseNoteIndex = scaleNotes[randomScaleIndex]
-
-      // Apply base key offset (transposition)
-      const baseKeyOffset = constants.BASE_KEY_OFFSETS[this.gameSettings.baseKey]
-      const transposedNoteIndex = (baseNoteIndex + baseKeyOffset) % 12
-
-      // Ensure the note index is within bounds
-      if (transposedNoteIndex < this.hitSounds.length) {
-        const selectedSound = this.hitSounds[transposedNoteIndex]
-        selectedSound.play()
-      }
-    }
+    // Delegate to sound manager for actual sound playback
+    this.soundManager.playRandomHitSound()
   }
 
   // Method to apply settings
   public applySettings(newSettings: GameSettings) {
     this.gameSettings = newSettings
 
-    // Update musical scale
-    this.currentScale = newSettings.musicalScale
+    // Update sound manager settings
+    this.soundManager.applySettings(newSettings)
 
     // Toggle Virtual Pad visibility
     this.controlsManager.setVirtualPadVisibility(newSettings.showVirtualPad)
@@ -867,13 +836,6 @@ export class BreakoutScene extends Phaser.Scene {
   // Special balls management methods
   private addSpecialBall(ball: Phaser.Physics.Arcade.Sprite): void {
     this.specialBalls.push(ball)
-  }
-
-  private removeSpecialBall(ball: Phaser.Physics.Arcade.Sprite): void {
-    const index = this.specialBalls.indexOf(ball)
-    if (index > -1) {
-      this.specialBalls.splice(index, 1)
-    }
   }
 
   private clearSpecialBalls(): void {

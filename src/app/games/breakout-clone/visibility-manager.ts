@@ -50,6 +50,13 @@ export class VisibilityManager {
   }
 
   /**
+   * Check if window is currently hidden or unfocused
+   */
+  public isWindowHidden(): boolean {
+    return _isWindowHidden()
+  }
+
+  /**
    * Static method to check if window is currently hidden or unfocused
    */
   public static isWindowHidden(): boolean {
