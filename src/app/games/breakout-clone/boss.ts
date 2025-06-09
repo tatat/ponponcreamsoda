@@ -1,6 +1,7 @@
 import * as Phaser from 'phaser'
 import { constants } from './constants'
 import { BrickGenerator } from './brick-generator'
+import { destroyAndNull } from '@/helpers/cleanup'
 
 export class Boss {
   private scene: Phaser.Scene
@@ -91,10 +92,7 @@ export class Boss {
       this.isFlashing = true
 
       // Stop any existing flash tween
-      if (this.flashTween) {
-        this.flashTween.destroy()
-        this.flashTween = null
-      }
+      this.flashTween = destroyAndNull(this.flashTween)
 
       // Flash effect when hit
       this.flashTween = this.scene.tweens.add({
@@ -151,16 +149,11 @@ export class Boss {
     this.sprite.disableBody()
 
     // Stop floating animations
-    if (this.floatTween) {
-      this.floatTween.destroy()
-      this.floatTween = null
-    }
+    this.floatTween = destroyAndNull(this.floatTween)
 
     // Stop flash animation and reset color
-    if (this.flashTween) {
-      this.flashTween.destroy()
-      this.flashTween = null
-    }
+    this.flashTween = destroyAndNull(this.flashTween)
+
     this.isFlashing = false
     this.sprite.setTint(0xffffff) // Ensure normal color before defeat animation
 
@@ -174,10 +167,7 @@ export class Boss {
       duration: 2000,
       ease: 'Power2',
       onComplete: () => {
-        if (this.sprite) {
-          this.sprite.destroy()
-          this.sprite = null
-        }
+        this.sprite = destroyAndNull(this.sprite)
       },
     })
 
@@ -198,18 +188,11 @@ export class Boss {
   }
 
   destroy() {
-    if (this.floatTween) {
-      this.floatTween.destroy()
-      this.floatTween = null
-    }
-    if (this.flashTween) {
-      this.flashTween.destroy()
-      this.flashTween = null
-    }
+    this.floatTween = destroyAndNull(this.floatTween)
+    this.flashTween = destroyAndNull(this.flashTween)
+
     this.isFlashing = false
-    if (this.sprite) {
-      this.sprite.destroy()
-      this.sprite = null
-    }
+
+    this.sprite = destroyAndNull(this.sprite)
   }
 }

@@ -1,6 +1,7 @@
 import * as Phaser from 'phaser'
 import { assertNonNullable } from '@/helpers/assertions'
 import { assertSpriteLight } from '@/helpers/phaser-assertions'
+import { destroyAndNull } from '@/helpers/cleanup'
 import { GameSettings, loadSettings } from './settings'
 import { Starfield } from './starfield'
 import { BrickGenerator } from './brick-generator'
@@ -19,7 +20,7 @@ export class BreakoutScene extends Phaser.Scene {
   private paddle!: Phaser.Physics.Arcade.Sprite
   private ball!: Phaser.Physics.Arcade.Sprite
   private bricks!: Phaser.Physics.Arcade.StaticGroup
-  private brickSpawnTimer!: Phaser.Time.TimerEvent
+  private brickSpawnTimer: Phaser.Time.TimerEvent | null = null
   private brickGenerator!: BrickGenerator
   private bossManager!: BossManager
   private specialBallTimer: Phaser.Time.TimerEvent | null = null // Timer for special ball generation
@@ -146,6 +147,17 @@ export class BreakoutScene extends Phaser.Scene {
 
     // Initialize boss manager
     this.bossManager = new BossManager(this, this.brickGenerator)
+    this.bossManager.onBossBattleWillStart = () => {
+      // Hide all existing bricks with fade out effect when boss battle is about to start
+      this.hideBricksWithFadeOut(() => {
+        // Clear occupied spaces since all bricks are gone
+        this.brickGenerator.clearOccupiedSpaces()
+      })
+    }
+    this.bossManager.onBossStarted = () => {
+      // Add boss collision for main ball and special balls when boss is ready
+      this.bossManager.addBossCollision([this.ball, ...this.specialBalls], () => this.playRandomHitSound())
+    }
     this.bossManager.onBossDefeated = () => {
       this.createBricksWithFadeIn()
     }
@@ -409,17 +421,9 @@ export class BreakoutScene extends Phaser.Scene {
     // Check for boss battle trigger
     const shouldStartBoss = this.bossManager.checkBossBattle(this.gameState.score)
     if (shouldStartBoss) {
-      // Start the boss battle
-      this.bossManager.startBossBattle(this.bricks)
-
-      // Add boss collision for main ball and special balls
-      this.time.delayedCall(1100, () => {
-        this.bossManager.addBossCollision(this.ball, this.specialBalls, () => this.playRandomHitSound())
-      })
+      // Start the boss battle (collision will be added automatically via onBossStarted callback)
+      this.bossManager.startBossBattle()
     }
-
-    // Check for special ball trigger (30 second timer)
-    this.checkSpecialBall()
 
     // If all bricks are destroyed, get bonus points and respawn bricks
     // However, disable all-clear check during boss battles
@@ -441,6 +445,36 @@ export class BreakoutScene extends Phaser.Scene {
         alpha: 1,
         duration: 1000,
         ease: 'Power2',
+      })
+    })
+  }
+
+  private hideBricksWithFadeOut(onComplete?: () => void) {
+    const brickEntries = this.bricks.children.entries
+    let completedAnimations = 0
+    const totalBricks = brickEntries.length
+
+    if (totalBricks === 0) {
+      onComplete?.()
+      return
+    }
+
+    brickEntries.forEach((brick) => {
+      const brickSprite = brick as Phaser.Physics.Arcade.Sprite
+      this.tweens.add({
+        targets: brickSprite,
+        alpha: 0,
+        duration: 1000,
+        ease: 'Power2',
+        onComplete: () => {
+          brickSprite.destroy()
+          completedAnimations++
+
+          // Call onComplete callback when all animations are finished
+          if (completedAnimations === totalBricks) {
+            onComplete?.()
+          }
+        },
       })
     })
   }
@@ -511,6 +545,15 @@ export class BreakoutScene extends Phaser.Scene {
     })
   }
 
+  private launchBallWithRandomAngle() {
+    const speed = 250
+    const angle = Phaser.Math.Between(-45, 45)
+    const radians = Phaser.Math.DegToRad(angle)
+    const velocityX = Math.sin(radians) * speed
+    const velocityY = -Math.cos(radians) * speed
+    this.ball.setVelocity(velocityX, velocityY)
+  }
+
   private startGame() {
     if (!this.gameState.isGameStarted && !this.gameState.isGameOver) {
       this.gameState.isGameStarted = true
@@ -525,19 +568,20 @@ export class BreakoutScene extends Phaser.Scene {
       this.physics.add.collider(this.ball, this.paddle, this.hitPaddle, undefined, this)
       this.physics.add.collider(this.ball, this.bricks, this.hitBrick, undefined, this)
 
-      // Launch ball at random angle
-      const speed = 250
-      const angle = Phaser.Math.Between(-45, 45) // Random angle from -45 to 45 degrees
-      const radians = Phaser.Math.DegToRad(angle)
-      const velocityX = Math.sin(radians) * speed
-      const velocityY = -Math.cos(radians) * speed // Ensure upward direction
-
-      this.ball.setVelocity(velocityX, velocityY)
+      this.launchBallWithRandomAngle()
 
       // Start brick addition timer (5 second intervals)
       this.brickSpawnTimer = this.time.addEvent({
         delay: 5000,
         callback: this.addNewBrick,
+        callbackScope: this,
+        loop: true,
+      })
+
+      // Start special ball timer (30 second intervals)
+      this.specialBallTimer = this.time.addEvent({
+        delay: 30000,
+        callback: this.createSpecialBall,
         callbackScope: this,
         loop: true,
       })
@@ -579,14 +623,7 @@ export class BreakoutScene extends Phaser.Scene {
     this.physics.add.collider(this.ball, this.paddle, this.hitPaddle, undefined, this)
     this.physics.add.collider(this.ball, this.bricks, this.hitBrick, undefined, this)
 
-    // Launch ball at random angle
-    const speed = 250
-    const angle = Phaser.Math.Between(-45, 45) // Random angle from -45 to 45 degrees
-    const radians = Phaser.Math.DegToRad(angle)
-    const velocityX = Math.sin(radians) * speed
-    const velocityY = -Math.cos(radians) * speed // Ensure upward direction
-
-    this.ball.setVelocity(velocityX, velocityY)
+    this.launchBallWithRandomAngle()
   }
 
   private startJump() {
@@ -615,10 +652,7 @@ export class BreakoutScene extends Phaser.Scene {
     this.clearSpecialBalls()
 
     // Stop special ball timer
-    if (this.specialBallTimer) {
-      this.specialBallTimer.destroy()
-      this.specialBallTimer = null
-    }
+    this.specialBallTimer = destroyAndNull(this.specialBallTimer)
 
     // Make paddle fall with animation
     this.paddle.setImmovable(false) // Make paddle movable
@@ -635,10 +669,8 @@ export class BreakoutScene extends Phaser.Scene {
       this.setupGameOverTouchRestart()
     })
 
-    // Stop brick addition timer
-    if (this.brickSpawnTimer) {
-      this.brickSpawnTimer.destroy()
-    }
+    // Stop timers
+    this.brickSpawnTimer = destroyAndNull(this.brickSpawnTimer)
   }
 
   private restartGame() {
@@ -655,17 +687,12 @@ export class BreakoutScene extends Phaser.Scene {
     this.bossManager.reset()
 
     // Stop special ball timer if it exists
-    if (this.specialBallTimer) {
-      this.specialBallTimer.destroy()
-      this.specialBallTimer = null
-    }
+    this.specialBallTimer = destroyAndNull(this.specialBallTimer)
 
     this.physics.resume()
 
     // Stop brick spawn timer if it exists
-    if (this.brickSpawnTimer) {
-      this.brickSpawnTimer.destroy()
-    }
+    this.brickSpawnTimer = destroyAndNull(this.brickSpawnTimer)
 
     // Reset UI using UIManager
     this.uiManager.reset()
@@ -701,28 +728,6 @@ export class BreakoutScene extends Phaser.Scene {
       if (this.gameState.isGameOver) {
         this.restartGame()
       }
-    })
-  }
-
-  private checkSpecialBall() {
-    // Start special ball timer if not already running
-    if (
-      !this.specialBallTimer &&
-      this.gameState.isGameStarted &&
-      !this.gameState.isGameOver &&
-      !this.gameState.isPaused
-    ) {
-      this.startSpecialBallTimer()
-    }
-  }
-
-  private startSpecialBallTimer() {
-    // Create special ball every 30 seconds
-    this.specialBallTimer = this.time.addEvent({
-      delay: 30000, // 30 seconds
-      callback: this.createSpecialBall,
-      callbackScope: this,
-      loop: true,
     })
   }
 

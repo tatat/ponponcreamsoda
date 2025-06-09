@@ -2,6 +2,7 @@ import * as Phaser from 'phaser'
 import { constants } from './constants'
 import { Boss } from './boss'
 import { BrickGenerator } from './brick-generator'
+import { destroyAndNull } from '@/helpers/cleanup'
 
 export class BossManager {
   private scene: Phaser.Scene
@@ -10,7 +11,9 @@ export class BossManager {
   private bossNumber = 0
   private isBossBattle = false
 
-  // Callback mechanism for recreating bricks
+  // Callback mechanisms
+  onBossBattleWillStart?: () => void
+  onBossStarted?: () => void
   onBossDefeated?: () => void
 
   constructor(scene: Phaser.Scene, brickGenerator: BrickGenerator) {
@@ -25,25 +28,14 @@ export class BossManager {
     return score >= nextBossThreshold
   }
 
-  startBossBattle(bricks: Phaser.Physics.Arcade.StaticGroup): void {
+  startBossBattle(): void {
     if (this.isBossBattle) return
+
+    // Call the onBossBattleWillStart callback if defined
+    this.onBossBattleWillStart?.()
 
     this.isBossBattle = true
     this.bossNumber++
-
-    // Hide all existing bricks with fade out effect
-    bricks.children.entries.forEach((brick) => {
-      const brickSprite = brick as Phaser.Physics.Arcade.Sprite
-      this.scene.tweens.add({
-        targets: brickSprite,
-        alpha: 0,
-        duration: 1000,
-        ease: 'Power2',
-        onComplete: () => {
-          brickSprite.destroy()
-        },
-      })
-    })
 
     // Show boss battle message
     const bossText = this.scene.add.text(constants.GAME_CENTER_X, constants.GAME_CENTER_Y - 200, 'BOSS BATTLE!', {
@@ -67,6 +59,9 @@ export class BossManager {
     // Create boss after bricks fade out
     this.scene.time.delayedCall(1000, () => {
       this.createBoss()
+
+      // Call the onBossStarted callback after boss is created
+      this.onBossStarted?.()
     })
   }
 
@@ -86,9 +81,6 @@ export class BossManager {
     this.currentBoss = new Boss(this.scene, this.bossNumber, this.brickGenerator)
     const bossSprite = this.currentBoss.create()
 
-    // Clear occupied spaces since all bricks are gone
-    this.brickGenerator.clearOccupiedSpaces()
-
     return bossSprite
   }
 
@@ -97,9 +89,7 @@ export class BossManager {
       if (!this.currentBoss) return
 
       // Play hit sound if provided
-      if (playHitSound) {
-        playHitSound()
-      }
+      playHitSound?.()
 
       const isDefeated = this.currentBoss.hit()
 
@@ -154,21 +144,14 @@ export class BossManager {
     return bonusScore
   }
 
-  addBossCollision(
-    ball: Phaser.Physics.Arcade.Sprite,
-    specialBalls: Phaser.Physics.Arcade.Sprite[],
-    playHitSound?: () => void,
-  ) {
+  addBossCollision(targets: Phaser.Physics.Arcade.Sprite[], playHitSound?: () => void) {
     const bossSprite = this.getBossSprite()
     if (!bossSprite) return
 
-    // Add collision with main ball
-    this.scene.physics.add.collider(ball, bossSprite, this.createHitBossCallback(playHitSound), undefined, this.scene)
-
-    // Add collision with special balls
-    specialBalls.forEach((specialBall) => {
+    // Add collision for all targets with the same process
+    targets.forEach((target) => {
       this.scene.physics.add.collider(
-        specialBall,
+        target,
         bossSprite,
         this.createHitBossCallback(playHitSound),
         undefined,
@@ -188,9 +171,6 @@ export class BossManager {
   reset() {
     this.isBossBattle = false
     this.bossNumber = 0
-    if (this.currentBoss) {
-      this.currentBoss.destroy()
-      this.currentBoss = null
-    }
+    this.currentBoss = destroyAndNull(this.currentBoss)
   }
 }
