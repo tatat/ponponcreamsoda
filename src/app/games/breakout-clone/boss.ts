@@ -1,15 +1,18 @@
 import * as Phaser from 'phaser'
 import { constants } from './constants'
 import { BrickGenerator } from './brick-generator'
+import { destroyAndNull } from '@/helpers/cleanup'
 
 export class Boss {
   private scene: Phaser.Scene
   private sprite: Phaser.Physics.Arcade.Sprite | null = null
   private floatTween: Phaser.Tweens.Tween | null = null
+  private flashTween: Phaser.Tweens.Tween | null = null
   private hits = 0
   private maxHits: number
   private bossNumber: number
   private brickGenerator: BrickGenerator
+  private isFlashing = false
 
   constructor(scene: Phaser.Scene, bossNumber: number, brickGenerator: BrickGenerator) {
     this.scene = scene
@@ -84,14 +87,36 @@ export class Boss {
 
     this.hits++
 
-    // Flash effect when hit
-    this.scene.tweens.add({
-      targets: this.sprite,
-      tint: 0xff0000,
-      duration: 100,
-      yoyo: true,
-      ease: 'Power2',
-    })
+    // Only start flash animation if not already flashing
+    if (!this.isFlashing) {
+      this.isFlashing = true
+
+      // Stop any existing flash tween
+      this.flashTween = destroyAndNull(this.flashTween)
+
+      // Flash effect when hit
+      this.flashTween = this.scene.tweens.add({
+        targets: this.sprite,
+        tint: 0xff0000,
+        duration: 100,
+        yoyo: true,
+        ease: 'Power2',
+        onComplete: () => {
+          // Ensure sprite returns to normal color
+          if (this.sprite) {
+            this.sprite.setTint(0xffffff)
+          }
+          this.isFlashing = false
+          this.flashTween = null
+        },
+        onYoyo: () => {
+          // Ensure the yoyo back to normal color works properly
+          if (this.sprite) {
+            this.sprite.setTint(0xffffff)
+          }
+        },
+      })
+    }
 
     // Show hit counter
     const hitText = this.scene.add.text(this.sprite.x, this.sprite.y - 50, `${this.hits}/${this.maxHits}`, {
@@ -124,10 +149,13 @@ export class Boss {
     this.sprite.disableBody()
 
     // Stop floating animations
-    if (this.floatTween) {
-      this.floatTween.destroy()
-      this.floatTween = null
-    }
+    this.floatTween = destroyAndNull(this.floatTween)
+
+    // Stop flash animation and reset color
+    this.flashTween = destroyAndNull(this.flashTween)
+
+    this.isFlashing = false
+    this.sprite.setTint(0xffffff) // Ensure normal color before defeat animation
 
     // Boss defeat animation
     this.scene.tweens.add({
@@ -139,10 +167,7 @@ export class Boss {
       duration: 2000,
       ease: 'Power2',
       onComplete: () => {
-        if (this.sprite) {
-          this.sprite.destroy()
-          this.sprite = null
-        }
+        this.sprite = destroyAndNull(this.sprite)
       },
     })
 
@@ -163,13 +188,11 @@ export class Boss {
   }
 
   destroy() {
-    if (this.floatTween) {
-      this.floatTween.destroy()
-      this.floatTween = null
-    }
-    if (this.sprite) {
-      this.sprite.destroy()
-      this.sprite = null
-    }
+    this.floatTween = destroyAndNull(this.floatTween)
+    this.flashTween = destroyAndNull(this.flashTween)
+
+    this.isFlashing = false
+
+    this.sprite = destroyAndNull(this.sprite)
   }
 }
