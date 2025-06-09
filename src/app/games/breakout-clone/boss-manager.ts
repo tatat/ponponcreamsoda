@@ -6,7 +6,6 @@ import { BrickGenerator } from './brick-generator'
 export class BossManager {
   private scene: Phaser.Scene
   private brickGenerator: BrickGenerator
-  private bricks: Phaser.Physics.Arcade.StaticGroup
   private currentBoss: Boss | null = null
   private bossNumber = 0
   private isBossBattle = false
@@ -14,18 +13,17 @@ export class BossManager {
   // Callback mechanism for recreating bricks
   onBossDefeated?: () => void
 
-  constructor(scene: Phaser.Scene, brickGenerator: BrickGenerator, bricks: Phaser.Physics.Arcade.StaticGroup) {
+  constructor(scene: Phaser.Scene, brickGenerator: BrickGenerator) {
     this.scene = scene
     this.brickGenerator = brickGenerator
-    this.bricks = bricks
   }
 
-  checkBossBattle(score: number): boolean {
+  checkBossBattle(score: number, bricks: Phaser.Physics.Arcade.StaticGroup): boolean {
     if (this.isBossBattle) return false
 
     const nextBossThreshold = this.calculateNextBossThreshold()
     if (score >= nextBossThreshold) {
-      this.startBossBattle()
+      this.startBossBattle(bricks)
       return true
     }
     return false
@@ -43,12 +41,12 @@ export class BossManager {
     return threshold
   }
 
-  private startBossBattle() {
+  private startBossBattle(bricks: Phaser.Physics.Arcade.StaticGroup) {
     this.isBossBattle = true
     this.bossNumber++
 
     // Hide all existing bricks with fade out effect
-    this.bricks.children.entries.forEach((brick) => {
+    bricks.children.entries.forEach((brick) => {
       const brickSprite = brick as Phaser.Physics.Arcade.Sprite
       this.scene.tweens.add({
         targets: brickSprite,

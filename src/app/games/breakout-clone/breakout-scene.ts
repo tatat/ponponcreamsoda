@@ -145,7 +145,7 @@ export class BreakoutScene extends Phaser.Scene {
     this.brickGenerator.initializeBrickAspectRatios()
 
     // Initialize boss manager
-    this.bossManager = new BossManager(this, this.brickGenerator, this.bricks)
+    this.bossManager = new BossManager(this, this.brickGenerator)
     this.bossManager.onBossDefeated = () => {
       this.createBricksWithFadeIn()
     }
@@ -407,7 +407,7 @@ export class BreakoutScene extends Phaser.Scene {
     this.brickGenerator.updateOccupiedSpaces()
 
     // Check for boss battle trigger
-    const bossTriggered = this.bossManager.checkBossBattle(this.gameState.score)
+    const bossTriggered = this.bossManager.checkBossBattle(this.gameState.score, this.bricks)
     if (bossTriggered) {
       // Add boss collision for main ball and special balls
       this.time.delayedCall(1100, () => {

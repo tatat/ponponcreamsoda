@@ -12,12 +12,13 @@ export type SoundSettings = {
  */
 export class SoundManager {
   private scene: Phaser.Scene
-  private hitSounds: Phaser.Sound.BaseSound[] = []
-  private currentScale: keyof typeof constants.MUSICAL_SCALES = 'major'
-  private currentBaseKey: keyof typeof constants.BASE_KEY_OFFSETS = 'C'
+  private hitSounds: Phaser.Sound.BaseSound[]
+  private currentScale: keyof typeof constants.MUSICAL_SCALES
+  private currentBaseKey: keyof typeof constants.BASE_KEY_OFFSETS
 
   constructor(scene: Phaser.Scene, soundSettings: SoundSettings) {
     this.scene = scene
+    this.hitSounds = []
     this.currentScale = soundSettings.musicalScale
     this.currentBaseKey = soundSettings.baseKey
   }
