@@ -35,9 +35,9 @@ export class SoundManager {
   }
 
   /**
-   * Initialize hit sounds array after assets are loaded
+   * Initialize sound manager after assets are loaded
    */
-  initializeHitSounds(): void {
+  initialize(): void {
     // Initialize hit sounds array with all loaded hit sounds
     this.hitSounds = []
     for (let i = 1; i <= 12; i++) {

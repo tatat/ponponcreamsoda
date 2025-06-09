@@ -184,7 +184,7 @@ export class BreakoutScene extends Phaser.Scene {
     this.uiManager.initialize()
 
     // Initialize sound manager
-    this.soundManager.initializeHitSounds()
+    this.soundManager.initialize()
 
     // Apply initial settings
     this.applySettings(this.gameSettings)
