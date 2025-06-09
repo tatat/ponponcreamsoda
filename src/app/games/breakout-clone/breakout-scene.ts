@@ -9,6 +9,7 @@ import { BossManager } from './boss-manager'
 import { ControlsManager, ControlsCallbacks } from './controls-manager'
 import { constants } from './constants'
 import { BreakoutState } from './breakout-state'
+import { VisibilityManager } from './visibility-manager'
 
 /**
  * BreakoutScene class - Main scene for endless breakout game
@@ -34,6 +35,7 @@ export class BreakoutScene extends Phaser.Scene {
   private currentScale: keyof typeof constants.MUSICAL_SCALES = 'major'
   private specialBalls: Phaser.Physics.Arcade.Sprite[] = [] // Array to track special balls
   private gameState!: BreakoutState
+  private visibilityManager!: VisibilityManager
 
   constructor() {
     super({ key: 'BreakoutScene' })
@@ -280,24 +282,22 @@ export class BreakoutScene extends Phaser.Scene {
   }
 
   private setupVisibilityListener() {
-    // Auto-pause when window becomes inactive/hidden
-    const handleVisibilityChange = () => {
-      if (document.hidden || !document.hasFocus()) {
+    // Initialize visibility manager
+    this.visibilityManager = new VisibilityManager((isWindowHidden: boolean) => {
+      // Auto-pause when window becomes inactive/hidden
+      if (isWindowHidden) {
         // Auto-pause if game is running
         if (this.gameState.isGameStarted && !this.gameState.isGameOver && !this.gameState.isPaused) {
           this.togglePause()
         }
       }
-    }
+    })
 
-    // Listen for visibility changes
-    document.addEventListener('visibilitychange', handleVisibilityChange)
-    window.addEventListener('blur', handleVisibilityChange)
+    this.visibilityManager.startListening()
 
     // Clean up listeners when scene is destroyed
     this.events.on('destroy', () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange)
-      window.removeEventListener('blur', handleVisibilityChange)
+      this.visibilityManager.stopListening()
     })
   }
 
