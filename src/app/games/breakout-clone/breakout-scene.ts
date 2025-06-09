@@ -179,8 +179,13 @@ export class BreakoutScene extends Phaser.Scene {
     })
     this.controlsManager.initialize()
 
-    // Initialize UI Manager
-    this.uiManager = new UIManager(this, this.gameState)
+    // Initialize UI Manager with initial data from game state
+    const initialUIData = {
+      score: this.gameState.score,
+      lives: this.gameState.lives,
+      formattedElapsedTime: this.gameState.getFormattedElapsedTime(),
+    }
+    this.uiManager = new UIManager(this, initialUIData)
     this.uiManager.initialize()
 
     // Initialize sound manager
@@ -225,7 +230,7 @@ export class BreakoutScene extends Phaser.Scene {
     // Update elapsed time if game is started
     if (this.gameState.isGameActive()) {
       this.gameState.elapsedTimeMs = this.gameState.calculateElapsedTime()
-      this.uiManager.updateElapsedTime()
+      this.uiManager.updateElapsedTime(this.gameState.getFormattedElapsedTime())
     }
 
     // Handle jumping physics
@@ -393,7 +398,7 @@ export class BreakoutScene extends Phaser.Scene {
     // Add points based on base size
     const points = this.getScoreBySize(baseSize)
     this.gameState.addScore(points)
-    this.uiManager.updateScore()
+    this.uiManager.updateScore(this.gameState.score)
 
     // Point display effect
     this.uiManager.showPointsEffect(brickX, brickY, points)
@@ -454,7 +459,7 @@ export class BreakoutScene extends Phaser.Scene {
 
     // Reduce lives and proceed to next process
     this.gameState.loseLife()
-    this.uiManager.updateLives()
+    this.uiManager.updateLives(this.gameState.lives)
 
     // Hide ball immediately if it's the last life
     if (this.gameState.lives <= 0) {
@@ -481,7 +486,7 @@ export class BreakoutScene extends Phaser.Scene {
   private allBricksCleared() {
     // Get bonus points (100 points)
     this.gameState.addScore(100)
-    this.uiManager.updateScore()
+    this.uiManager.updateScore(this.gameState.score)
 
     // Display bonus acquisition effect
     this.uiManager.showBonusEffect()
@@ -539,23 +544,15 @@ export class BreakoutScene extends Phaser.Scene {
   private togglePause() {
     this.gameState.togglePause()
 
-    if (this.gameState.isPaused) {
+    const { isPaused } = this.gameState
+
+    if (isPaused) {
       // Record pause start time
       this.gameState.startPause()
 
       // Pause the game
       this.physics.pause()
       this.uiManager.showPauseScreen()
-
-      // Pause the brick spawn timer
-      if (this.brickSpawnTimer) {
-        this.brickSpawnTimer.paused = true
-      }
-
-      // Pause the special ball timer
-      if (this.specialBallTimer) {
-        this.specialBallTimer.paused = true
-      }
     } else {
       // Calculate paused duration and add to total
       this.gameState.endPause()
@@ -563,16 +560,14 @@ export class BreakoutScene extends Phaser.Scene {
       // Resume the game
       this.physics.resume()
       this.uiManager.hidePauseScreen()
+    }
 
-      // Resume the brick spawn timer
-      if (this.brickSpawnTimer) {
-        this.brickSpawnTimer.paused = false
-      }
+    if (this.brickSpawnTimer) {
+      this.brickSpawnTimer.paused = isPaused
+    }
 
-      // Resume the special ball timer
-      if (this.specialBallTimer) {
-        this.specialBallTimer.paused = false
-      }
+    if (this.specialBallTimer) {
+      this.specialBallTimer.paused = isPaused
     }
   }
 
@@ -631,7 +626,7 @@ export class BreakoutScene extends Phaser.Scene {
     // Display game over after paddle falls with slight delay
     this.time.delayedCall(1500, () => {
       // Show game over screen using UIManager
-      this.uiManager.showGameOverScreen()
+      this.uiManager.showGameOverScreen(this.gameState.score, this.gameState.elapsedTimeMs)
 
       // Add touch restart for all devices
       this.setupGameOverTouchRestart()
@@ -675,7 +670,7 @@ export class BreakoutScene extends Phaser.Scene {
     // Set initial score to 900 in debug mode
     if (this.gameSettings.debugMode) {
       this.gameState.initializeDebugMode()
-      this.uiManager.updateScore()
+      this.uiManager.updateScore(this.gameState.score)
     }
 
     // Reset ball and paddle

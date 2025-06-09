@@ -1,14 +1,21 @@
 import * as Phaser from 'phaser'
 import { constants } from './constants'
 import { gameInfo } from './config'
-import { BreakoutState } from './breakout-state'
+
+/**
+ * Interface for game data that UIManager needs to display
+ */
+export interface GameDisplayData {
+  score: number
+  lives: number
+  formattedElapsedTime: string
+}
 
 /**
  * UIManager class - Manages all UI elements and visual effects for the BreakoutScene
  */
 export class UIManager {
   private scene: Phaser.Scene
-  private gameState: BreakoutState
 
   // UI Text elements
   private scoreText!: Phaser.GameObjects.Text
@@ -21,9 +28,16 @@ export class UIManager {
   // UI Graphics elements
   private fullScreenOverlay!: Phaser.GameObjects.Graphics
 
-  constructor(scene: Phaser.Scene, gameState: BreakoutState) {
+  // Current display data
+  private currentData: GameDisplayData
+
+  // Initial data for reset
+  private initialData: GameDisplayData
+
+  constructor(scene: Phaser.Scene, initialData: GameDisplayData) {
     this.scene = scene
-    this.gameState = gameState
+    this.initialData = { ...initialData }
+    this.currentData = { ...initialData }
   }
 
   /**
@@ -42,17 +56,17 @@ export class UIManager {
     const textColor = '#ffffff'
 
     // Game status texts
-    this.scoreText = this.scene.add.text(16, 16, `Score: ${this.gameState.score}`, {
+    this.scoreText = this.scene.add.text(16, 16, `Score: ${this.currentData.score}`, {
       fontSize: '16px',
       color: textColor,
     })
 
-    this.livesText = this.scene.add.text(16, 38, 'Lives: 3', {
+    this.livesText = this.scene.add.text(16, 38, `Lives: ${this.currentData.lives}`, {
       fontSize: '16px',
       color: textColor,
     })
 
-    this.elapsedTimeText = this.scene.add.text(16, 60, 'Time: 0.0s', {
+    this.elapsedTimeText = this.scene.add.text(16, 60, `Time: ${this.currentData.formattedElapsedTime}`, {
       fontSize: '16px',
       color: textColor,
     })
@@ -137,24 +151,37 @@ export class UIManager {
   }
 
   /**
+   * Update display data and refresh UI
+   */
+  updateDisplayData(data: GameDisplayData): void {
+    this.currentData = { ...data }
+    this.scoreText.setText(`Score: ${this.currentData.score}`)
+    this.livesText.setText(`Lives: ${this.currentData.lives}`)
+    this.elapsedTimeText.setText(`Time: ${this.currentData.formattedElapsedTime}`)
+  }
+
+  /**
    * Update score display
    */
-  updateScore(): void {
-    this.scoreText.setText(`Score: ${this.gameState.score}`)
+  updateScore(score: number): void {
+    this.currentData.score = score
+    this.scoreText.setText(`Score: ${score}`)
   }
 
   /**
    * Update lives display
    */
-  updateLives(): void {
-    this.livesText.setText(`Lives: ${this.gameState.lives}`)
+  updateLives(lives: number): void {
+    this.currentData.lives = lives
+    this.livesText.setText(`Lives: ${lives}`)
   }
 
   /**
    * Update elapsed time display
    */
-  updateElapsedTime(): void {
-    this.elapsedTimeText.setText(`Time: ${this.gameState.getFormattedElapsedTime()}`)
+  updateElapsedTime(formattedTime: string): void {
+    this.currentData.formattedElapsedTime = formattedTime
+    this.elapsedTimeText.setText(`Time: ${formattedTime}`)
   }
 
   /**
@@ -178,10 +205,10 @@ export class UIManager {
   /**
    * Show game over screen with final stats
    */
-  showGameOverScreen(): void {
-    const finalSeconds = (this.gameState.elapsedTimeMs / 1000).toFixed(1)
+  showGameOverScreen(finalScore: number, finalTimeMs: number): void {
+    const finalSeconds = (finalTimeMs / 1000).toFixed(1)
     this.gameOverText.setText(
-      `GAME OVER\nFinal Score: ${this.gameState.score}\nTime: ${finalSeconds}s\nPress R or tap to restart`,
+      `GAME OVER\nFinal Score: ${finalScore}\nTime: ${finalSeconds}s\nPress R or tap to restart`,
     )
     this.gameOverText.setVisible(true)
     this.fullScreenOverlay.setVisible(true)
@@ -329,10 +356,13 @@ export class UIManager {
    * Reset all UI elements to initial state
    */
   reset(): void {
+    // Reset to initial values
+    this.currentData = { ...this.initialData }
+
     // Update displays with reset values
-    this.updateScore()
-    this.updateLives()
-    this.updateElapsedTime()
+    this.updateScore(this.currentData.score)
+    this.updateLives(this.currentData.lives)
+    this.updateElapsedTime(this.currentData.formattedElapsedTime)
 
     // Show start screen
     this.showStartScreen()
