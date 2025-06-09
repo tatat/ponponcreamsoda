@@ -146,21 +146,22 @@ export class BreakoutScene extends Phaser.Scene {
     this.brickGenerator.initializeBrickAspectRatios()
 
     // Initialize boss manager
-    this.bossManager = new BossManager(this, this.brickGenerator)
-    this.bossManager.onBossBattleWillStart = () => {
-      // Hide all existing bricks with fade out effect when boss battle is about to start
-      this.hideBricksWithFadeOut(() => {
-        // Clear occupied spaces since all bricks are gone
-        this.brickGenerator.clearOccupiedSpaces()
-      })
-    }
-    this.bossManager.onBossStarted = () => {
-      // Add boss collision for main ball and special balls when boss is ready
-      this.bossManager.addBossCollision([this.ball, ...this.specialBalls], () => this.playRandomHitSound())
-    }
-    this.bossManager.onBossDefeated = () => {
-      this.createBricksWithFadeIn()
-    }
+    this.bossManager = new BossManager(this, this.brickGenerator, {
+      onBossBattleWillStart: () => {
+        // Hide all existing bricks with fade out effect when boss battle is about to start
+        this.hideBricksWithFadeOut(() => {
+          // Clear occupied spaces since all bricks are gone
+          this.brickGenerator.clearOccupiedSpaces()
+        })
+      },
+      onBossStarted: () => {
+        // Add boss collision for main ball and special balls when boss is ready
+        this.bossManager.addBossCollision([this.ball, ...this.specialBalls], () => this.playRandomHitSound())
+      },
+      onBossDefeated: () => {
+        this.createBricksWithFadeIn()
+      },
+    })
 
     this.createBricks()
 
@@ -192,12 +193,11 @@ export class BreakoutScene extends Phaser.Scene {
     this.controlsManager.initialize()
 
     // Initialize UI Manager with initial data from game state
-    const initialUIData = {
+    this.uiManager = new UIManager(this, {
       score: this.gameState.score,
       lives: this.gameState.lives,
       formattedElapsedTime: this.gameState.getFormattedElapsedTime(),
-    }
-    this.uiManager = new UIManager(this, initialUIData)
+    })
     this.uiManager.initialize()
 
     // Initialize sound manager

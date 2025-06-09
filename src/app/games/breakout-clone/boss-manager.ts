@@ -4,21 +4,24 @@ import { Boss } from './boss'
 import { BrickGenerator } from './brick-generator'
 import { destroyAndNull } from '@/helpers/cleanup'
 
+export interface BossManagerCallbacks {
+  onBossBattleWillStart?: () => void
+  onBossStarted?: () => void
+  onBossDefeated?: () => void
+}
+
 export class BossManager {
   private scene: Phaser.Scene
   private brickGenerator: BrickGenerator
+  private callbacks: BossManagerCallbacks
   private currentBoss: Boss | null = null
   private bossNumber = 0
   private isBossBattle = false
 
-  // Callback mechanisms
-  onBossBattleWillStart?: () => void
-  onBossStarted?: () => void
-  onBossDefeated?: () => void
-
-  constructor(scene: Phaser.Scene, brickGenerator: BrickGenerator) {
+  constructor(scene: Phaser.Scene, brickGenerator: BrickGenerator, callbacks: BossManagerCallbacks) {
     this.scene = scene
     this.brickGenerator = brickGenerator
+    this.callbacks = callbacks
   }
 
   checkBossBattle(score: number): boolean {
@@ -32,7 +35,7 @@ export class BossManager {
     if (this.isBossBattle) return
 
     // Call the onBossBattleWillStart callback if defined
-    this.onBossBattleWillStart?.()
+    this.callbacks.onBossBattleWillStart?.()
 
     this.isBossBattle = true
     this.bossNumber++
@@ -61,7 +64,7 @@ export class BossManager {
       this.createBoss()
 
       // Call the onBossStarted callback after boss is created
-      this.onBossStarted?.()
+      this.callbacks.onBossStarted?.()
     })
   }
 
@@ -136,9 +139,7 @@ export class BossManager {
       this.currentBoss = null
 
       // Call the callback to recreate bricks
-      if (this.onBossDefeated) {
-        this.onBossDefeated()
-      }
+      this.callbacks.onBossDefeated?.()
     })
 
     return bonusScore
