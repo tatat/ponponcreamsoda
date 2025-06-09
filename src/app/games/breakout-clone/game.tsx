@@ -11,6 +11,7 @@ import { BrickGenerator } from './brick-generator'
 import { BossManager } from './boss-manager'
 import { ControlsManager, ControlsCallbacks } from './controls-manager'
 import { constants } from './constants'
+import { GameState } from './game-state'
 
 /**
  * BreakoutScene class - Main scene for endless breakout game
@@ -19,38 +20,27 @@ class BreakoutScene extends Phaser.Scene {
   private paddle!: Phaser.Physics.Arcade.Sprite
   private ball!: Phaser.Physics.Arcade.Sprite
   private bricks!: Phaser.Physics.Arcade.StaticGroup
-  private score = 0
-  private lives = 3
-  private startTime = 0
-  private elapsedTimeMs = 0
-  private pauseStartTime = 0
-  private totalPausedTime = 0
   private scoreText!: Phaser.GameObjects.Text
   private livesText!: Phaser.GameObjects.Text
   private elapsedTimeText!: Phaser.GameObjects.Text
   private gameOverText!: Phaser.GameObjects.Text
-  private isGameOver = false
-  private isGameStarted = false
-  private isPaused = false
   private startText!: Phaser.GameObjects.Text
   private pauseText!: Phaser.GameObjects.Text
   private brickSpawnTimer!: Phaser.Time.TimerEvent
   private brickGenerator!: BrickGenerator
   private bossManager!: BossManager
-  private specialBalls: Phaser.Physics.Arcade.Sprite[] = [] // Special balls for every 30 seconds
   private specialBallTimer: Phaser.Time.TimerEvent | null = null // Timer for special ball generation
-  private isJumping = false
-  private jumpVelocity = -225
-  private gravity = 600
-  private jumpDuration = 0
   private controlsManager!: ControlsManager
   private gameSettings: GameSettings = loadSettings()
   private starfield!: Starfield
   private hitSounds: Phaser.Sound.BaseSound[] = []
   private currentScale: keyof typeof constants.MUSICAL_SCALES = 'major'
+  private specialBalls: Phaser.Physics.Arcade.Sprite[] = [] // Array to track special balls
+  private gameState!: GameState
 
   constructor() {
     super({ key: 'BreakoutScene' })
+    this.gameState = new GameState()
   }
 
   preload() {
@@ -119,7 +109,7 @@ class BreakoutScene extends Phaser.Scene {
 
     // Set initial score to 900 in debug mode
     if (this.gameSettings.debugMode) {
-      this.score = 900
+      this.gameState.initializeDebugMode()
     }
 
     // Create paddle
@@ -176,19 +166,19 @@ class BreakoutScene extends Phaser.Scene {
     // Initialize controls manager
     const controlsCallbacks: ControlsCallbacks = {
       onStartGame: () => {
-        if (!this.isGameStarted && !this.isGameOver) {
+        if (!this.gameState.isGameStarted && !this.gameState.isGameOver) {
           this.startGame()
         }
       },
       onJump: () => {
-        if (!this.isGameStarted && !this.isGameOver) {
+        if (!this.gameState.isGameStarted && !this.gameState.isGameOver) {
           this.startGame()
-        } else if (this.isGameStarted && !this.isJumping && !this.isPaused) {
+        } else if (this.gameState.canJump()) {
           this.startJump()
         }
       },
       onPause: () => {
-        if (this.isGameStarted && !this.isGameOver) {
+        if (this.gameState.isGameStarted && !this.gameState.isGameOver) {
           this.togglePause()
         }
       },
@@ -203,7 +193,7 @@ class BreakoutScene extends Phaser.Scene {
     // Create UI text
     const textColor = '#ffffff'
 
-    this.scoreText = this.add.text(16, 16, `Score: ${this.score}`, {
+    this.scoreText = this.add.text(16, 16, `Score: ${this.gameState.score}`, {
       fontSize: '16px',
       color: textColor,
     })
@@ -297,7 +287,7 @@ class BreakoutScene extends Phaser.Scene {
     const handleVisibilityChange = () => {
       if (document.hidden || !document.hasFocus()) {
         // Auto-pause if game is running
-        if (this.isGameStarted && !this.isGameOver && !this.isPaused) {
+        if (this.gameState.isGameStarted && !this.gameState.isGameOver && !this.gameState.isPaused) {
           this.togglePause()
         }
       }
@@ -318,20 +308,19 @@ class BreakoutScene extends Phaser.Scene {
     // Update paddle movement
     this.updatePaddleMovement()
 
-    if (this.isGameOver || this.isPaused) {
+    if (this.gameState.isGameOver || this.gameState.isPaused) {
       return
     }
 
     // Update elapsed time if game is started
-    if (this.isGameStarted && !this.isGameOver && !this.isPaused) {
-      this.elapsedTimeMs = Date.now() - this.startTime - this.totalPausedTime
-      const elapsedSeconds = (this.elapsedTimeMs / 1000).toFixed(1)
-      this.elapsedTimeText.setText('Time: ' + elapsedSeconds + 's')
+    if (this.gameState.isGameActive()) {
+      this.gameState.elapsedTimeMs = this.gameState.calculateElapsedTime()
+      this.elapsedTimeText.setText('Time: ' + this.gameState.getFormattedElapsedTime())
     }
 
     // Handle jumping physics
-    if (this.isJumping) {
-      this.jumpDuration += this.game.loop.delta
+    if (this.gameState.isJumping) {
+      this.gameState.addJumpDuration(this.game.loop.delta)
 
       // Check if paddle should land (only when actually at ground level and falling)
       if (this.paddle.y >= constants.PADDLE_GROUND_Y && (this.paddle.body?.velocity.y ?? 0) >= 0) {
@@ -339,8 +328,7 @@ class BreakoutScene extends Phaser.Scene {
         this.paddle.y = constants.PADDLE_GROUND_Y
         this.paddle.setVelocityY(0)
         this.paddle.setGravityY(0)
-        this.isJumping = false
-        this.jumpDuration = 0
+        this.gameState.endJump()
 
         // Add a small bounce effect after landing
         this.tweens.add({
@@ -354,7 +342,7 @@ class BreakoutScene extends Phaser.Scene {
     }
 
     // Ensure paddle stays at ground level when not jumping
-    if (!this.isJumping) {
+    if (!this.gameState.isJumping) {
       if (this.paddle.y !== constants.PADDLE_GROUND_Y) {
         this.paddle.y = constants.PADDLE_GROUND_Y
         this.paddle.setVelocityY(0)
@@ -372,8 +360,7 @@ class BreakoutScene extends Phaser.Scene {
     for (let i = this.specialBalls.length - 1; i >= 0; i--) {
       const specialBall = this.specialBalls[i]
       if (specialBall.y > constants.BALL_DEATH_Y) {
-        specialBall.destroy()
-        this.specialBalls.splice(i, 1)
+        this.removeSpecialBallAt(i)
       }
     }
   }
@@ -383,7 +370,7 @@ class BreakoutScene extends Phaser.Scene {
     const movementInput = this.controlsManager.getMovementInput()
 
     // Paddle movement (disabled during game over or pause)
-    if (!this.isGameOver && !this.isPaused) {
+    if (this.gameState.canMove()) {
       // Check if fast move is pressed for acceleration
       const isAccelerated = movementInput.isFastMovePressed
       const baseSpeed = 400
@@ -428,7 +415,12 @@ class BreakoutScene extends Phaser.Scene {
   }
 
   private addNewBrick() {
-    if (this.isGameOver || !this.isGameStarted || this.isPaused || this.bossManager.isBossBattleActive()) {
+    if (
+      this.gameState.isGameOver ||
+      !this.gameState.isGameStarted ||
+      this.gameState.isPaused ||
+      this.bossManager.isBossBattleActive()
+    ) {
       return
     }
 
@@ -515,8 +507,8 @@ class BreakoutScene extends Phaser.Scene {
 
     // Add points based on base size
     const points = this.getScoreBySize(baseSize)
-    this.score += points
-    this.scoreText.setText('Score: ' + this.score)
+    this.gameState.addScore(points)
+    this.scoreText.setText('Score: ' + this.gameState.score)
 
     // Point display effect
     this.showPointsEffect(brickX, brickY, points)
@@ -525,7 +517,7 @@ class BreakoutScene extends Phaser.Scene {
     this.brickGenerator.updateOccupiedSpaces()
 
     // Check for boss battle trigger
-    const bossTriggered = this.bossManager.checkBossBattle(this.score)
+    const bossTriggered = this.bossManager.checkBossBattle(this.gameState.score)
     if (bossTriggered) {
       // Add boss collision for main ball and special balls
       this.time.delayedCall(1100, () => {
@@ -562,7 +554,7 @@ class BreakoutScene extends Phaser.Scene {
 
   private ballDied() {
     // Do nothing if already processing death
-    if (this.isGameOver) {
+    if (this.gameState.isGameOver) {
       return
     }
 
@@ -576,11 +568,11 @@ class BreakoutScene extends Phaser.Scene {
     this.ball.disableBody() // Disable ball physics
 
     // Reduce lives and proceed to next process
-    this.lives--
-    this.livesText.setText('Lives: ' + this.lives)
+    this.gameState.loseLife()
+    this.livesText.setText('Lives: ' + this.gameState.lives)
 
     // Hide ball immediately if it's the last life
-    if (this.lives <= 0) {
+    if (this.gameState.lives <= 0) {
       this.ball.setVisible(false)
     }
 
@@ -634,7 +626,7 @@ class BreakoutScene extends Phaser.Scene {
 
     // Proceed to next process with slight delay
     this.time.delayedCall(1000, () => {
-      if (this.lives <= 0) {
+      if (this.gameState.lives <= 0) {
         this.gameOver()
       } else {
         this.resetBall()
@@ -644,8 +636,8 @@ class BreakoutScene extends Phaser.Scene {
 
   private allBricksCleared() {
     // Get bonus points (100 points)
-    this.score += 100
-    this.scoreText.setText('Score: ' + this.score)
+    this.gameState.addScore(100)
+    this.scoreText.setText('Score: ' + this.gameState.score)
 
     // Display bonus acquisition effect
     const bonusText = this.add.text(constants.GAME_CENTER_X, constants.GAME_CENTER_Y - 112, '+100 BONUS!', {
@@ -686,10 +678,10 @@ class BreakoutScene extends Phaser.Scene {
   }
 
   private startGame() {
-    if (!this.isGameStarted && !this.isGameOver) {
-      this.isGameStarted = true
-      this.startTime = Date.now() // Record start time
-      this.elapsedTimeMs = 0
+    if (!this.gameState.isGameStarted && !this.gameState.isGameOver) {
+      this.gameState.isGameStarted = true
+      this.gameState.startTime = Date.now() // Record start time
+      this.gameState.elapsedTimeMs = 0
       this.startText.setVisible(false)
       const overlay = this.startText.getData('overlay')
       if (overlay) overlay.setVisible(false)
@@ -721,11 +713,11 @@ class BreakoutScene extends Phaser.Scene {
   }
 
   private togglePause() {
-    this.isPaused = !this.isPaused
+    this.gameState.togglePause()
 
-    if (this.isPaused) {
+    if (this.gameState.isPaused) {
       // Record pause start time
-      this.pauseStartTime = Date.now()
+      this.gameState.startPause()
 
       // Pause the game
       this.physics.pause()
@@ -744,10 +736,7 @@ class BreakoutScene extends Phaser.Scene {
       }
     } else {
       // Calculate paused duration and add to total
-      if (this.pauseStartTime > 0) {
-        this.totalPausedTime += Date.now() - this.pauseStartTime
-        this.pauseStartTime = 0
-      }
+      this.gameState.endPause()
 
       // Resume the game
       this.physics.resume()
@@ -783,12 +772,11 @@ class BreakoutScene extends Phaser.Scene {
   }
 
   private startJump() {
-    this.isJumping = true
-    this.jumpDuration = 0
+    this.gameState.startJump()
 
     // Set initial jump velocity with easing
-    this.paddle.setVelocityY(this.jumpVelocity)
-    this.paddle.setGravityY(this.gravity)
+    this.paddle.setVelocityY(this.gameState.jumpVelocity)
+    this.paddle.setGravityY(this.gameState.gravity)
 
     // Add a slight scale effect for visual feedback
     this.tweens.add({
@@ -801,13 +789,12 @@ class BreakoutScene extends Phaser.Scene {
   }
 
   private gameOver() {
-    this.isGameOver = true
+    this.gameState.isGameOver = true
     this.ball.setVelocity(0, 0)
     this.ball.setVisible(false) // Hide ball
 
     // Destroy all special balls
-    this.specialBalls.forEach((ball) => ball.destroy())
-    this.specialBalls = []
+    this.clearSpecialBalls()
 
     // Stop special ball timer
     if (this.specialBallTimer) {
@@ -819,14 +806,14 @@ class BreakoutScene extends Phaser.Scene {
     this.paddle.setImmovable(false) // Make paddle movable
     this.paddle.setGravityY(800) // Apply gravity
     this.paddle.setVelocityY(0) // Reset initial velocity
-    this.isJumping = false
+    this.gameState.isJumping = false
 
     // Display game over after paddle falls with slight delay
     this.time.delayedCall(1500, () => {
       // Display acquired points and elapsed time record on game over
-      const finalSeconds = (this.elapsedTimeMs / 1000).toFixed(1)
+      const finalSeconds = (this.gameState.elapsedTimeMs / 1000).toFixed(1)
       this.gameOverText.setText(
-        `GAME OVER\nFinal Score: ${this.score}\nTime: ${finalSeconds}s\nPress R or tap to restart`,
+        `GAME OVER\nFinal Score: ${this.gameState.score}\nTime: ${finalSeconds}s\nPress R or tap to restart`,
       )
       this.gameOverText.setVisible(true)
       const overlay = this.gameOverText.getData('overlay')
@@ -844,19 +831,10 @@ class BreakoutScene extends Phaser.Scene {
 
   private restartGame() {
     // Reset game state
-    this.isGameOver = false
-    this.isGameStarted = false
-    this.isPaused = false
-    this.score = 0
-    this.lives = 3
-    this.startTime = 0
-    this.elapsedTimeMs = 0
-    this.pauseStartTime = 0
-    this.totalPausedTime = 0
+    this.gameState.reset()
 
-    // Reset jumping state
-    this.isJumping = false
-    this.jumpDuration = 0
+    // Clear special balls
+    this.clearSpecialBalls()
 
     // Reset controls manager state
     this.controlsManager.resetState()
@@ -864,9 +842,7 @@ class BreakoutScene extends Phaser.Scene {
     // Reset boss manager
     this.bossManager.reset()
 
-    // Reset special balls
-    this.specialBalls.forEach((ball) => ball.destroy())
-    this.specialBalls = []
+    // Stop special ball timer if it exists
     if (this.specialBallTimer) {
       this.specialBallTimer.destroy()
       this.specialBallTimer = null
@@ -891,9 +867,9 @@ class BreakoutScene extends Phaser.Scene {
     // Update UI
     // Set initial score to 900 in debug mode
     if (this.gameSettings.debugMode) {
-      this.score = 900
+      this.gameState.initializeDebugMode()
     }
-    this.scoreText.setText(`Score: ${this.score}`)
+    this.scoreText.setText(`Score: ${this.gameState.score}`)
     this.livesText.setText('Lives: 3')
     this.elapsedTimeText.setText('Time: 0.0s')
 
@@ -902,7 +878,7 @@ class BreakoutScene extends Phaser.Scene {
     this.paddle.setVelocity(0, 0)
     this.paddle.setGravityY(0) // Initially disable gravity
     this.paddle.setImmovable(true) // Return paddle to fixed state
-    this.isJumping = false
+    this.gameState.resetJumping()
     this.ball.setVisible(true) // Show ball again
 
     // Reset ball to initial state (don't auto-start like resetBall() does)
@@ -931,7 +907,7 @@ class BreakoutScene extends Phaser.Scene {
   private setupGameOverTouchRestart() {
     // Use ControlsManager for game over touch restart
     this.controlsManager.setupGameOverTouchRestart(() => {
-      if (this.isGameOver) {
+      if (this.gameState.isGameOver) {
         this.restartGame()
       }
     })
@@ -939,7 +915,12 @@ class BreakoutScene extends Phaser.Scene {
 
   private checkSpecialBall() {
     // Start special ball timer if not already running
-    if (!this.specialBallTimer && this.isGameStarted && !this.isGameOver && !this.isPaused) {
+    if (
+      !this.specialBallTimer &&
+      this.gameState.isGameStarted &&
+      !this.gameState.isGameOver &&
+      !this.gameState.isPaused
+    ) {
       this.startSpecialBallTimer()
     }
   }
@@ -956,7 +937,7 @@ class BreakoutScene extends Phaser.Scene {
 
   private createSpecialBall() {
     // Skip if game is paused or not started
-    if (this.isPaused || !this.isGameStarted || this.isGameOver) {
+    if (this.gameState.isPaused || !this.gameState.isGameStarted || this.gameState.isGameOver) {
       return
     }
 
@@ -1023,7 +1004,7 @@ class BreakoutScene extends Phaser.Scene {
     })
 
     // Add to special balls array
-    this.specialBalls.push(specialBall)
+    this.addSpecialBall(specialBall)
   }
 
   private initializeHitSounds() {
@@ -1078,8 +1059,32 @@ class BreakoutScene extends Phaser.Scene {
 
   // Method to pause game when settings modal opens
   public pauseForSettings() {
-    if (this.isGameStarted && !this.isGameOver && !this.isPaused) {
+    if (this.gameState.isGameStarted && !this.gameState.isGameOver && !this.gameState.isPaused) {
       this.togglePause()
+    }
+  }
+
+  // Special balls management methods
+  private addSpecialBall(ball: Phaser.Physics.Arcade.Sprite): void {
+    this.specialBalls.push(ball)
+  }
+
+  private removeSpecialBall(ball: Phaser.Physics.Arcade.Sprite): void {
+    const index = this.specialBalls.indexOf(ball)
+    if (index > -1) {
+      this.specialBalls.splice(index, 1)
+    }
+  }
+
+  private clearSpecialBalls(): void {
+    this.specialBalls.forEach((ball) => ball.destroy())
+    this.specialBalls = []
+  }
+
+  private removeSpecialBallAt(index: number): void {
+    if (index >= 0 && index < this.specialBalls.length) {
+      this.specialBalls[index].destroy()
+      this.specialBalls.splice(index, 1)
     }
   }
 }
