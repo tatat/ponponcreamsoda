@@ -1,7 +1,7 @@
 /**
- * GameState class - Manages all game state for the BreakoutScene
+ * BreakoutState class - Manages all game state for the BreakoutScene
  */
-export class GameState {
+export class BreakoutState {
   // Score and lives
   score = 0
   lives = 3
