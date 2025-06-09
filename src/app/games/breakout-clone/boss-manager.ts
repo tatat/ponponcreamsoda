@@ -18,30 +18,16 @@ export class BossManager {
     this.brickGenerator = brickGenerator
   }
 
-  checkBossBattle(score: number, bricks: Phaser.Physics.Arcade.StaticGroup): boolean {
+  checkBossBattle(score: number): boolean {
     if (this.isBossBattle) return false
 
     const nextBossThreshold = this.calculateNextBossThreshold()
-    if (score >= nextBossThreshold) {
-      this.startBossBattle(bricks)
-      return true
-    }
-    return false
+    return score >= nextBossThreshold
   }
 
-  private calculateNextBossThreshold(): number {
-    let threshold = 1000 // First boss always at 1000
+  startBossBattle(bricks: Phaser.Physics.Arcade.StaticGroup): void {
+    if (this.isBossBattle) return
 
-    for (let i = 1; i <= this.bossNumber; i++) {
-      const bossBonus = 400 + i * 100 // Boss 1: 500, Boss 2: 600, Boss 3: 700, etc.
-      threshold += bossBonus
-      threshold += 1000
-    }
-
-    return threshold
-  }
-
-  private startBossBattle(bricks: Phaser.Physics.Arcade.StaticGroup) {
     this.isBossBattle = true
     this.bossNumber++
 
@@ -82,6 +68,18 @@ export class BossManager {
     this.scene.time.delayedCall(1000, () => {
       this.createBoss()
     })
+  }
+
+  private calculateNextBossThreshold(): number {
+    let threshold = 1000 // First boss always at 1000
+
+    for (let i = 1; i <= this.bossNumber; i++) {
+      const bossBonus = 400 + i * 100 // Boss 1: 500, Boss 2: 600, Boss 3: 700, etc.
+      threshold += bossBonus
+      threshold += 1000
+    }
+
+    return threshold
   }
 
   private createBoss() {

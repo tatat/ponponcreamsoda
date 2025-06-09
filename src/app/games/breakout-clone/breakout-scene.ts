@@ -407,8 +407,11 @@ export class BreakoutScene extends Phaser.Scene {
     this.brickGenerator.updateOccupiedSpaces()
 
     // Check for boss battle trigger
-    const bossTriggered = this.bossManager.checkBossBattle(this.gameState.score, this.bricks)
-    if (bossTriggered) {
+    const shouldStartBoss = this.bossManager.checkBossBattle(this.gameState.score)
+    if (shouldStartBoss) {
+      // Start the boss battle
+      this.bossManager.startBossBattle(this.bricks)
+
       // Add boss collision for main ball and special balls
       this.time.delayedCall(1100, () => {
         this.bossManager.addBossCollision(this.ball, this.specialBalls, () => this.playRandomHitSound())
