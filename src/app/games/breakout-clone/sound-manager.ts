@@ -1,5 +1,4 @@
 import * as Phaser from 'phaser'
-import { GameSettings } from './settings'
 import { constants } from './constants'
 
 export type SoundSettings = {
@@ -73,7 +72,7 @@ export class SoundManager {
   /**
    * Update settings and apply changes
    */
-  applySettings(newSettings: GameSettings): void {
+  applySettings(newSettings: SoundSettings): void {
     this.currentScale = newSettings.musicalScale
     this.currentBaseKey = newSettings.baseKey
   }
