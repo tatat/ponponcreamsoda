@@ -1,7 +1,6 @@
 import * as Phaser from 'phaser'
 import { assertNonNullable } from '@/helpers/assertions'
 import { assertSpriteLight } from '@/helpers/phaser-assertions'
-import { gameInfo } from './config'
 import { GameSettings, loadSettings } from './settings'
 import { Starfield } from './starfield'
 import { BrickGenerator } from './brick-generator'
@@ -10,6 +9,7 @@ import { ControlsManager, ControlsCallbacks } from './controls-manager'
 import { constants } from './constants'
 import { BreakoutState } from './breakout-state'
 import { VisibilityManager } from './visibility-manager'
+import { UIManager } from './ui-manager'
 
 /**
  * BreakoutScene class - Main scene for endless breakout game
@@ -18,12 +18,6 @@ export class BreakoutScene extends Phaser.Scene {
   private paddle!: Phaser.Physics.Arcade.Sprite
   private ball!: Phaser.Physics.Arcade.Sprite
   private bricks!: Phaser.Physics.Arcade.StaticGroup
-  private scoreText!: Phaser.GameObjects.Text
-  private livesText!: Phaser.GameObjects.Text
-  private elapsedTimeText!: Phaser.GameObjects.Text
-  private gameOverText!: Phaser.GameObjects.Text
-  private startText!: Phaser.GameObjects.Text
-  private pauseText!: Phaser.GameObjects.Text
   private brickSpawnTimer!: Phaser.Time.TimerEvent
   private brickGenerator!: BrickGenerator
   private bossManager!: BossManager
@@ -36,6 +30,7 @@ export class BreakoutScene extends Phaser.Scene {
   private specialBalls: Phaser.Physics.Arcade.Sprite[] = [] // Array to track special balls
   private gameState!: BreakoutState
   private visibilityManager!: VisibilityManager
+  private uiManager!: UIManager
 
   constructor() {
     super({ key: 'BreakoutScene' })
@@ -189,84 +184,9 @@ export class BreakoutScene extends Phaser.Scene {
     this.controlsManager = new ControlsManager(this, controlsCallbacks)
     this.controlsManager.initialize()
 
-    // Create UI text
-    const textColor = '#ffffff'
-
-    this.scoreText = this.add.text(16, 16, `Score: ${this.gameState.score}`, {
-      fontSize: '16px',
-      color: textColor,
-    })
-    this.livesText = this.add.text(16, 38, 'Lives: 3', {
-      fontSize: '16px',
-      color: textColor,
-    })
-    this.elapsedTimeText = this.add.text(16, 60, 'Time: 0.0s', {
-      fontSize: '16px',
-      color: textColor,
-    })
-
-    // Create full-screen overlay for all instruction messages
-    const fullScreenOverlay = this.add.graphics()
-    fullScreenOverlay.fillStyle(0x000000, 0.6)
-    fullScreenOverlay.fillRect(0, 0, constants.GAME_WIDTH, constants.GAME_HEIGHT)
-    fullScreenOverlay.setDepth(100) // High depth to always display in front
-    fullScreenOverlay.setVisible(true) // Initially visible (for start screen)
-
-    // Game over text (initially hidden)
-    this.gameOverText = this.add.text(
-      constants.GAME_CENTER_X,
-      constants.GAME_CENTER_Y,
-      'GAME OVER\nPress R to restart',
-      {
-        fontSize: '32px',
-        color: '#ff6b6b', // Bright red
-        align: 'center',
-      },
-    )
-    this.gameOverText.setOrigin(0.5)
-    this.gameOverText.setVisible(false)
-
-    // Start text (initially visible)
-    this.startText = this.add.text(
-      constants.GAME_CENTER_X,
-      constants.GAME_CENTER_Y,
-      'Press SPACE to start\n\n--- CONTROLS ---\n← → : Move paddle\nSHIFT + ← → : Fast move\nSPACE : Jump (during game)\nP : Pause/Resume\nR : Restart',
-      {
-        fontSize: '24px',
-        color: '#ffffff',
-        align: 'center',
-        lineSpacing: 8,
-      },
-    )
-    this.startText.setOrigin(0.5)
-    this.startText.setVisible(true)
-
-    // Set text depth to appear above overlay
-    this.gameOverText.setDepth(101)
-    this.startText.setDepth(101)
-
-    // Store overlay reference for all text elements
-    this.gameOverText.setData('overlay', fullScreenOverlay)
-    this.startText.setData('overlay', fullScreenOverlay)
-
-    // Pause text (initially hidden)
-    this.pauseText = this.add.text(
-      constants.GAME_CENTER_X,
-      constants.GAME_CENTER_Y,
-      'PAUSED\nPress P to resume\n\n--- CONTROLS ---\n← → : Move paddle\nSHIFT + ← → : Fast move\nSPACE : Jump\nP : Pause/Resume\nR : Restart',
-      {
-        fontSize: '24px',
-        color: '#ffffff',
-        align: 'center',
-        lineSpacing: 8,
-      },
-    )
-    this.pauseText.setOrigin(0.5)
-    this.pauseText.setVisible(false)
-    this.pauseText.setDepth(101)
-    this.pauseText.setData('overlay', fullScreenOverlay)
-
-    this.updateTexts()
+    // Initialize UI Manager
+    this.uiManager = new UIManager(this, this.gameState)
+    this.uiManager.initialize()
 
     // Initialize hit sounds array
     this.initializeHitSounds()
@@ -312,7 +232,7 @@ export class BreakoutScene extends Phaser.Scene {
     // Update elapsed time if game is started
     if (this.gameState.isGameActive()) {
       this.gameState.elapsedTimeMs = this.gameState.calculateElapsedTime()
-      this.elapsedTimeText.setText('Time: ' + this.gameState.getFormattedElapsedTime())
+      this.uiManager.updateElapsedTime()
     }
 
     // Handle jumping physics
@@ -430,31 +350,6 @@ export class BreakoutScene extends Phaser.Scene {
     return constants.SCORE_BY_SIZE[size as keyof typeof constants.SCORE_BY_SIZE] ?? constants.DEFAULT_SCORE
   }
 
-  private showPointsEffect(x: number, y: number, points: number) {
-    // Create point display text
-    const pointsText = this.add.text(x, y, `+${points}`, {
-      fontSize: '24px',
-      color: '#00ff88', // Bright green
-      align: 'center',
-    })
-    pointsText.setOrigin(0.5)
-    pointsText.setDepth(105) // Display in front of other effects
-
-    // Point text animation
-    this.tweens.add({
-      targets: pointsText,
-      y: y - 60, // Move up
-      alpha: 0, // Fade out
-      scaleX: 1.5, // Slightly enlarge
-      scaleY: 1.5,
-      duration: 1200,
-      ease: 'Power2',
-      onComplete: () => {
-        pointsText.destroy()
-      },
-    })
-  }
-
   private hitPaddle: Phaser.Types.Physics.Arcade.ArcadePhysicsCallback = (ball, paddle) => {
     assertSpriteLight(ball)
     assertSpriteLight(paddle)
@@ -505,10 +400,10 @@ export class BreakoutScene extends Phaser.Scene {
     // Add points based on base size
     const points = this.getScoreBySize(baseSize)
     this.gameState.addScore(points)
-    this.scoreText.setText('Score: ' + this.gameState.score)
+    this.uiManager.updateScore()
 
     // Point display effect
-    this.showPointsEffect(brickX, brickY, points)
+    this.uiManager.showPointsEffect(brickX, brickY, points)
 
     // Update occupied spaces using BrickGenerator
     this.brickGenerator.updateOccupiedSpaces()
@@ -566,60 +461,19 @@ export class BreakoutScene extends Phaser.Scene {
 
     // Reduce lives and proceed to next process
     this.gameState.loseLife()
-    this.livesText.setText('Lives: ' + this.gameState.lives)
+    this.uiManager.updateLives()
 
     // Hide ball immediately if it's the last life
     if (this.gameState.lives <= 0) {
       this.ball.setVisible(false)
     }
 
-    // Death effect: explosion-like circular effect
-    const explosionGraphics = this.add.graphics()
-    explosionGraphics.setDepth(103)
-
-    // Create explosion effect with multiple circles
-    const colors = [0xff6b6b, 0xff9f43, 0xfeca57, 0xff6348]
-    for (let i = 0; i < 4; i++) {
-      explosionGraphics.fillStyle(colors[i], 0.7)
-      explosionGraphics.fillCircle(ballX, ballY, 5)
-    }
-
-    // Explosion animation
-    this.tweens.add({
-      targets: explosionGraphics,
-      scaleX: 8,
-      scaleY: 8,
-      alpha: 0,
-      duration: 800,
-      ease: 'Power2',
-      onComplete: () => {
-        explosionGraphics.destroy()
-      },
-    })
-
-    // "MISS!" text effect
-    const missText = this.add.text(ballX, ballY - 50, 'MISS!', {
-      fontSize: '32px',
-      color: '#ff6b6b', // Red
-      align: 'center',
-    })
-    missText.setOrigin(0.5)
-    missText.setDepth(104)
-
-    // MISS text animation
-    this.tweens.add({
-      targets: missText,
-      y: ballY - 100,
-      alpha: 0,
-      duration: 1500,
-      ease: 'Power2',
-      onComplete: () => {
-        missText.destroy()
-      },
-    })
+    // Show explosion and miss effects using UIManager
+    this.uiManager.showExplosionEffect(ballX, ballY)
+    this.uiManager.showMissEffect(ballX, ballY)
 
     // Shake screen slightly
-    this.cameras.main.shake(300, 0.01)
+    this.uiManager.shakeCamera(300, 0.01)
 
     // Proceed to next process with slight delay
     this.time.delayedCall(1000, () => {
@@ -634,28 +488,10 @@ export class BreakoutScene extends Phaser.Scene {
   private allBricksCleared() {
     // Get bonus points (100 points)
     this.gameState.addScore(100)
-    this.scoreText.setText('Score: ' + this.gameState.score)
+    this.uiManager.updateScore()
 
     // Display bonus acquisition effect
-    const bonusText = this.add.text(constants.GAME_CENTER_X, constants.GAME_CENTER_Y - 112, '+100 BONUS!', {
-      fontSize: '48px',
-      color: '#ffd700', // Gold
-      align: 'center',
-    })
-    bonusText.setOrigin(0.5)
-    bonusText.setDepth(102)
-
-    // Bonus text animation
-    this.tweens.add({
-      targets: bonusText,
-      y: constants.GAME_CENTER_Y - 162,
-      alpha: 0,
-      duration: 2000,
-      ease: 'Power2',
-      onComplete: () => {
-        bonusText.destroy()
-      },
-    })
+    this.uiManager.showBonusEffect()
 
     // Respawn all bricks
     this.brickGenerator.clearOccupiedSpaces()
@@ -679,9 +515,7 @@ export class BreakoutScene extends Phaser.Scene {
       this.gameState.isGameStarted = true
       this.gameState.startTime = Date.now() // Record start time
       this.gameState.elapsedTimeMs = 0
-      this.startText.setVisible(false)
-      const overlay = this.startText.getData('overlay')
-      if (overlay) overlay.setVisible(false)
+      this.uiManager.hideStartScreen()
 
       // Enable ball physics body before starting
       this.ball.enableBody()
@@ -718,9 +552,7 @@ export class BreakoutScene extends Phaser.Scene {
 
       // Pause the game
       this.physics.pause()
-      this.pauseText.setVisible(true)
-      const overlay = this.pauseText.getData('overlay')
-      if (overlay) overlay.setVisible(true)
+      this.uiManager.showPauseScreen()
 
       // Pause the brick spawn timer
       if (this.brickSpawnTimer) {
@@ -737,9 +569,7 @@ export class BreakoutScene extends Phaser.Scene {
 
       // Resume the game
       this.physics.resume()
-      this.pauseText.setVisible(false)
-      const overlay = this.pauseText.getData('overlay')
-      if (overlay) overlay.setVisible(false)
+      this.uiManager.hidePauseScreen()
 
       // Resume the brick spawn timer
       if (this.brickSpawnTimer) {
@@ -807,14 +637,8 @@ export class BreakoutScene extends Phaser.Scene {
 
     // Display game over after paddle falls with slight delay
     this.time.delayedCall(1500, () => {
-      // Display acquired points and elapsed time record on game over
-      const finalSeconds = (this.gameState.elapsedTimeMs / 1000).toFixed(1)
-      this.gameOverText.setText(
-        `GAME OVER\nFinal Score: ${this.gameState.score}\nTime: ${finalSeconds}s\nPress R or tap to restart`,
-      )
-      this.gameOverText.setVisible(true)
-      const overlay = this.gameOverText.getData('overlay')
-      if (overlay) overlay.setVisible(true)
+      // Show game over screen using UIManager
+      this.uiManager.showGameOverScreen()
 
       // Add touch restart for all devices
       this.setupGameOverTouchRestart()
@@ -852,23 +676,14 @@ export class BreakoutScene extends Phaser.Scene {
       this.brickSpawnTimer.destroy()
     }
 
-    // Hide game over text and pause text, show start text
-    this.gameOverText.setVisible(false)
-    this.pauseText.setVisible(false)
-    this.startText.setVisible(true)
+    // Reset UI using UIManager
+    this.uiManager.reset()
 
-    // Show overlay for start screen
-    const overlay = this.startText.getData('overlay')
-    if (overlay) overlay.setVisible(true)
-
-    // Update UI
     // Set initial score to 900 in debug mode
     if (this.gameSettings.debugMode) {
       this.gameState.initializeDebugMode()
+      this.uiManager.updateScore()
     }
-    this.scoreText.setText(`Score: ${this.gameState.score}`)
-    this.livesText.setText('Lives: 3')
-    this.elapsedTimeText.setText('Time: 0.0s')
 
     // Reset ball and paddle
     this.paddle.setPosition(constants.GAME_CENTER_X, constants.PADDLE_GROUND_Y)
@@ -887,18 +702,6 @@ export class BreakoutScene extends Phaser.Scene {
     this.brickGenerator.clearOccupiedSpaces()
     this.bricks.clear(true, true)
     this.createBricks()
-  }
-
-  private updateTexts() {
-    // Update start text for all devices (keyboard + virtual pad controls)
-    this.startText.setText(
-      `${gameInfo.title}\n\nPRESS SPACE OR TAP/CLICK TO START\n\n--- KEYBOARD CONTROLS ---\n← → : Move paddle\nSHIFT + ← → : Fast move\nSPACE : Jump (during game)\nP : Pause/Resume\nR : Restart\n\n--- VIRTUAL PAD CONTROLS ---\n← → buttons: Move paddle\nJUMP button: Jump\nPAUSE button: Pause/Resume\nFAST button: Fast move\nTap/Click anywhere: Start game`,
-    )
-
-    // Update pause text for all devices
-    this.pauseText.setText(
-      `${gameInfo.title}\n\nPAUSED\nPress P or tap/click PAUSE to resume\n\n--- KEYBOARD CONTROLS ---\n← → : Move paddle\nSHIFT + ← → : Fast move\nSPACE : Jump\nP : Pause/Resume\nR : Restart\n\n--- VIRTUAL PAD CONTROLS ---\n← → buttons: Move paddle\nJUMP button: Jump\nPAUSE button: Pause/Resume\nFAST button: Fast move`,
-    )
   }
 
   private setupGameOverTouchRestart() {
