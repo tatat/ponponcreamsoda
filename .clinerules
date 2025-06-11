@@ -2,12 +2,12 @@
 
 ## Project Overview
 
-This is a Next.js 13+ TypeScript project for a doujin circle website with App Router, featuring books, galleries, and item listings.
+This is a Next.js 15+ TypeScript project for a doujin circle website with App Router, featuring books, galleries, and item listings.
 
 ## Code Style Guidelines
 
 - Use TypeScript with strict typing
-- Follow Next.js 13+ App Router conventions
+- Follow Next.js 15+ App Router conventions
 - Use functional components with React hooks
 - Prefer `const` over `let` when possible
 - Use descriptive variable and function names

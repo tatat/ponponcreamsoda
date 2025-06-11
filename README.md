@@ -2,7 +2,7 @@
 
 # Pon Pon Creamsoda
 
-A Next.js 13+ TypeScript project for a doujin circle website with App Router, featuring books, galleries, and item listings.
+A Next.js 15+ TypeScript project for a doujin circle website with App Router, featuring books, galleries, and item listings.
 
 ## Development
 
