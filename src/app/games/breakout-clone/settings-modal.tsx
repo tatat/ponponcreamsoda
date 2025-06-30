@@ -70,7 +70,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
         <div
           css={css`
             background: #f5f1eb;
-            padding: 20px;
+            padding: 12px 20px;
             border-bottom: 1px solid #e8dcc6;
             display: flex;
             justify-content: space-between;
@@ -115,7 +115,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
         {/* Content Area */}
         <div
           css={css`
-            padding: 20px;
+            padding: 20px 32px;
             max-height: 400px;
             overflow-y: auto;
             color: #5d4e37;
@@ -145,11 +145,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
                 align-items: center;
                 cursor: pointer;
                 margin-bottom: 20px;
-                padding: 16px;
-                background: #ffffff;
-                border-radius: 3px;
-                border: none;
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
               `}
             >
               <input
@@ -205,12 +200,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
             </h3>
             <div
               css={css`
-                padding: 16px;
-                background: #ffffff;
-                border-radius: 3px;
-                border: none;
                 margin-bottom: 16px;
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
               `}
             >
               <div
@@ -260,11 +250,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
 
             <div
               css={css`
-                padding: 16px;
-                background: #ffffff;
-                border-radius: 3px;
-                border: none;
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
               `}
             >
               <div
@@ -296,7 +281,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
                 css={css`
                   width: 100%;
                   padding: 8px 12px;
-                  background: #fefcf9;
+                  background: #ffffff;
                   border: 1px solid #e8dcc6;
                   border-radius: 3px;
                   color: #5d4e37;
@@ -348,7 +333,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
                 css={css`
                   width: 100%;
                   padding: 8px 12px;
-                  background: #fefcf9;
+                  background: #ffffff;
                   border: 1px solid #e8dcc6;
                   border-radius: 3px;
                   color: #5d4e37;
@@ -395,11 +380,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
             </h3>
             <div
               css={css`
-                padding: 16px;
-                background: #ffffff;
-                border-radius: 3px;
-                border: none;
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
               `}
             >
               <div
@@ -460,11 +440,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
                 align-items: center;
                 cursor: pointer;
                 margin-bottom: 20px;
-                padding: 16px;
-                background: #ffffff;
-                border-radius: 3px;
-                border: none;
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
               `}
             >
               <input
@@ -524,7 +499,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
         <div
           css={css`
             background: #f5f1eb;
-            padding: 20px;
+            padding: 12px 20px;
             border-top: 1px solid #e8dcc6;
             display: flex;
             justify-content: space-between;
