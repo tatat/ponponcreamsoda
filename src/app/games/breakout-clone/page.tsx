@@ -11,7 +11,7 @@ export async function generateMetadata(_props: unknown, parent: ResolvingMetadat
   const url = `${siteOrigin}/games/breakout-clone/`
 
   const images = {
-    url: `${siteOrigin}/images/og-image-home.png`,
+    url: `${siteOrigin}/images/og-image-breakout-clone.png`,
     width: 1200,
     height: 630,
     type: 'image/png',
