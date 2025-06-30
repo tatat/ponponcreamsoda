@@ -6,7 +6,7 @@ export async function generateMetadata(_props: unknown, parent: ResolvingMetadat
   const metadata = await parent
   const siteName = metadata.title?.absolute ?? 'Pon Pon Creamsoda'
   const title = `Games | ${siteName}`
-  const description = 'Pon Pon Creamsoda ゲーム - ブロック崩しなどのゲームをお楽しみください'
+  const description = 'Pon Pon Creamsoda ゲーム'
   const url = `${siteOrigin}/games/`
 
   const images = {
