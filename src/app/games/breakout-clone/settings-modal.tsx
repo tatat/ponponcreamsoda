@@ -57,29 +57,30 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
     >
       <div
         css={css`
-          background: #2d3748;
-          border-radius: 2px;
+          background: #fefcf9;
+          border-radius: 3px;
           width: 100%;
           max-width: 600px;
           max-height: 80vh;
           overflow: hidden;
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
         `}
       >
         {/* Header */}
         <div
           css={css`
-            background: #4a5568;
+            background: #f5f1eb;
             padding: 20px;
-            border-bottom: 1px solid #718096;
+            border-bottom: 1px solid #e8dcc6;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-radius: 3px 3px 0 0;
           `}
         >
           <h2
             css={css`
-              color: #e2e8f0;
+              color: #5d4e37;
               margin: 0;
               font-size: 24px;
               font-weight: bold;
@@ -92,7 +93,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
             css={css`
               background: none;
               border: none;
-              color: #a0aec0;
+              color: #8b7355;
               font-size: 24px;
               cursor: pointer;
               padding: 0;
@@ -101,9 +102,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
               display: flex;
               align-items: center;
               justify-content: center;
-              border-radius: 2px;
+              border-radius: 8px;
               &:hover {
-                background: rgba(160, 174, 192, 0.2);
+                background: rgba(113, 128, 150, 0.15);
               }
             `}
           >
@@ -117,7 +118,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
             padding: 20px;
             max-height: 400px;
             overflow-y: auto;
-            color: #e2e8f0;
+            color: #5d4e37;
           `}
         >
           {/* バーチャルパッド設定セクション */}
@@ -128,12 +129,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
           >
             <h3
               css={css`
-                color: #e2e8f0;
+                color: #5d4e37;
                 margin: 0 0 16px 0;
                 font-size: 18px;
                 font-weight: bold;
                 padding-bottom: 8px;
-                border-bottom: 1px solid #718096;
+                border-bottom: 1px solid #e8dcc6;
               `}
             >
               バーチャルパッド設定
@@ -145,9 +146,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
                 cursor: pointer;
                 margin-bottom: 20px;
                 padding: 16px;
-                background: #4a5568;
-                border-radius: 2px;
-                border: 1px solid #718096;
+                background: #ffffff;
+                border-radius: 3px;
+                border: none;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
               `}
             >
               <input
@@ -158,6 +160,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
                   margin-right: 12px;
                   accent-color: #ffffff;
                   transform: scale(1.2);
+                  border: 1px solid #e8dcc6;
                 `}
               />
               <div>
@@ -173,7 +176,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
                 <div
                   css={css`
                     font-size: 12px;
-                    color: #a0aec0;
+                    color: #8b7355;
                   `}
                 >
                   タッチデバイスでの操作用ボタンを表示します
@@ -190,12 +193,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
           >
             <h3
               css={css`
-                color: #e2e8f0;
+                color: #5d4e37;
                 margin: 0 0 16px 0;
                 font-size: 18px;
                 font-weight: bold;
                 padding-bottom: 8px;
-                border-bottom: 1px solid #718096;
+                border-bottom: 1px solid #e8dcc6;
               `}
             >
               音楽設定
@@ -203,10 +206,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
             <div
               css={css`
                 padding: 16px;
-                background: #4a5568;
-                border-radius: 2px;
-                border: 1px solid #718096;
+                background: #ffffff;
+                border-radius: 3px;
+                border: none;
                 margin-bottom: 16px;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
               `}
             >
               <div
@@ -221,7 +225,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
               <div
                 css={css`
                   font-size: 12px;
-                  color: #a0aec0;
+                  color: #8b7355;
                   margin-bottom: 12px;
                 `}
               >
@@ -244,6 +248,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
                     margin-right: 12px;
                     accent-color: #ffffff;
                     transform: scale(1.2);
+                    border: 1px solid #e8dcc6;
+                    &:checked {
+                      border: 1px solid #d4a574;
+                    }
                   `}
                 />
                 <span>サウンドを有効にする</span>
@@ -253,9 +261,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
             <div
               css={css`
                 padding: 16px;
-                background: #4a5568;
-                border-radius: 2px;
-                border: 1px solid #718096;
+                background: #ffffff;
+                border-radius: 3px;
+                border: none;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
               `}
             >
               <div
@@ -270,7 +279,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
               <div
                 css={css`
                   font-size: 12px;
-                  color: #a0aec0;
+                  color: #8b7355;
                   margin-bottom: 12px;
                 `}
               >
@@ -287,15 +296,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
                 css={css`
                   width: 100%;
                   padding: 8px 12px;
-                  background: #2d3748;
-                  border: 1px solid #718096;
-                  border-radius: 2px;
-                  color: #e2e8f0;
+                  background: #fefcf9;
+                  border: 1px solid #e8dcc6;
+                  border-radius: 3px;
+                  color: #5d4e37;
                   font-size: 14px;
                   margin-bottom: 16px;
                   &:focus {
                     outline: none;
-                    border-color: #ffffff;
+                    border-color: #d4a574;
                   }
                 `}
               >
@@ -322,7 +331,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
               <div
                 css={css`
                   font-size: 12px;
-                  color: #a0aec0;
+                  color: #8b7355;
                   margin-bottom: 12px;
                 `}
               >
@@ -339,14 +348,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
                 css={css`
                   width: 100%;
                   padding: 8px 12px;
-                  background: #2d3748;
-                  border: 1px solid #718096;
-                  border-radius: 2px;
-                  color: #e2e8f0;
+                  background: #fefcf9;
+                  border: 1px solid #e8dcc6;
+                  border-radius: 3px;
+                  color: #5d4e37;
                   font-size: 14px;
                   &:focus {
                     outline: none;
-                    border-color: #ffffff;
+                    border-color: #d4a574;
                   }
                 `}
               >
@@ -366,16 +375,81 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
             </div>
           </div>
 
-          {/* 開発用設定セクション */}
-          <div>
+          {/* ナビゲーションセクション */}
+          <div
+            css={css`
+              margin-bottom: 32px;
+            `}
+          >
             <h3
               css={css`
-                color: #e2e8f0;
+                color: #5d4e37;
                 margin: 0 0 16px 0;
                 font-size: 18px;
                 font-weight: bold;
                 padding-bottom: 8px;
-                border-bottom: 1px solid #718096;
+                border-bottom: 1px solid #e8dcc6;
+              `}
+            >
+              ナビゲーション
+            </h3>
+            <div
+              css={css`
+                padding: 16px;
+                background: #ffffff;
+                border-radius: 3px;
+                border: none;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+              `}
+            >
+              <div
+                css={css`
+                  font-weight: bold;
+                  font-size: 16px;
+                  margin-bottom: 8px;
+                `}
+              >
+                ページ移動
+              </div>
+              <div
+                css={css`
+                  font-size: 12px;
+                  color: #8b7355;
+                  margin-bottom: 12px;
+                `}
+              >
+                他のページに移動できます
+              </div>
+              <a
+                href="/"
+                css={css`
+                  color: #4299e1;
+                  font-size: 14px;
+                  font-weight: bold;
+                  text-decoration: underline;
+                  text-underline-offset: 2px;
+                  transition: color 0.2s ease;
+                  &:hover {
+                    color: #3182ce;
+                    text-decoration: underline;
+                  }
+                `}
+              >
+                ホームに戻る
+              </a>
+            </div>
+          </div>
+
+          {/* 開発用設定セクション */}
+          <div>
+            <h3
+              css={css`
+                color: #5d4e37;
+                margin: 0 0 16px 0;
+                font-size: 18px;
+                font-weight: bold;
+                padding-bottom: 8px;
+                border-bottom: 1px solid #e8dcc6;
               `}
             >
               開発用設定
@@ -387,9 +461,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
                 cursor: pointer;
                 margin-bottom: 20px;
                 padding: 16px;
-                background: #4a5568;
-                border-radius: 2px;
-                border: 1px solid #718096;
+                background: #ffffff;
+                border-radius: 3px;
+                border: none;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
               `}
             >
               <input
@@ -400,6 +475,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
                   margin-right: 12px;
                   accent-color: #ffffff;
                   transform: scale(1.2);
+                  border: 1px solid #e8dcc6;
                 `}
               />
               <div>
@@ -415,7 +491,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
                 <div
                   css={css`
                     font-size: 12px;
-                    color: #a0aec0;
+                    color: #8b7355;
                   `}
                 >
                   物理エンジンの当たり判定を可視化します
@@ -423,7 +499,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
                 <div
                   css={css`
                     font-size: 11px;
-                    color: #a0aec0;
+                    color: #8b7355;
                     margin-top: 2px;
                   `}
                 >
@@ -447,12 +523,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
         {/* Footer */}
         <div
           css={css`
-            background: #4a5568;
+            background: #f5f1eb;
             padding: 20px;
-            border-top: 1px solid #718096;
+            border-top: 1px solid #e8dcc6;
             display: flex;
             justify-content: space-between;
             gap: 12px;
+            border-radius: 0 0 3px 3px;
           `}
         >
           <button
@@ -460,7 +537,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
             css={css`
               background: #fc8181;
               border: none;
-              border-radius: 2px;
+              border-radius: 3px;
               color: #ffffff;
               padding: 10px 20px;
               cursor: pointer;
@@ -484,9 +561,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
             <button
               onClick={handleCancel}
               css={css`
-                background: #718096;
+                background: #8b7355;
                 border: none;
-                border-radius: 2px;
+                border-radius: 3px;
                 color: #ffffff;
                 padding: 10px 20px;
                 cursor: pointer;
@@ -494,7 +571,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
                 font-weight: bold;
                 transition: background 0.2s ease;
                 &:hover {
-                  background: #a0aec0;
+                  background: #a08970;
                 }
               `}
             >
@@ -504,17 +581,17 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
             <button
               onClick={handleSave}
               css={css`
-                background: #ffffff;
+                background: #4299e1;
                 border: none;
-                border-radius: 2px;
-                color: #000000;
+                border-radius: 3px;
+                color: #ffffff;
                 padding: 10px 20px;
                 cursor: pointer;
                 font-size: 14px;
                 font-weight: bold;
                 transition: background 0.2s ease;
                 &:hover {
-                  background: #f7fafc;
+                  background: #3182ce;
                 }
               `}
             >
