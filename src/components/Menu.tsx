@@ -167,6 +167,7 @@ export default function Menu({ className, color = '#333333', secondaryColor = '#
       { href: '/', label: 'Home' },
       { href: '/gallery/', label: 'Gallery' },
       { href: '/item-list/', label: 'Item List' },
+      { href: '/games/', label: 'Games' },
     ],
     [],
   )

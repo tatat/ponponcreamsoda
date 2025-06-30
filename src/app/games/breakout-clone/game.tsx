@@ -68,7 +68,7 @@ export const BreakoutGame: React.FC<BreakoutGameParams> = ({ debugMode: propDebu
     // Listen for settings modal open event from game scenes
     game.events.on('openSettings', () => {
       setIsSettingsOpen(true)
-      
+
       // Auto-pause the BreakoutScene when settings open (OpeningScene doesn't need pausing)
       const breakoutScene = game.scene.getScene('BreakoutScene')
       if (breakoutScene && breakoutScene.scene.isActive() && 'pauseForSettings' in breakoutScene) {

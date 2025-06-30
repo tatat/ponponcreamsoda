@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { css } from '@emotion/react'
+import Link from 'next/link'
 import { GameSettings, saveSettings, resetSettings, MusicalScale, BaseKey } from './settings'
 
 interface SettingsModalProps {
@@ -248,10 +249,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
               </label>
             </div>
 
-            <div
-              css={css`
-              `}
-            >
+            <div css={css``}>
               <div
                 css={css`
                   font-weight: bold;
@@ -378,10 +376,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
             >
               ナビゲーション
             </h3>
-            <div
-              css={css`
-              `}
-            >
+            <div css={css``}>
               <div
                 css={css`
                   font-weight: bold;
@@ -400,7 +395,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
               >
                 他のページに移動できます
               </div>
-              <a
+              <Link
                 href="/"
                 css={css`
                   color: #4299e1;
@@ -416,7 +411,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
                 `}
               >
                 ホームに戻る
-              </a>
+              </Link>
             </div>
           </div>
 
