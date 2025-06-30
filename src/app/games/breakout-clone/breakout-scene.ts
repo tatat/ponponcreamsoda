@@ -12,6 +12,7 @@ import { BreakoutState } from './breakout-state'
 import { VisibilityManager } from './visibility-manager'
 import { UIManager } from './ui-manager'
 import { SoundManager } from './sound-manager'
+import { SettingsButton } from './settings-button'
 
 /**
  * BreakoutScene class - Main scene for endless breakout game
@@ -32,6 +33,7 @@ export class BreakoutScene extends Phaser.Scene {
   private gameState!: BreakoutState
   private visibilityManager!: VisibilityManager
   private uiManager!: UIManager
+  private settingsButton!: SettingsButton
 
   constructor() {
     super({ key: 'BreakoutScene' })
@@ -45,6 +47,10 @@ export class BreakoutScene extends Phaser.Scene {
         this.load.image(`brick-${name}-${size}`, `/games/breakout-clone/images/i-${name}-${size}@2x.png`)
       })
     })
+
+    // Create settings button instance for preloading
+    this.settingsButton = new SettingsButton(this, { fadeInDelay: 500 })
+    this.settingsButton.preload()
 
     // Initialize sound manager with settings from registry
     const registrySettings = this.registry.get('settings') as GameSettings
@@ -215,6 +221,9 @@ export class BreakoutScene extends Phaser.Scene {
 
     // Add visibility change listener for auto-pause
     this.setupVisibilityListener()
+
+    // Create settings button
+    this.settingsButton.create()
   }
 
   private setupVisibilityListener() {

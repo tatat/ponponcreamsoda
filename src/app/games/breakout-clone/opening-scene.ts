@@ -2,11 +2,13 @@ import Phaser from 'phaser'
 import { constants } from './constants'
 import { GameSettings } from './settings'
 import { SoundManager } from './sound-manager'
+import { SettingsButton } from './settings-button'
 
 export class OpeningScene extends Phaser.Scene {
   private titleLogo?: Phaser.GameObjects.Image
   private gameNameText?: Phaser.GameObjects.Text
   private startText?: Phaser.GameObjects.Text
+  private settingsButton!: SettingsButton
   private stars: Phaser.GameObjects.Arc[] = []
   private isTransitioning = false
   private soundManager?: SoundManager
@@ -24,6 +26,10 @@ export class OpeningScene extends Phaser.Scene {
 
     // Load logo for title with specific size to avoid scaling blur
     this.load.svg('logo-tssh', '/games/breakout-clone/images/logo-tssh.svg', { width: 360, height: 326 })
+    
+    // Create settings button instance for preloading
+    this.settingsButton = new SettingsButton(this)
+    this.settingsButton.preload()
 
     // Load hit sound effects for game start sound
     for (let i = 1; i <= 12; i++) {
@@ -48,6 +54,9 @@ export class OpeningScene extends Phaser.Scene {
     this.createStartText()
     this.createFloatingBricks()
     this.setupInputHandlers()
+
+    // Create settings button
+    this.settingsButton.create()
   }
 
   private createBackground() {
@@ -227,6 +236,9 @@ export class OpeningScene extends Phaser.Scene {
     if (this.soundManager) {
       this.soundManager.playRandomHitSound()
     }
+
+    // Hide settings button
+    this.settingsButton.hide(500)
 
     this.tweens.add({
       targets: [this.titleLogo, this.gameNameText, this.startText],

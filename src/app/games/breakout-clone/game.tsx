@@ -65,6 +65,17 @@ export const BreakoutGame: React.FC<BreakoutGameParams> = ({ debugMode: propDebu
     // Store initial settings in Phaser's registry for all scenes to access
     game.registry.set('settings', settingsRef.current)
 
+    // Listen for settings modal open event from game scenes
+    game.events.on('openSettings', () => {
+      setIsSettingsOpen(true)
+      
+      // Auto-pause the BreakoutScene when settings open (OpeningScene doesn't need pausing)
+      const breakoutScene = game.scene.getScene('BreakoutScene')
+      if (breakoutScene && breakoutScene.scene.isActive() && 'pauseForSettings' in breakoutScene) {
+        ;(breakoutScene as BreakoutScene).pauseForSettings()
+      }
+    })
+
     return () => {
       game.destroy(true)
       gameRef.current = null
@@ -113,54 +124,15 @@ export const BreakoutGame: React.FC<BreakoutGameParams> = ({ debugMode: propDebu
           position: relative;
           max-width: ${constants.GAME_WIDTH}px;
           max-height: ${constants.GAME_HEIGHT}px;
-          aspect-ratio: ${constants.GAME_WIDTH} / ${constants.GAME_HEIGHT};
           position: relative;
         `}
       >
-        {/* Settings button */}
-        <button
-          onClick={() => {
-            // Pause game when opening settings
-            if (gameRef.current) {
-              const scene = gameRef.current.scene.getScene('BreakoutScene') as BreakoutScene
-              if (scene && scene.scene.isActive()) {
-                scene.pauseForSettings()
-              }
-            }
-            setIsSettingsOpen(true)
-          }}
-          css={css`
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            z-index: 200;
-            background: #f5f5f5;
-            border: none;
-            border-radius: 2px;
-            color: #333333;
-            padding: 12px 20px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: background-color 0.2s ease;
-            box-shadow: none;
-
-            &:hover {
-              background: #e0e0e0;
-            }
-
-            &:active {
-              background: #d0d0d0;
-            }
-          `}
-        >
-          設定
-        </button>
         <div
           css={css`
             display: flex;
             align-items: center;
             justify-content: center;
+            aspect-ratio: ${constants.GAME_WIDTH} / ${constants.GAME_HEIGHT};
           `}
           data-phaser-game
           ref={gameContainerRef}
