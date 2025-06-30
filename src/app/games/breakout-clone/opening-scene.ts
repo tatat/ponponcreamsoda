@@ -242,8 +242,16 @@ export class OpeningScene extends Phaser.Scene {
   private startGame() {
     this.isTransitioning = true
 
+    // Get latest settings from registry and update sound manager
+    const latestSettings = this.registry.get('settings') as GameSettings
+    if (latestSettings && this.soundManager) {
+      console.log('startGame: applying settings:', latestSettings.sound)
+      this.soundManager.applySettings(latestSettings.sound)
+    }
+
     // Play random hit sound when starting game
     if (this.soundManager) {
+      console.log('startGame: playing random hit sound')
       this.soundManager.playRandomHitSound()
     }
 
@@ -277,9 +285,15 @@ export class OpeningScene extends Phaser.Scene {
   applySettings(newSettings: GameSettings) {
     this.settings = newSettings
 
+    // Debug: Log settings change
+    console.log('OpeningScene applySettings called:', newSettings.sound)
+
     // Update sound manager with new settings
     if (this.soundManager) {
       this.soundManager.applySettings(newSettings.sound)
     }
+
+    // Update registry with new settings
+    this.registry.set('settings', newSettings)
   }
 }

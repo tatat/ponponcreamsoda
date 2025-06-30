@@ -1,10 +1,6 @@
 import * as Phaser from 'phaser'
 import { constants } from './constants'
-
-export type SoundSettings = {
-  musicalScale: keyof typeof constants.MUSICAL_SCALES
-  baseKey: keyof typeof constants.BASE_KEY_OFFSETS
-}
+import { SoundSettings } from './settings'
 
 /**
  * SoundManager class - Handles all sound-related functionality for the breakout game
@@ -12,12 +8,14 @@ export type SoundSettings = {
 export class SoundManager {
   private scene: Phaser.Scene
   private hitSounds: Phaser.Sound.BaseSound[]
+  private soundEnabled: boolean
   private currentScale: keyof typeof constants.MUSICAL_SCALES
   private currentBaseKey: keyof typeof constants.BASE_KEY_OFFSETS
 
   constructor(scene: Phaser.Scene, soundSettings: SoundSettings) {
     this.scene = scene
     this.hitSounds = []
+    this.soundEnabled = soundSettings.soundEnabled
     this.currentScale = soundSettings.musicalScale
     this.currentBaseKey = soundSettings.baseKey
   }
@@ -51,6 +49,11 @@ export class SoundManager {
    * Play a random hit sound based on current musical scale and base key
    */
   playRandomHitSound(): void {
+    // Check if sound is enabled
+    if (!this.soundEnabled) {
+      return
+    }
+
     // Play a random hit sound from the current scale with base key transposition
     if (this.hitSounds.length > 0) {
       const scaleNotes = constants.MUSICAL_SCALES[this.currentScale]
@@ -73,6 +76,7 @@ export class SoundManager {
    * Update settings and apply changes
    */
   applySettings(newSettings: SoundSettings): void {
+    this.soundEnabled = newSettings.soundEnabled
     this.currentScale = newSettings.musicalScale
     this.currentBaseKey = newSettings.baseKey
   }

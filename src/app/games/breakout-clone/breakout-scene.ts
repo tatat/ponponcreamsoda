@@ -46,8 +46,10 @@ export class BreakoutScene extends Phaser.Scene {
       })
     })
 
-    // Initialize sound manager and load sounds
-    this.soundManager = new SoundManager(this, this.gameSettings.sound)
+    // Initialize sound manager with settings from registry
+    const registrySettings = this.registry.get('settings') as GameSettings
+    const soundSettings = registrySettings ? registrySettings.sound : this.gameSettings.sound
+    this.soundManager = new SoundManager(this, soundSettings)
     this.soundManager.preload()
 
     // Create graphics for game objects using proper sizes
@@ -203,8 +205,15 @@ export class BreakoutScene extends Phaser.Scene {
     // Initialize sound manager
     this.soundManager.initialize()
 
-    // Apply initial settings
-    this.applySettings(this.gameSettings)
+    // Apply settings from registry (latest settings)
+    const currentSettings = this.registry.get('settings') as GameSettings
+    if (currentSettings) {
+      console.log('BreakoutScene applying registry settings:', currentSettings.sound)
+      this.applySettings(currentSettings)
+    } else {
+      console.log('BreakoutScene applying default settings:', this.gameSettings.sound)
+      this.applySettings(this.gameSettings)
+    }
 
     // Add visibility change listener for auto-pause
     this.setupVisibilityListener()
