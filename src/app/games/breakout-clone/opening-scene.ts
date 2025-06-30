@@ -19,9 +19,9 @@ export class OpeningScene extends Phaser.Scene {
   }
 
   preload() {
-    // Load brick images for floating effect (128 size only)
+    // Load brick images for floating effect (using 256 size for better quality)
     constants.BRICK_NAMES.forEach((name) => {
-      this.load.image(`brick-${name}-128`, `/games/breakout-clone/images/i-${name}-128@2x.png`)
+      this.load.image(`brick-${name}-256`, `/games/breakout-clone/images/i-${name}-256@2x.png`)
     })
 
     // Load logo for title with specific size to avoid scaling blur
@@ -102,13 +102,38 @@ export class OpeningScene extends Phaser.Scene {
       { x: 1114, y: 491 }, // t2
     ]
 
-    // Create static brick images using 128 size only
+    // Create static brick images using high-quality 256 textures at 256px size
     brickPositions.forEach((pos, index) => {
       const brickName = constants.BRICK_NAMES[index]
-      const brickKey = `brick-${brickName}-128`
+      const brickKey = `brick-${brickName}-256`
 
       // Create regular image (no physics)
-      const brick = this.add.image(pos.x, pos.y, brickKey)
+      const brick = this.add.image(Math.round(pos.x), Math.round(pos.y), brickKey)
+      
+      // Get original texture dimensions to maintain aspect ratio
+      const texture = this.textures.get(brickKey)
+      const sourceImage = texture.getSourceImage() as HTMLImageElement
+      
+      // Calculate logical size (since images are @2x resolution)
+      const logicalWidth = sourceImage.width / 2
+      const logicalHeight = sourceImage.height / 2
+      
+      // Scale to exactly 256px while maintaining aspect ratio
+      const aspectRatio = logicalWidth / logicalHeight
+      let displayWidth, displayHeight
+      
+      if (aspectRatio >= 1) {
+        // Horizontal or square - base width on 256px
+        displayWidth = 256
+        displayHeight = 256 / aspectRatio
+      } else {
+        // Vertical - base height on 256px
+        displayWidth = 256 * aspectRatio
+        displayHeight = 256
+      }
+      
+      // Set display size with proper aspect ratio (256px texture at 256px)
+      brick.setDisplaySize(displayWidth, displayHeight)
 
       // Background effect with subtle styling (no scale change)
       brick.setAlpha(0) // Start transparent for fade in
@@ -126,7 +151,7 @@ export class OpeningScene extends Phaser.Scene {
       // Add floating animation
       this.tweens.add({
         targets: brick,
-        y: pos.y + Phaser.Math.Between(-10, 10),
+        y: Math.round(pos.y + Phaser.Math.Between(-10, 10)),
         duration: Phaser.Math.Between(3000, 5000),
         ease: 'Sine.easeInOut',
         yoyo: true,
