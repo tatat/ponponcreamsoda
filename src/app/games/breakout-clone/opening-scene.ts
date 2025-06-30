@@ -7,7 +7,6 @@ export class OpeningScene extends Phaser.Scene {
   private titleLogo?: Phaser.GameObjects.Image
   private gameNameText?: Phaser.GameObjects.Text
   private startText?: Phaser.GameObjects.Text
-  private background?: Phaser.GameObjects.Rectangle
   private stars: Phaser.GameObjects.Arc[] = []
   private isTransitioning = false
   private soundManager?: SoundManager
@@ -18,12 +17,9 @@ export class OpeningScene extends Phaser.Scene {
   }
 
   preload() {
-    // Load brick images for floating effect
+    // Load brick images for floating effect (128 size only)
     constants.BRICK_NAMES.forEach((name) => {
-      const sizes = [128, 160, 192] // Load larger sizes for better visibility
-      sizes.forEach((size) => {
-        this.load.image(`brick-${name}-${size}`, `/games/breakout-clone/images/i-${name}-${size}@2x.png`)
-      })
+      this.load.image(`brick-${name}-128`, `/games/breakout-clone/images/i-${name}-128@2x.png`)
     })
 
     // Load logo for title with specific size to avoid scaling blur
@@ -55,7 +51,7 @@ export class OpeningScene extends Phaser.Scene {
   }
 
   private createBackground() {
-    this.background = this.add.rectangle(
+    this.add.rectangle(
       constants.GAME_WIDTH / 2,
       constants.GAME_HEIGHT / 2,
       constants.GAME_WIDTH,
@@ -143,14 +139,7 @@ export class OpeningScene extends Phaser.Scene {
   }
 
   private createTitle() {
-    this.titleLogo = this.add.image(231, 205, 'logo-tssh').setOrigin(0.5).setAlpha(0).setDepth(1) // Put logo in front of bricks
-
-    // Add physics body to title logo for collision detection
-    this.physics.add.existing(this.titleLogo, true) // true = static body
-
-    // Set the collision area to match the logo bounds
-    const logoBounds = this.titleLogo.getBounds()
-    this.titleLogo.setSize(logoBounds.width, logoBounds.height)
+    this.titleLogo = this.add.image(231, 205, 'logo-tssh').setOrigin(0.5).setAlpha(0).setDepth(1)
 
     this.tweens.add({
       targets: this.titleLogo,
@@ -169,14 +158,7 @@ export class OpeningScene extends Phaser.Scene {
       })
       .setOrigin(0)
       .setAlpha(0)
-      .setDepth(1) // Put text in front of bricks
-
-    // Add physics body to game name text for collision detection
-    this.physics.add.existing(this.gameNameText, true) // true = static body
-
-    // Set the collision area to match the text bounds
-    const gameNameBounds = this.gameNameText.getBounds()
-    this.gameNameText.setSize(gameNameBounds.width, gameNameBounds.height)
+      .setDepth(1)
 
     this.tweens.add({
       targets: this.gameNameText,
@@ -198,14 +180,7 @@ export class OpeningScene extends Phaser.Scene {
       })
       .setOrigin(0)
       .setAlpha(0)
-      .setDepth(1) // Put text in front of bricks
-
-    // Add physics body to start text for collision detection
-    this.physics.add.existing(this.startText, true) // true = static body
-
-    // Set the collision area to match the text bounds
-    const startTextBounds = this.startText.getBounds()
-    this.startText.setSize(startTextBounds.width, startTextBounds.height)
+      .setDepth(1)
 
     this.tweens.add({
       targets: this.startText,
@@ -245,13 +220,11 @@ export class OpeningScene extends Phaser.Scene {
     // Get latest settings from registry and update sound manager
     const latestSettings = this.registry.get('settings') as GameSettings
     if (latestSettings && this.soundManager) {
-      console.log('startGame: applying settings:', latestSettings.sound)
       this.soundManager.applySettings(latestSettings.sound)
     }
 
     // Play random hit sound when starting game
     if (this.soundManager) {
-      console.log('startGame: playing random hit sound')
       this.soundManager.playRandomHitSound()
     }
 
@@ -284,9 +257,6 @@ export class OpeningScene extends Phaser.Scene {
   // Apply settings from the settings modal
   applySettings(newSettings: GameSettings) {
     this.settings = newSettings
-
-    // Debug: Log settings change
-    console.log('OpeningScene applySettings called:', newSettings.sound)
 
     // Update sound manager with new settings
     if (this.soundManager) {

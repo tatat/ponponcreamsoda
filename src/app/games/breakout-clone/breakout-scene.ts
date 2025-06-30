@@ -208,10 +208,8 @@ export class BreakoutScene extends Phaser.Scene {
     // Apply settings from registry (latest settings)
     const currentSettings = this.registry.get('settings') as GameSettings
     if (currentSettings) {
-      console.log('BreakoutScene applying registry settings:', currentSettings.sound)
       this.applySettings(currentSettings)
     } else {
-      console.log('BreakoutScene applying default settings:', this.gameSettings.sound)
       this.applySettings(this.gameSettings)
     }
 
