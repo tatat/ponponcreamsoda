@@ -1,7 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { css } from '@emotion/react'
 import * as Phaser from 'phaser'
-import { BreakoutScene } from './breakout-scene'
+import type { OpeningScene } from './opening-scene'
+import type { BreakoutScene } from './breakout-scene'
+import { OpeningScene as OpeningSceneClass } from './opening-scene'
+import { BreakoutScene as BreakoutSceneClass } from './breakout-scene'
 import { constants } from './constants'
 import { GameSettings, loadSettings } from './settings'
 import { SettingsModal } from './settings-modal'
@@ -15,6 +18,7 @@ export const BreakoutGame: React.FC<BreakoutGameParams> = ({ debugMode: propDebu
   const gameRef = useRef<Phaser.Game | null>(null)
   const [settings, setSettings] = useState<GameSettings>(() => loadSettings())
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const settingsRef = useRef<GameSettings>(settings)
 
   // Get debug mode from settings, prioritize props if provided
   const debugMode = propDebugMode !== undefined ? propDebugMode : settings.debugMode
@@ -42,7 +46,7 @@ export const BreakoutGame: React.FC<BreakoutGameParams> = ({ debugMode: propDebu
         mipmapFilter: 'LINEAR_MIPMAP_LINEAR', // High-quality mipmaps
         batchSize: 4096, // Increase batch size
       },
-      scene: BreakoutScene,
+      scene: [OpeningSceneClass, BreakoutSceneClass],
       backgroundColor: '#0a0a1a', // Deep space color
       physics: {
         default: 'arcade',
@@ -58,6 +62,9 @@ export const BreakoutGame: React.FC<BreakoutGameParams> = ({ debugMode: propDebu
 
     gameRef.current = game
 
+    // Store initial settings in Phaser's registry for all scenes to access
+    game.registry.set('settings', settingsRef.current)
+
     return () => {
       game.destroy(true)
       gameRef.current = null
@@ -67,6 +74,7 @@ export const BreakoutGame: React.FC<BreakoutGameParams> = ({ debugMode: propDebu
   const handleSettingsChange = (newSettings: GameSettings) => {
     const previousDebugMode = settings.debugMode
     setSettings(newSettings)
+    settingsRef.current = newSettings
 
     // Reset game if debug mode changed
     if (newSettings.debugMode !== previousDebugMode) {
@@ -77,12 +85,18 @@ export const BreakoutGame: React.FC<BreakoutGameParams> = ({ debugMode: propDebu
       }
       // useEffect will re-run and recreate the game
     } else {
-      // For other setting changes, apply normal settings
+      // For other setting changes, update registry and notify all active scenes
       if (gameRef.current) {
-        const scene = gameRef.current.scene.getScene('BreakoutScene') as BreakoutScene
-        if (scene) {
-          scene.applySettings(newSettings)
-        }
+        // Update settings in registry
+        gameRef.current.registry.set('settings', newSettings)
+
+        // Apply settings to all active scenes
+        const scenes = gameRef.current.scene.scenes
+        scenes.forEach((scene) => {
+          if (scene.scene.isActive() && 'applySettings' in scene) {
+            ;(scene as BreakoutScene | OpeningScene).applySettings(newSettings)
+          }
+        })
       }
     }
   }
@@ -109,7 +123,7 @@ export const BreakoutGame: React.FC<BreakoutGameParams> = ({ debugMode: propDebu
             // Pause game when opening settings
             if (gameRef.current) {
               const scene = gameRef.current.scene.getScene('BreakoutScene') as BreakoutScene
-              if (scene) {
+              if (scene && scene.scene.isActive()) {
                 scene.pauseForSettings()
               }
             }

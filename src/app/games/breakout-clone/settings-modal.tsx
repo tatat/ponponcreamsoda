@@ -236,8 +236,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
               >
                 <input
                   type="checkbox"
-                  checked={localSettings.soundEnabled}
-                  onChange={(e) => updateSetting('soundEnabled', e.target.checked)}
+                  checked={localSettings.sound.soundEnabled}
+                  onChange={(e) =>
+                    setLocalSettings((prev) => ({ ...prev, sound: { ...prev.sound, soundEnabled: e.target.checked } }))
+                  }
                   css={css`
                     margin-right: 12px;
                     accent-color: #ffffff;
@@ -275,8 +277,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
                 ヒット音で使用する音楽スケールを選択します
               </div>
               <select
-                value={localSettings.musicalScale}
-                onChange={(e) => updateSetting('musicalScale', e.target.value as MusicalScale)}
+                value={localSettings.sound.musicalScale}
+                onChange={(e) =>
+                  setLocalSettings((prev) => ({
+                    ...prev,
+                    sound: { ...prev.sound, musicalScale: e.target.value as MusicalScale },
+                  }))
+                }
                 css={css`
                   width: 100%;
                   padding: 8px 12px;
@@ -322,8 +329,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
                 スケールの基準となる音程を選択します
               </div>
               <select
-                value={localSettings.baseKey}
-                onChange={(e) => updateSetting('baseKey', e.target.value as BaseKey)}
+                value={localSettings.sound.baseKey}
+                onChange={(e) =>
+                  setLocalSettings((prev) => ({
+                    ...prev,
+                    sound: { ...prev.sound, baseKey: e.target.value as BaseKey },
+                  }))
+                }
                 css={css`
                   width: 100%;
                   padding: 8px 12px;

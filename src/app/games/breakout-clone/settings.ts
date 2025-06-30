@@ -11,13 +11,17 @@ export type MusicalScale =
 
 export type BaseKey = 'C' | 'C#' | 'D' | 'D#' | 'E' | 'F' | 'F#' | 'G' | 'G#' | 'A' | 'A#' | 'B'
 
+export interface SoundSettings {
+  soundEnabled: boolean
+  musicalScale: MusicalScale
+  baseKey: BaseKey
+}
+
 export interface GameSettings {
   // Control settings
   showVirtualPad: boolean
   // Audio settings
-  soundEnabled: boolean
-  musicalScale: MusicalScale
-  baseKey: BaseKey
+  sound: SoundSettings
   // Debug settings
   debugMode: boolean
 }
@@ -26,9 +30,11 @@ export const defaultSettings: GameSettings = {
   // Control settings
   showVirtualPad: true,
   // Audio settings
-  soundEnabled: true,
-  musicalScale: 'major',
-  baseKey: 'C',
+  sound: {
+    soundEnabled: true,
+    musicalScale: 'major',
+    baseKey: 'C',
+  },
   // Debug settings
   debugMode: false,
 }
@@ -51,6 +57,24 @@ export function loadSettings(): GameSettings {
     const saved = localStorage.getItem(SETTINGS_STORAGE_KEY)
     if (saved) {
       const parsed = JSON.parse(saved)
+
+      // Migrate old settings format to new format
+      if ('soundEnabled' in parsed || 'musicalScale' in parsed || 'baseKey' in parsed) {
+        const migrated: GameSettings = {
+          ...getDeviceSpecificDefaults(),
+          showVirtualPad: parsed.showVirtualPad ?? getDeviceSpecificDefaults().showVirtualPad,
+          debugMode: parsed.debugMode ?? false,
+          sound: {
+            soundEnabled: parsed.soundEnabled ?? true,
+            musicalScale: parsed.musicalScale ?? 'major',
+            baseKey: parsed.baseKey ?? 'C',
+          },
+        }
+        // Save migrated settings
+        saveSettings(migrated)
+        return migrated
+      }
+
       // Merge with device-specific defaults to handle cases where new settings are added
       return { ...getDeviceSpecificDefaults(), ...parsed }
     }

@@ -47,7 +47,7 @@ export class BreakoutScene extends Phaser.Scene {
     })
 
     // Initialize sound manager and load sounds
-    this.soundManager = new SoundManager(this, this.gameSettings)
+    this.soundManager = new SoundManager(this, this.gameSettings.sound)
     this.soundManager.preload()
 
     // Create graphics for game objects using proper sizes
@@ -805,7 +805,7 @@ export class BreakoutScene extends Phaser.Scene {
 
   private playRandomHitSound() {
     // Don't play sound if disabled in settings
-    if (!this.gameSettings.soundEnabled) {
+    if (!this.gameSettings.sound.soundEnabled) {
       return
     }
 
@@ -823,7 +823,7 @@ export class BreakoutScene extends Phaser.Scene {
     this.gameSettings = newSettings
 
     // Update sound manager settings
-    this.soundManager.applySettings(newSettings)
+    this.soundManager.applySettings(newSettings.sound)
 
     // Toggle Virtual Pad visibility
     this.controlsManager.setVirtualPadVisibility(newSettings.showVirtualPad)

@@ -93,8 +93,11 @@ This is a Next.js 15+ TypeScript project for a doujin circle website with App Ro
 
 ## Development
 
-- Run `npm run lint` and `npm run format` after making changes
-- Ensure all linting errors are fixed before committing
+- **IMPORTANT: Always run lint, format, and type-check after making changes:**
+  - Run `npm run lint` to check for ESLint errors
+  - Run `npm run format` to auto-format code with Prettier
+  - Run `npm run type-check` to check for TypeScript type errors
+- Ensure all linting and type errors are fixed before committing
 - Test changes thoroughly before deployment
 
 ## Japanese Content
