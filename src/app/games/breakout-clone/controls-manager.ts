@@ -79,12 +79,12 @@ export class ControlsManager {
     const buttonMargin = 15 // Margin for edge placement
     const buttonSpacing = 15 // Spacing between adjacent buttons (same as margin)
 
-    // Pause button (right top) with pause symbol
+    // Pause button (right side, third from bottom) with pause symbol
     const pauseControl = this.scene.add.graphics()
     pauseControl.fillStyle(0x000000, 0.3) // Semi-transparent black fill
     pauseControl.fillRect(
       constants.GAME_WIDTH - buttonMargin - rightButtonSize,
-      buttonMargin,
+      constants.GAME_HEIGHT - buttonMargin - rightButtonSize * 3 - buttonSpacing * 2,
       rightButtonSize,
       rightButtonSize,
     )
@@ -92,14 +92,14 @@ export class ControlsManager {
     // Draw pause symbol (two vertical lines)
     pauseControl.lineStyle(4, 0xffffff, 0.8)
     const pauseX = constants.GAME_WIDTH - buttonMargin - rightButtonSize / 2
-    const pauseY = buttonMargin + rightButtonSize / 2
+    const pauseY = constants.GAME_HEIGHT - buttonMargin - rightButtonSize * 2.5 - buttonSpacing * 2
     pauseControl.lineBetween(pauseX - 8, pauseY - 12, pauseX - 8, pauseY + 12)
     pauseControl.lineBetween(pauseX + 8, pauseY - 12, pauseX + 8, pauseY + 12)
     pauseControl.setDepth(110)
     pauseControl.setInteractive(
       new Phaser.Geom.Rectangle(
         constants.GAME_WIDTH - buttonMargin - rightButtonSize,
-        buttonMargin,
+        constants.GAME_HEIGHT - buttonMargin - rightButtonSize * 3 - buttonSpacing * 2,
         rightButtonSize,
         rightButtonSize,
       ),

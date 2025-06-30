@@ -33,7 +33,7 @@ export class SettingsButton {
    * Preload settings icon assets
    */
   preload(): void {
-    this.scene.load.svg('settings-icon', '/games/breakout-clone/images/settings.svg', { width: 30, height: 30 })
+    this.scene.load.svg('settings-icon', '/games/breakout-clone/images/settings.svg', { width: 36, height: 36 })
   }
 
   create(): void {
@@ -44,13 +44,11 @@ export class SettingsButton {
     // Create icon
     this.icon = this.scene.add.image(0, 0, 'settings-icon')
     this.icon.setOrigin(0.5)
-    // No need to set display size - use original 30x30
-    this.icon.setTint(0xffffff)
 
     // Set fixed button size for consistent appearance
     const padding = { x: 6, y: 6 }
-    const bgWidth = 30 + padding.x * 2
-    const bgHeight = 30 + padding.y * 2
+    const bgWidth = 36 + padding.x * 2
+    const bgHeight = 36 + padding.y * 2
 
     // Create rounded rectangle background
     this.background = this.scene.add.graphics()
@@ -63,7 +61,7 @@ export class SettingsButton {
     this.container.setSize(bgWidth, bgHeight)
     this.container.setInteractive({ useHandCursor: true })
 
-    // Adjust position for right alignment (considering button width)
+    // Adjust position - config.x/y is the desired top-right corner
     this.container.setPosition(this.config.x - bgWidth / 2, this.config.y + bgHeight / 2)
 
     // Fade in animation

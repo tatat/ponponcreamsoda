@@ -26,7 +26,7 @@ export class OpeningScene extends Phaser.Scene {
 
     // Load logo for title with specific size to avoid scaling blur
     this.load.svg('logo-tssh', '/games/breakout-clone/images/logo-tssh.svg', { width: 360, height: 326 })
-    
+
     // Create settings button instance for preloading
     this.settingsButton = new SettingsButton(this)
     this.settingsButton.preload()
@@ -163,7 +163,7 @@ export class OpeningScene extends Phaser.Scene {
       .text(50, 596, 'ブロック崩し', {
         fontSize: '38px',
         fontFamily: '"Kaisei Decol", serif',
-        color: '#e8e8e8',
+        color: '#d8d8d8',
       })
       .setOrigin(0)
       .setAlpha(0)
@@ -184,8 +184,6 @@ export class OpeningScene extends Phaser.Scene {
         fontSize: '24px',
         fontFamily: '"Kaisei Decol", serif',
         color: '#a0a0a0',
-        stroke: '#1a1a1a',
-        strokeThickness: 1,
       })
       .setOrigin(0)
       .setAlpha(0)
