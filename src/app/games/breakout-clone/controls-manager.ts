@@ -23,6 +23,8 @@ export class ControlsManager {
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys
   private spaceKey!: Phaser.Input.Keyboard.Key
   private shiftKey!: Phaser.Input.Keyboard.Key
+  private aKey!: Phaser.Input.Keyboard.Key
+  private dKey!: Phaser.Input.Keyboard.Key
   private callbacks: ControlsCallbacks
   private state: ControlsState = {
     isLeftPressed: false,
@@ -54,6 +56,8 @@ export class ControlsManager {
     this.cursors = this.scene.input.keyboard.createCursorKeys()
     this.spaceKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE)
     this.shiftKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT)
+    this.aKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A)
+    this.dKey = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D)
 
     // Add keyboard event listeners
     this.scene.input.keyboard.on('keydown-R', this.callbacks.onRestart)
@@ -340,8 +344,8 @@ export class ControlsManager {
 
   public getMovementInput() {
     return {
-      isLeftPressed: this.cursors.left.isDown || this.state.isLeftPressed,
-      isRightPressed: this.cursors.right.isDown || this.state.isRightPressed,
+      isLeftPressed: this.cursors.left.isDown || this.aKey.isDown || this.state.isLeftPressed,
+      isRightPressed: this.cursors.right.isDown || this.dKey.isDown || this.state.isRightPressed,
       isFastMovePressed: this.shiftKey.isDown || this.state.isFastMovePressed,
     }
   }

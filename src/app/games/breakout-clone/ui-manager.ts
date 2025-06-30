@@ -75,7 +75,8 @@ export class UIManager {
     this.gameOverText = this.scene.add.text(
       constants.GAME_CENTER_X,
       constants.GAME_CENTER_Y,
-      'GAME OVER\nPress R to restart',
+      `GAME OVER
+Press R to restart`,
       {
         fontSize: '32px',
         color: '#ff6b6b', // Bright red
@@ -90,7 +91,14 @@ export class UIManager {
     this.startText = this.scene.add.text(
       constants.GAME_CENTER_X,
       constants.GAME_CENTER_Y,
-      'Press SPACE to start\n\n--- CONTROLS ---\n← → : Move paddle\nSHIFT + ← → : Fast move\nSPACE : Jump (during game)\nP : Pause/Resume\nR : Restart',
+      `Press SPACE to start
+
+--- CONTROLS ---
+← → / A D : Move paddle
+SHIFT + ← → / A D : Fast move
+SPACE : Jump (during game)
+P : Pause/Resume
+R : Restart`,
       {
         fontSize: '24px',
         color: '#ffffff',
@@ -106,7 +114,15 @@ export class UIManager {
     this.pauseText = this.scene.add.text(
       constants.GAME_CENTER_X,
       constants.GAME_CENTER_Y,
-      'PAUSED\nPress P to resume\n\n--- CONTROLS ---\n← → : Move paddle\nSHIFT + ← → : Fast move\nSPACE : Jump\nP : Pause/Resume\nR : Restart',
+      `PAUSED
+Press P to resume
+
+--- CONTROLS ---
+← → / A D : Move paddle
+SHIFT + ← → / A D : Fast move
+SPACE : Jump
+P : Pause/Resume
+R : Restart`,
       {
         fontSize: '24px',
         color: '#ffffff',
@@ -141,12 +157,44 @@ export class UIManager {
   updateAllTexts(): void {
     // Update start text for all devices (keyboard + virtual pad controls)
     this.startText.setText(
-      `${gameInfo.title}\n\nPRESS SPACE OR TAP/CLICK TO START\n\n--- KEYBOARD CONTROLS ---\n← → : Move paddle\nSHIFT + ← → : Fast move\nSPACE : Jump (during game)\nP : Pause/Resume\nR : Restart\n\n--- VIRTUAL PAD CONTROLS ---\n← → buttons: Move paddle\nJUMP button: Jump\nPAUSE button: Pause/Resume\nFAST button: Fast move\nTap/Click anywhere: Start game`,
+      `${gameInfo.title}
+
+PRESS SPACE OR TAP/CLICK TO START
+
+--- KEYBOARD CONTROLS ---
+← → / A D : Move paddle
+SHIFT + ← → / A D : Fast move
+SPACE : Jump (during game)
+P : Pause/Resume
+R : Restart
+
+--- VIRTUAL PAD CONTROLS ---
+← → buttons: Move paddle
+JUMP button: Jump
+PAUSE button: Pause/Resume
+FAST button: Fast move
+Tap/Click anywhere: Start game`,
     )
 
     // Update pause text for all devices
     this.pauseText.setText(
-      `${gameInfo.title}\n\nPAUSED\nPress P or tap/click PAUSE to resume\n\n--- KEYBOARD CONTROLS ---\n← → : Move paddle\nSHIFT + ← → : Fast move\nSPACE : Jump\nP : Pause/Resume\nR : Restart\n\n--- VIRTUAL PAD CONTROLS ---\n← → buttons: Move paddle\nJUMP button: Jump\nPAUSE button: Pause/Resume\nFAST button: Fast move`,
+      `${gameInfo.title}
+
+PAUSED
+Press P or tap/click PAUSE to resume
+
+--- KEYBOARD CONTROLS ---
+← → / A D : Move paddle
+SHIFT + ← → / A D : Fast move
+SPACE : Jump
+P : Pause/Resume
+R : Restart
+
+--- VIRTUAL PAD CONTROLS ---
+← → buttons: Move paddle
+JUMP button: Jump
+PAUSE button: Pause/Resume
+FAST button: Fast move`,
     )
   }
 
@@ -208,7 +256,10 @@ export class UIManager {
   showGameOverScreen(finalScore: number, finalTimeMs: number): void {
     const finalSeconds = (finalTimeMs / 1000).toFixed(1)
     this.gameOverText.setText(
-      `GAME OVER\nFinal Score: ${finalScore}\nTime: ${finalSeconds}s\nPress R or tap to restart`,
+      `GAME OVER
+Final Score: ${finalScore}
+Time: ${finalSeconds}s
+Press R or tap to restart`,
     )
     this.gameOverText.setVisible(true)
     this.fullScreenOverlay.setVisible(true)
