@@ -106,16 +106,27 @@ const useStyles = () => {
           max-width: 600px;
         }
       `,
-      newReleaseGrid: css`
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      featuredGrid: css`
+        display: flex;
+        flex-wrap: wrap;
         gap: 2rem;
-        max-width: 600px;
+        max-width: 1200px;
         margin: 0 auto;
+        justify-content: center;
+
+        > * {
+          flex: 1 1 450px;
+          max-width: 600px;
+        }
 
         @media ${theme.breakpoints.portrait} {
-          grid-template-columns: 1fr;
           gap: 1.5rem;
+          max-width: 600px;
+
+          > * {
+            flex: 1 1 100%;
+            max-width: 100%;
+          }
         }
       `,
       stickerGrid: css`
@@ -176,6 +187,20 @@ const useStyles = () => {
 
         @media ${theme.breakpoints.portrait} {
           height: 280px;
+          padding: 0.5rem 0.5rem 0 0.5rem;
+        }
+      `,
+      featuredImage: css`
+        width: 100%;
+        height: 480px;
+        object-fit: contain;
+        display: block;
+        background: rgba(236, 240, 241, 0.05);
+        padding: 0.75rem 0.75rem 0 0.75rem;
+        box-sizing: border-box;
+
+        @media ${theme.breakpoints.portrait} {
+          height: 360px;
           padding: 0.5rem 0.5rem 0 0.5rem;
         }
       `,
@@ -368,9 +393,25 @@ const useStyles = () => {
         justify-content: center;
         background: rgba(236, 240, 241, 0.05);
         padding: 0.75rem 0.75rem 0 0.75rem;
+        min-height: 360px;
 
         @media ${theme.breakpoints.portrait} {
           padding: 0.5rem 0.5rem 0 0.5rem;
+          min-height: 280px;
+        }
+      `,
+      groupImageGridWrapperFeatured: css`
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(236, 240, 241, 0.05);
+        padding: 0.75rem 0.75rem 0 0.75rem;
+        min-height: 480px;
+
+        @media ${theme.breakpoints.portrait} {
+          padding: 0.5rem 0.5rem 0 0.5rem;
+          min-height: 360px;
         }
       `,
       groupImageGrid: css`
@@ -528,10 +569,12 @@ const ItemInfo = ({
   )
 }
 
-const BookItem = ({ item }: { item: ItemBook }) => {
+const BookItem = ({ item, isFeatured = false }: { item: ItemBook; isFeatured?: boolean }) => {
   const styles = useStyles()
 
-  const imageElement = <img src={item.imageUrl} alt={item.name} css={styles.itemImage} />
+  const imageElement = (
+    <img src={item.imageUrl} alt={item.name} css={isFeatured ? styles.featuredImage : styles.itemImage} />
+  )
 
   return (
     <div css={styles.itemCard}>
@@ -576,13 +619,13 @@ const OtherItem = ({ item }: { item: ItemOther }) => {
   )
 }
 
-const GroupSetItem = ({ group }: { group: ItemGroup }) => {
+const GroupSetItem = ({ group, isFeatured = false }: { group: ItemGroup; isFeatured?: boolean }) => {
   const styles = useStyles()
 
   return (
     <div css={styles.groupSetCard}>
       <div css={styles.setBadge}>セット</div>
-      <div css={styles.groupImageGridWrapper}>
+      <div css={isFeatured ? styles.groupImageGridWrapperFeatured : styles.groupImageGridWrapper}>
         <div
           css={styles.groupImageGrid}
           style={{ gridTemplateColumns: `repeat(${Math.min(group.itemCount, 3)}, auto)` }}
@@ -619,12 +662,12 @@ export default function ItemListContent() {
       {itemList.newReleases.map((category, categoryIndex) => (
         <section key={categoryIndex} css={styles.section}>
           <h2 css={styles.sectionTitle}>新刊</h2>
-          <div css={styles.itemGrid}>
+          <div css={styles.featuredGrid}>
             {category.items.map((item, itemIndex) => {
               if (item.itemType === 'group') {
-                return <GroupSetItem key={`item-${itemIndex}`} group={item} />
+                return <GroupSetItem key={`item-${itemIndex}`} group={item} isFeatured={true} />
               } else if (item.itemType === 'book') {
-                return <BookItem key={`item-${itemIndex}`} item={item} />
+                return <BookItem key={`item-${itemIndex}`} item={item} isFeatured={true} />
               }
               return null
             })}
