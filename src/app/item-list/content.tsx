@@ -3,6 +3,7 @@
 import { css, useTheme } from '@emotion/react'
 import { useMemo } from 'react'
 import Link from 'next/link'
+import html2canvas from 'html2canvas'
 import Menu from '@/components/Menu'
 import { itemList } from '@/item-list'
 import type { ItemBook, ItemSticker, ItemOther, ItemGroup, AvailabilityState } from '@/item-list-type'
@@ -59,6 +60,30 @@ const useStyles = () => {
           font-size: 1rem;
         }
       `,
+      downloadButton: css`
+        ${theme.styles.text};
+        background: linear-gradient(135deg, #8b7355, #a68b5b);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        letter-spacing: 0.05em;
+        margin: 1.5rem auto 0;
+        display: block;
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 8px rgba(139, 115, 85, 0.3);
+        }
+
+        @media ${theme.breakpoints.portrait} {
+          font-size: 0.8rem;
+          padding: 0.6rem 1.2rem;
+        }
+      `,
       section: css`
         margin-bottom: 4rem;
 
@@ -66,23 +91,31 @@ const useStyles = () => {
           margin-bottom: 3rem;
         }
       `,
+      sectionTitleWrapper: css`
+        text-align: center;
+        margin-bottom: 2rem;
+
+        @media ${theme.breakpoints.portrait} {
+          margin-bottom: 1.5rem;
+        }
+      `,
       sectionTitle: css`
         ${theme.styles.text};
         color: #8b7355;
         font-size: 2rem;
         font-weight: 700;
-        margin: 0 0 2rem 0;
-        text-align: center;
+        margin: 0;
         text-shadow: 1px 1px 2px rgba(139, 115, 85, 0.1);
         letter-spacing: 0.08em;
+        display: inline-block;
         position: relative;
+        padding-bottom: 0.5rem;
 
         &::after {
           content: '';
           position: absolute;
-          bottom: -0.5rem;
-          left: 50%;
-          transform: translateX(-50%);
+          bottom: 0;
+          left: calc(50% - 30px);
           width: 60px;
           height: 2px;
           background: linear-gradient(90deg, transparent, #d4a574, transparent);
@@ -90,7 +123,6 @@ const useStyles = () => {
 
         @media ${theme.breakpoints.portrait} {
           font-size: 1.5rem;
-          margin-bottom: 1.5rem;
         }
       `,
       itemGrid: css`
@@ -147,6 +179,8 @@ const useStyles = () => {
         border-radius: 0;
         overflow: hidden;
         transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
 
         &:hover {
           transform: translateY(-2px);
@@ -176,47 +210,65 @@ const useStyles = () => {
         color: #e67e22;
         margin: 0;
       `,
-      itemImage: css`
-        width: 100%;
+      itemImageWrapper: css`
         height: 360px;
-        object-fit: contain;
-        display: block;
         background: rgba(236, 240, 241, 0.05);
         padding: 0.75rem 0.75rem 0 0.75rem;
         box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
         @media ${theme.breakpoints.portrait} {
           height: 280px;
           padding: 0.5rem 0.5rem 0 0.5rem;
         }
       `,
-      featuredImage: css`
-        width: 100%;
+      featuredImageWrapper: css`
         height: 480px;
-        object-fit: contain;
-        display: block;
         background: rgba(236, 240, 241, 0.05);
         padding: 0.75rem 0.75rem 0 0.75rem;
         box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
         @media ${theme.breakpoints.portrait} {
           height: 360px;
           padding: 0.5rem 0.5rem 0 0.5rem;
         }
       `,
-      stickerImage: css`
-        width: 100%;
-        height: 200px;
+      itemImage: css`
+        max-width: 100%;
+        max-height: 100%;
         object-fit: contain;
         display: block;
+      `,
+      featuredImage: css`
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        display: block;
+      `,
+      stickerImageWrapper: css`
+        height: 200px;
         background: rgba(236, 240, 241, 0.1);
         padding: 1rem;
         box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
         @media ${theme.breakpoints.portrait} {
           height: 160px;
           padding: 0.5rem;
         }
+      `,
+      stickerImage: css`
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        display: block;
       `,
       itemInfo: css`
         padding: 0.75rem;
@@ -573,7 +625,9 @@ const BookItem = ({ item, isFeatured = false }: { item: ItemBook; isFeatured?: b
   const styles = useStyles()
 
   const imageElement = (
-    <img src={item.imageUrl} alt={item.name} css={isFeatured ? styles.featuredImage : styles.itemImage} />
+    <div css={isFeatured ? styles.featuredImageWrapper : styles.itemImageWrapper}>
+      <img src={item.imageUrl} alt={item.name} css={isFeatured ? styles.featuredImage : styles.itemImage} />
+    </div>
   )
 
   return (
@@ -601,7 +655,9 @@ const StickerItem = ({ item }: { item: ItemSticker }) => {
 
   return (
     <div css={styles.stickerCard}>
-      <img src={item.imageUrl} alt="ステッカー" css={styles.stickerImage} />
+      <div css={styles.stickerImageWrapper}>
+        <img src={item.imageUrl} alt="ステッカー" css={styles.stickerImage} />
+      </div>
       <div css={styles.stickerInfo}>
         <p css={styles.stickerPrice}>{item.price}</p>
       </div>
@@ -649,6 +705,22 @@ const GroupSetItem = ({ group, isFeatured = false }: { group: ItemGroup; isFeatu
 export default function ItemListContent() {
   const styles = useStyles()
 
+  const handleDownloadImage = async () => {
+    const element = document.body
+    const canvas = await html2canvas(element, {
+      useCORS: true,
+      allowTaint: true,
+      scale: window.devicePixelRatio,
+      width: 1400,
+      windowWidth: 1400,
+    })
+
+    const link = document.createElement('a')
+    link.download = `item-list-${new Date().toISOString().split('T')[0]}.png`
+    link.href = canvas.toDataURL('image/png')
+    link.click()
+  }
+
   return (
     <main css={styles.container}>
       <Menu color="#8b7355" secondaryColor="#a68b5b" />
@@ -656,12 +728,17 @@ export default function ItemListContent() {
       <header css={styles.header}>
         <h1 css={styles.title}>お品書き</h1>
         <p css={styles.subtitle}>Pon Pon Creamsoda アイテム一覧</p>
+        <button data-html2canvas-ignore css={styles.downloadButton} onClick={handleDownloadImage}>
+          画像としてダウンロード
+        </button>
       </header>
 
       {/* New Releases */}
       {itemList.newReleases.map((category, categoryIndex) => (
         <section key={categoryIndex} css={styles.section}>
-          <h2 css={styles.sectionTitle}>新刊</h2>
+          <div css={styles.sectionTitleWrapper}>
+            <h2 css={styles.sectionTitle}>新刊</h2>
+          </div>
           <div css={styles.featuredGrid}>
             {category.items.map((item, itemIndex) => {
               if (item.itemType === 'group') {
@@ -678,7 +755,9 @@ export default function ItemListContent() {
       {/* Back Catalog */}
       {itemList.backCatalog.map((category, categoryIndex) => (
         <section key={categoryIndex} css={styles.section}>
-          <h2 css={styles.sectionTitle}>既刊</h2>
+          <div css={styles.sectionTitleWrapper}>
+            <h2 css={styles.sectionTitle}>既刊</h2>
+          </div>
           <div css={styles.itemGrid}>
             {category.items.toReversed().map((item, itemIndex) => {
               if (item.itemType === 'group') {
@@ -695,7 +774,9 @@ export default function ItemListContent() {
       {/* Stickers */}
       {itemList.stickers.map((category, categoryIndex) => (
         <section key={categoryIndex} css={styles.section}>
-          <h2 css={styles.sectionTitle}>ステッカー</h2>
+          <div css={styles.sectionTitleWrapper}>
+            <h2 css={styles.sectionTitle}>ステッカー</h2>
+          </div>
           <div css={styles.stickerGrid}>
             {category.items.map((item, itemIndex) => {
               if (item.itemType === 'sticker') {
@@ -710,7 +791,9 @@ export default function ItemListContent() {
       {/* Others */}
       {itemList.others.map((category, categoryIndex) => (
         <section key={categoryIndex} css={styles.section}>
-          <h2 css={styles.sectionTitle}>その他</h2>
+          <div css={styles.sectionTitleWrapper}>
+            <h2 css={styles.sectionTitle}>その他</h2>
+          </div>
           <div css={styles.otherItemsList}>
             {category.items.map((item, itemIndex) => {
               if (item.itemType === 'other') {
