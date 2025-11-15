@@ -15,11 +15,29 @@ const useStyles = () => {
     () => ({
       container: css`
         position: relative;
-        background: linear-gradient(135deg, #f8f4f0 0%, #e8ddd4 50%, #f0e6dc 100%);
+        background: #efe7e1;
         min-height: 100vh;
         min-height: 100lvh;
         padding: 2rem;
         box-sizing: border-box;
+        animation: chromatic-aberration 8s step-end infinite;
+
+        @keyframes chromatic-aberration {
+          0%,
+          80%,
+          100% {
+            filter: url(#chromatic-normal);
+          }
+          94% {
+            filter: url(#chromatic-shift-1);
+          }
+          95% {
+            filter: url(#chromatic-shift-2);
+          }
+          99% {
+            filter: url(#chromatic-shift-1);
+          }
+        }
 
         @media ${theme.breakpoints.compact} {
           padding: 1rem;
@@ -174,7 +192,7 @@ const useStyles = () => {
         }
       `,
       itemCard: css`
-        background: rgba(255, 255, 255, 0.15);
+        background: #f1ebe6;
         border: 2px solid rgba(212, 165, 116, 0.3);
         border-radius: 0;
         overflow: hidden;
@@ -182,19 +200,22 @@ const useStyles = () => {
         display: flex;
         flex-direction: column;
         position: relative;
+        z-index: 2;
 
         &:hover {
           transform: translateY(-2px);
         }
       `,
       stickerCard: css`
-        background: rgba(255, 255, 255, 0.15);
+        background: #f1ebe6;
         border: 2px solid rgba(212, 165, 116, 0.3);
         border-radius: 0;
         overflow: hidden;
         transition: all 0.3s ease;
         display: flex;
         flex-direction: column;
+        position: relative;
+        z-index: 2;
 
         &:hover {
           transform: translateY(-2px);
@@ -360,12 +381,14 @@ const useStyles = () => {
         }
       `,
       otherItem: css`
-        background: rgba(255, 255, 255, 0.15);
+        background: #f1ebe6;
         border: 2px solid rgba(212, 165, 116, 0.3);
         border-radius: 0;
         padding: 1.5rem;
         text-align: center;
         transition: all 0.3s ease;
+        position: relative;
+        z-index: 2;
 
         &:hover {
           transform: translateY(-2px);
@@ -408,7 +431,7 @@ const useStyles = () => {
         }
       `,
       groupSetCard: css`
-        background: rgba(255, 255, 255, 0.25);
+        background: #f1ebe6;
         border: 2px solid #d4a574;
         border-radius: 0;
         overflow: hidden;
@@ -416,6 +439,7 @@ const useStyles = () => {
         position: relative;
         display: flex;
         flex-direction: column;
+        z-index: 2;
 
         &:hover {
           transform: translateY(-2px);
@@ -666,84 +690,147 @@ export default function ItemListContent() {
   }
 
   return (
-    <main css={styles.container}>
-      <Menu color="#8b7355" secondaryColor="#a68b5b" />
+    <>
+      <svg width="0" height="0" style={{ position: 'absolute' }}>
+        <defs>
+          <filter id="chromatic-normal">
+            <feColorMatrix
+              type="matrix"
+              values="1 0 0 0 0
+                      0 1 0 0 0
+                      0 0 1 0 0
+                      0 0 0 1 0"
+            />
+          </filter>
+          <filter id="chromatic-shift-1">
+            <feOffset in="SourceGraphic" dx="1" dy="0" result="red" />
+            <feColorMatrix
+              in="red"
+              type="matrix"
+              values="1 0 0 0 0
+                      0 0 0 0 0
+                      0 0 0 0 0
+                      0 0 0 1 0"
+              result="red"
+            />
+            <feOffset in="SourceGraphic" dx="-1" dy="0" result="cyan" />
+            <feColorMatrix
+              in="cyan"
+              type="matrix"
+              values="0 0 0 0 0
+                      0 1 0 0 0
+                      0 0 1 0 0
+                      0 0 0 1 0"
+              result="cyan"
+            />
+            <feBlend in="red" in2="cyan" mode="screen" result="blend" />
+            <feBlend in="blend" in2="SourceGraphic" mode="normal" />
+          </filter>
+          <filter id="chromatic-shift-2">
+            <feOffset in="SourceGraphic" dx="2" dy="0" result="red" />
+            <feColorMatrix
+              in="red"
+              type="matrix"
+              values="1 0 0 0 0
+                      0 0 0 0 0
+                      0 0 0 0 0
+                      0 0 0 1 0"
+              result="red"
+            />
+            <feOffset in="SourceGraphic" dx="-2" dy="0" result="cyan" />
+            <feColorMatrix
+              in="cyan"
+              type="matrix"
+              values="0 0 0 0 0
+                      0 1 0 0 0
+                      0 0 1 0 0
+                      0 0 0 1 0"
+              result="cyan"
+            />
+            <feBlend in="red" in2="cyan" mode="screen" result="blend" />
+            <feBlend in="blend" in2="SourceGraphic" mode="normal" />
+          </filter>
+        </defs>
+      </svg>
+      <main css={styles.container}>
+        <Menu color="#8b7355" secondaryColor="#a68b5b" />
 
-      <header css={styles.header}>
-        <h1 css={styles.title}>お品書き</h1>
-        <p css={styles.subtitle}>Pon Pon Creamsoda アイテム一覧</p>
-        <button data-html2canvas-ignore css={styles.downloadButton} onClick={handleDownloadImage}>
-          画像としてダウンロード
-        </button>
-      </header>
+        <header css={styles.header}>
+          <h1 css={styles.title}>お品書き</h1>
+          <p css={styles.subtitle}>Pon Pon Creamsoda アイテム一覧</p>
+          <button data-html2canvas-ignore css={styles.downloadButton} onClick={handleDownloadImage}>
+            画像としてダウンロード
+          </button>
+        </header>
 
-      {/* New Releases */}
-      {itemList.newReleases.map((category, categoryIndex) => (
-        <section key={categoryIndex} css={styles.section}>
-          <div css={styles.sectionTitleWrapper}>
-            <h2 css={styles.sectionTitle}>新刊</h2>
-          </div>
-          <div css={styles.featuredGrid}>
-            {category.items.map((item, itemIndex) => {
-              if (item.itemType === 'book') {
-                return <BookItem key={`item-${itemIndex}`} item={item} isFeatured={true} />
-              }
-              return null
-            })}
-          </div>
-        </section>
-      ))}
+        {/* New Releases */}
+        {itemList.newReleases.map((category, categoryIndex) => (
+          <section key={categoryIndex} css={styles.section}>
+            <div css={styles.sectionTitleWrapper}>
+              <h2 css={styles.sectionTitle}>新刊</h2>
+            </div>
+            <div css={styles.featuredGrid}>
+              {category.items.map((item, itemIndex) => {
+                if (item.itemType === 'book') {
+                  return <BookItem key={`item-${itemIndex}`} item={item} isFeatured={true} />
+                }
+                return null
+              })}
+            </div>
+          </section>
+        ))}
 
-      {/* Back Catalog */}
-      {itemList.backCatalog.map((category, categoryIndex) => (
-        <section key={categoryIndex} css={styles.section}>
-          <div css={styles.sectionTitleWrapper}>
-            <h2 css={styles.sectionTitle}>既刊</h2>
-          </div>
-          <div css={styles.itemGrid}>
-            {category.items.toReversed().map((item, itemIndex) => {
-              if (item.itemType === 'book') {
-                return <BookItem key={itemIndex} item={item} />
-              }
-              return null
-            })}
-          </div>
-        </section>
-      ))}
+        {/* Back Catalog */}
+        {itemList.backCatalog.map((category, categoryIndex) => (
+          <section key={categoryIndex} css={styles.section}>
+            <div css={styles.sectionTitleWrapper}>
+              <h2 css={styles.sectionTitle}>既刊</h2>
+            </div>
+            <div css={styles.itemGrid}>
+              {category.items.toReversed().map((item, itemIndex) => {
+                if (item.itemType === 'book') {
+                  return <BookItem key={itemIndex} item={item} />
+                }
+                return null
+              })}
+            </div>
+          </section>
+        ))}
 
-      {/* Stickers */}
-      {itemList.stickers.map((category, categoryIndex) => (
-        <section key={categoryIndex} css={styles.section}>
-          <div css={styles.sectionTitleWrapper}>
-            <h2 css={styles.sectionTitle}>ステッカー</h2>
-          </div>
-          <div css={styles.stickerGrid}>
-            {category.items.map((item, itemIndex) => {
-              if (item.itemType === 'sticker') {
-                return <StickerItem key={itemIndex} item={item} />
-              }
-              return null
-            })}
-          </div>
-        </section>
-      ))}
+        {/* Stickers */}
+        {itemList.stickers.map((category, categoryIndex) => (
+          <section key={categoryIndex} css={styles.section}>
+            <div css={styles.sectionTitleWrapper}>
+              <h2 css={styles.sectionTitle}>ステッカー</h2>
+            </div>
+            <div css={styles.stickerGrid}>
+              {category.items.map((item, itemIndex) => {
+                if (item.itemType === 'sticker') {
+                  return <StickerItem key={itemIndex} item={item} />
+                }
+                return null
+              })}
+            </div>
+          </section>
+        ))}
 
-      {/* Others */}
-      {itemList.others.map((category, categoryIndex) => (
-        <section key={categoryIndex} css={styles.section}>
-          <div css={styles.sectionTitleWrapper}>
-            <h2 css={styles.sectionTitle}>その他</h2>
-          </div>
-          <div css={styles.otherItemsList}>
-            {category.items.map((item, itemIndex) => {
-              if (item.itemType === 'other') {
-                return <OtherItem key={itemIndex} item={item} />
-              }
-              return null
-            })}
-          </div>
-        </section>
-      ))}
-    </main>
+        {/* Others */}
+        {itemList.others.map((category, categoryIndex) => (
+          <section key={categoryIndex} css={styles.section}>
+            <div css={styles.sectionTitleWrapper}>
+              <h2 css={styles.sectionTitle}>その他</h2>
+            </div>
+            <div css={styles.otherItemsList}>
+              {category.items.map((item, itemIndex) => {
+                if (item.itemType === 'other') {
+                  return <OtherItem key={itemIndex} item={item} />
+                }
+                return null
+              })}
+            </div>
+          </section>
+        ))}
+      </main>
+    </>
   )
 }
