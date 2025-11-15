@@ -175,7 +175,7 @@ const useStyles = () => {
       `,
       itemCard: css`
         background: rgba(255, 255, 255, 0.15);
-        border: none;
+        border: 2px solid rgba(212, 165, 116, 0.3);
         border-radius: 0;
         overflow: hidden;
         transition: all 0.3s ease;
@@ -189,7 +189,7 @@ const useStyles = () => {
       `,
       stickerCard: css`
         background: rgba(255, 255, 255, 0.15);
-        border: none;
+        border: 2px solid rgba(212, 165, 116, 0.3);
         border-radius: 0;
         overflow: hidden;
         transition: all 0.3s ease;
@@ -361,7 +361,7 @@ const useStyles = () => {
       `,
       otherItem: css`
         background: rgba(255, 255, 255, 0.15);
-        border: none;
+        border: 2px solid rgba(212, 165, 116, 0.3);
         border-radius: 0;
         padding: 1.5rem;
         text-align: center;
