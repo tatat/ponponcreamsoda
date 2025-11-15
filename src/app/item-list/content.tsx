@@ -179,20 +179,6 @@ const useStyles = () => {
           padding: 0.5rem 0.5rem 0 0.5rem;
         }
       `,
-      newReleaseImage: css`
-        width: 100%;
-        height: 500px;
-        object-fit: contain;
-        display: block;
-        background: rgba(236, 240, 241, 0.05);
-        padding: 1rem 1rem 0 1rem;
-        box-sizing: border-box;
-
-        @media ${theme.breakpoints.portrait} {
-          height: 400px;
-          padding: 0.75rem 0.75rem 0 0.75rem;
-        }
-      `,
       stickerImage: css`
         width: 100%;
         height: 200px;
@@ -221,11 +207,9 @@ const useStyles = () => {
         color: #8b7355;
         margin: 0.5rem 0 0.5rem 0;
         line-height: 1.2;
-        padding: 0 0.75rem;
 
         @media ${theme.breakpoints.portrait} {
           font-size: 0.9rem;
-          padding: 0 0.5rem;
           margin: 0.4rem 0 0.4rem 0;
         }
       `,
@@ -336,6 +320,10 @@ const useStyles = () => {
       availabilityLink: css`
         text-decoration: none;
         color: inherit;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
 
         &:hover {
           text-decoration: underline;
@@ -348,6 +336,8 @@ const useStyles = () => {
         overflow: hidden;
         transition: all 0.3s ease;
         position: relative;
+        display: flex;
+        flex-direction: column;
 
         &:hover {
           transform: translateY(-2px);
@@ -371,63 +361,33 @@ const useStyles = () => {
           padding: 0.3rem 0.6rem;
         }
       `,
-      groupImageGrid: css`
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 0.5rem;
-        padding: 1rem;
+      groupImageGridWrapper: css`
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         background: rgba(236, 240, 241, 0.05);
+        padding: 0.75rem 0.75rem 0 0.75rem;
 
         @media ${theme.breakpoints.portrait} {
-          padding: 0.75rem;
-          gap: 0.4rem;
+          padding: 0.5rem 0.5rem 0 0.5rem;
+        }
+      `,
+      groupImageGrid: css`
+        display: grid;
+        gap: 0.75rem;
+        justify-content: space-between;
+        width: 100%;
+
+        @media ${theme.breakpoints.portrait} {
+          gap: 0.5rem;
         }
       `,
       groupThumbnail: css`
         width: 100%;
-        height: 120px;
+        height: auto;
         object-fit: contain;
         display: block;
-
-        @media ${theme.breakpoints.portrait} {
-          height: 100px;
-        }
-      `,
-      groupSetInfo: css`
-        padding: 1rem;
-
-        @media ${theme.breakpoints.portrait} {
-          padding: 0.75rem;
-        }
-      `,
-      groupSetName: css`
-        ${theme.styles.text};
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: #8b7355;
-        margin: 0 0 0.5rem 0;
-        line-height: 1.3;
-
-        @media ${theme.breakpoints.portrait} {
-          font-size: 1rem;
-        }
-      `,
-      groupSetPrice: css`
-        ${theme.styles.text};
-        font-size: 1.2rem;
-        font-weight: 700;
-        color: #e67e22;
-        margin: 0 0 0.75rem 0;
-
-        @media ${theme.breakpoints.portrait} {
-          font-size: 1.1rem;
-        }
-      `,
-      groupItemCount: css`
-        ${theme.styles.text};
-        font-size: 0.85rem;
-        color: #a68b5b;
-        margin: 0 0 0.75rem 0;
       `,
     }),
     [theme],
@@ -476,92 +436,121 @@ const getAvailabilityStatusText = (status: AvailabilityState) => {
   }
 }
 
-const BookItem = ({ item, isNewRelease = false }: { item: ItemBook; isNewRelease?: boolean }) => {
+const ItemInfo = ({
+  title,
+  itemType,
+  price,
+  availability,
+  links,
+}: {
+  title: string
+  itemType: string
+  price: string
+  availability: {
+    venue: AvailabilityState
+    onlinePhysical?: AvailabilityState
+    onlineDigital?: AvailabilityState
+  }
+  links?: {
+    onlinePhysical?: string[]
+    onlineDigital?: string[]
+  }
+}) => {
   const styles = useStyles()
 
-  const imageAndTitle = (
-    <>
-      <img src={item.imageUrl} alt={item.name} css={isNewRelease ? styles.newReleaseImage : styles.itemImage} />
-      <h3 css={styles.itemName}>{item.name}</h3>
-    </>
-  )
-
-  const content = (
-    <div css={styles.itemCard}>
-      {item.links?.website ? (
-        <Link href={item.links.website} css={styles.websiteLink}>
-          {imageAndTitle}
-        </Link>
-      ) : (
-        imageAndTitle
-      )}
-      <div css={styles.itemInfo}>
-        <div css={styles.itemTypeAndPrice}>
-          <p css={styles.itemType}>{item.bookType === 'manga' ? 'マンガ' : 'イラスト'}</p>
-          <p css={styles.itemPrice}>{item.price}</p>
-        </div>
-        <div css={styles.availabilitySection}>
-          <h4 css={styles.availabilityTitle}>販売状況</h4>
-          <ul css={styles.availabilityList}>
+  return (
+    <div css={styles.itemInfo}>
+      <h3 css={styles.itemName}>{title}</h3>
+      <div css={styles.itemTypeAndPrice}>
+        <p css={styles.itemType}>{itemType}</p>
+        <p css={styles.itemPrice}>{price}</p>
+      </div>
+      <div css={styles.availabilitySection}>
+        <h4 css={styles.availabilityTitle}>販売状況</h4>
+        <ul css={styles.availabilityList}>
+          <li css={styles.availabilityItem}>
+            <span>会場販売</span>
+            <span css={[styles.availabilityStatus, getAvailabilityStatusStyle(availability.venue)]}>
+              {getAvailabilityStatusText(availability.venue)}
+            </span>
+          </li>
+          {availability.onlinePhysical && (
             <li css={styles.availabilityItem}>
-              <span>会場販売</span>
-              <span css={[styles.availabilityStatus, getAvailabilityStatusStyle(item.availability.venue)]}>
-                {getAvailabilityStatusText(item.availability.venue)}
-              </span>
-            </li>
-            <li css={styles.availabilityItem}>
-              {item.links?.onlinePhysical && item.links.onlinePhysical.length > 0 ? (
+              {links?.onlinePhysical && links.onlinePhysical.length > 0 ? (
                 <a
-                  href={item.links.onlinePhysical[0]}
+                  href={links.onlinePhysical[0]}
                   target="_blank"
                   rel="noopener noreferrer"
                   css={styles.availabilityLink}
-                  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}
                 >
                   <span>オンライン（物理）</span>
-                  <span css={[styles.availabilityStatus, getAvailabilityStatusStyle(item.availability.onlinePhysical)]}>
-                    {getAvailabilityStatusText(item.availability.onlinePhysical)}
+                  <span css={[styles.availabilityStatus, getAvailabilityStatusStyle(availability.onlinePhysical)]}>
+                    {getAvailabilityStatusText(availability.onlinePhysical)}
                   </span>
                 </a>
               ) : (
                 <>
                   <span>オンライン（物理）</span>
-                  <span css={[styles.availabilityStatus, getAvailabilityStatusStyle(item.availability.onlinePhysical)]}>
-                    {getAvailabilityStatusText(item.availability.onlinePhysical)}
+                  <span css={[styles.availabilityStatus, getAvailabilityStatusStyle(availability.onlinePhysical)]}>
+                    {getAvailabilityStatusText(availability.onlinePhysical)}
                   </span>
                 </>
               )}
             </li>
+          )}
+          {availability.onlineDigital && (
             <li css={styles.availabilityItem}>
-              {item.links?.onlineDigital && item.links.onlineDigital.length > 0 ? (
+              {links?.onlineDigital && links.onlineDigital.length > 0 ? (
                 <a
-                  href={item.links.onlineDigital[0]}
+                  href={links.onlineDigital[0]}
                   target="_blank"
                   rel="noopener noreferrer"
                   css={styles.availabilityLink}
-                  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}
                 >
                   <span>オンライン（デジタル）</span>
-                  <span css={[styles.availabilityStatus, getAvailabilityStatusStyle(item.availability.onlineDigital)]}>
-                    {getAvailabilityStatusText(item.availability.onlineDigital)}
+                  <span css={[styles.availabilityStatus, getAvailabilityStatusStyle(availability.onlineDigital)]}>
+                    {getAvailabilityStatusText(availability.onlineDigital)}
                   </span>
                 </a>
               ) : (
                 <>
                   <span>オンライン（デジタル）</span>
-                  <span css={[styles.availabilityStatus, getAvailabilityStatusStyle(item.availability.onlineDigital)]}>
-                    {getAvailabilityStatusText(item.availability.onlineDigital)}
+                  <span css={[styles.availabilityStatus, getAvailabilityStatusStyle(availability.onlineDigital)]}>
+                    {getAvailabilityStatusText(availability.onlineDigital)}
                   </span>
                 </>
               )}
             </li>
-          </ul>
-        </div>
+          )}
+        </ul>
       </div>
     </div>
   )
+}
 
-  return content
+const BookItem = ({ item }: { item: ItemBook }) => {
+  const styles = useStyles()
+
+  const imageElement = <img src={item.imageUrl} alt={item.name} css={styles.itemImage} />
+
+  return (
+    <div css={styles.itemCard}>
+      {item.links?.website ? (
+        <Link href={item.links.website} css={styles.websiteLink}>
+          {imageElement}
+        </Link>
+      ) : (
+        imageElement
+      )}
+      <ItemInfo
+        title={item.name}
+        itemType={item.bookType === 'manga' ? 'マンガ' : 'イラスト'}
+        price={item.price}
+        availability={item.availability}
+        links={item.links}
+      />
+    </div>
+  )
 }
 
 const StickerItem = ({ item }: { item: ItemSticker }) => {
@@ -593,77 +582,23 @@ const GroupSetItem = ({ group }: { group: ItemGroup }) => {
   return (
     <div css={styles.groupSetCard}>
       <div css={styles.setBadge}>セット</div>
-      <div css={styles.groupImageGrid}>
-        {group.imageUrls.map((imageUrl, index) => (
-          <img key={index} src={imageUrl} alt={`${group.name} - ${index + 1}`} css={styles.groupThumbnail} />
-        ))}
-      </div>
-      <div css={styles.groupSetInfo}>
-        <h3 css={styles.groupSetName}>{group.name}</h3>
-        <p css={styles.groupItemCount}>{group.itemCount}冊セット</p>
-        <p css={styles.groupSetPrice}>{group.price}</p>
-        <div css={styles.availabilitySection}>
-          <h4 css={styles.availabilityTitle}>販売状況</h4>
-          <ul css={styles.availabilityList}>
-            <li css={styles.availabilityItem}>
-              <span>会場販売</span>
-              <span css={[styles.availabilityStatus, getAvailabilityStatusStyle(group.availability.venue)]}>
-                {getAvailabilityStatusText(group.availability.venue)}
-              </span>
-            </li>
-            <li css={styles.availabilityItem}>
-              {group.links?.onlinePhysical && group.links.onlinePhysical.length > 0 ? (
-                <a
-                  href={group.links.onlinePhysical[0]}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  css={styles.availabilityLink}
-                  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}
-                >
-                  <span>オンライン（物理）</span>
-                  <span
-                    css={[styles.availabilityStatus, getAvailabilityStatusStyle(group.availability.onlinePhysical)]}
-                  >
-                    {getAvailabilityStatusText(group.availability.onlinePhysical)}
-                  </span>
-                </a>
-              ) : (
-                <>
-                  <span>オンライン（物理）</span>
-                  <span
-                    css={[styles.availabilityStatus, getAvailabilityStatusStyle(group.availability.onlinePhysical)]}
-                  >
-                    {getAvailabilityStatusText(group.availability.onlinePhysical)}
-                  </span>
-                </>
-              )}
-            </li>
-            <li css={styles.availabilityItem}>
-              {group.links?.onlineDigital && group.links.onlineDigital.length > 0 ? (
-                <a
-                  href={group.links.onlineDigital[0]}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  css={styles.availabilityLink}
-                  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}
-                >
-                  <span>オンライン（デジタル）</span>
-                  <span css={[styles.availabilityStatus, getAvailabilityStatusStyle(group.availability.onlineDigital)]}>
-                    {getAvailabilityStatusText(group.availability.onlineDigital)}
-                  </span>
-                </a>
-              ) : (
-                <>
-                  <span>オンライン（デジタル）</span>
-                  <span css={[styles.availabilityStatus, getAvailabilityStatusStyle(group.availability.onlineDigital)]}>
-                    {getAvailabilityStatusText(group.availability.onlineDigital)}
-                  </span>
-                </>
-              )}
-            </li>
-          </ul>
+      <div css={styles.groupImageGridWrapper}>
+        <div
+          css={styles.groupImageGrid}
+          style={{ gridTemplateColumns: `repeat(${Math.min(group.itemCount, 3)}, auto)` }}
+        >
+          {group.imageUrls.map((imageUrl, index) => (
+            <img key={index} src={imageUrl} alt={`${group.name} - ${index + 1}`} css={styles.groupThumbnail} />
+          ))}
         </div>
       </div>
+      <ItemInfo
+        title={group.name}
+        itemType="セット"
+        price={group.price}
+        availability={group.availability}
+        links={group.links}
+      />
     </div>
   )
 }
@@ -689,7 +624,7 @@ export default function ItemListContent() {
               if (item.itemType === 'group') {
                 return <GroupSetItem key={`item-${itemIndex}`} group={item} />
               } else if (item.itemType === 'book') {
-                return <BookItem key={`item-${itemIndex}`} item={item} isNewRelease={false} />
+                return <BookItem key={`item-${itemIndex}`} item={item} />
               }
               return null
             })}
