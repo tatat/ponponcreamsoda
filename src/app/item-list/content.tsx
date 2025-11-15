@@ -181,6 +181,7 @@ const useStyles = () => {
         transition: all 0.3s ease;
         display: flex;
         flex-direction: column;
+        position: relative;
 
         &:hover {
           transform: translateY(-2px);
@@ -424,7 +425,7 @@ const useStyles = () => {
         position: absolute;
         top: 0;
         right: 0;
-        background: linear-gradient(135deg, #e67e22, #d35400);
+        background: #e67e22;
         color: white;
         padding: 0.4rem 0.8rem;
         font-size: 0.75rem;
