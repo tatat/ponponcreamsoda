@@ -74,21 +74,6 @@ export const itemList: ItemList = {
       items: [
         {
           itemType: 'book',
-          name: '漫画本（モノクロ）5',
-          imageUrl: '/images/item-list/book-05.jpg',
-          links: {
-            website: '/books/05',
-          },
-          bookType: 'illustration',
-          availability: {
-            venue: 'available',
-            onlinePhysical: 'preparing',
-            onlineDigital: 'preparing',
-          },
-          price: '500yen',
-        },
-        {
-          itemType: 'book',
           name: '漫画本（モノクロ）1',
           imageUrl: '/images/item-list/book-01.jpg',
           links: {
@@ -152,6 +137,21 @@ export const itemList: ItemList = {
             onlineDigital: 'notApplicable',
           },
           price: '600yen',
+        },
+        {
+          itemType: 'book',
+          name: '漫画本（モノクロ）3',
+          imageUrl: '/images/item-list/book-05.jpg',
+          links: {
+            website: '/books/05',
+          },
+          bookType: 'illustration',
+          availability: {
+            venue: 'available',
+            onlinePhysical: 'preparing',
+            onlineDigital: 'preparing',
+          },
+          price: '500yen',
         },
       ],
     },
