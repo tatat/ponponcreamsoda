@@ -1,7 +1,7 @@
 'use client'
 
 import { css, keyframes, useTheme } from '@emotion/react'
-import { useMemo } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import Link from 'next/link'
 import html2canvas from 'html2canvas'
 import Menu from '@/components/Menu'
@@ -63,7 +63,7 @@ const chromaticAberrationAnimation = keyframes`
   }
 `
 
-const useStyles = () => {
+const useStyles = (isChrome: boolean = false) => {
   const theme = useTheme()
 
   return useMemo(
@@ -75,7 +75,11 @@ const useStyles = () => {
         min-height: 100lvh;
         padding: 2rem;
         box-sizing: border-box;
-        animation: ${chromaticAberrationAnimation} 16s step-end infinite;
+        transform: translateZ(0);
+        ${isChrome &&
+        css`
+          animation: ${chromaticAberrationAnimation} 16s step-end infinite;
+        `}
 
         &::before {
           content: '';
@@ -522,7 +526,7 @@ const useStyles = () => {
         }
       `,
     }),
-    [theme],
+    [theme, isChrome],
   )
 }
 
@@ -729,7 +733,18 @@ const OtherItem = ({ item }: { item: ItemOther }) => {
 }
 
 export default function ItemListContent() {
-  const styles = useStyles()
+  const [isChrome, setIsChrome] = useState(false)
+
+  useEffect(() => {
+    // Detect Chrome browser (excluding Edge)
+    // Safari: CSS animation with filter: url(#id) is not properly supported
+    // Firefox: The animation is too heavy and causes performance issues
+    const userAgent = navigator.userAgent
+    const isChromeBrowser = /Chrome/.test(userAgent) && !/Edg/.test(userAgent)
+    setIsChrome(isChromeBrowser)
+  }, [])
+
+  const styles = useStyles(isChrome)
 
   const handleDownloadImage = async () => {
     const element = document.body
@@ -784,7 +799,7 @@ export default function ItemListContent() {
             <feBlend in="red" in2="cyan" mode="screen" result="blend" />
             <feBlend in="blend" in2="SourceGraphic" mode="normal" result="chromatic" />
             <feTurbulence baseFrequency="0 0.5" numOctaves="1" seed="10" result="lines" />
-            <feDisplacementMap in="chromatic" in2="lines" scale="2 3" xChannelSelector="R" yChannelSelector="R" />
+            <feDisplacementMap in="chromatic" in2="lines" scale="3" xChannelSelector="R" yChannelSelector="R" />
           </filter>
           <filter id="chromatic-shift-1">
             <feOffset in="SourceGraphic" dx="1" dy="0.5" result="red" />
