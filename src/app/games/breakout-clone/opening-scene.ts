@@ -109,19 +109,19 @@ export class OpeningScene extends Phaser.Scene {
 
       // Create regular image (no physics)
       const brick = this.add.image(Math.round(pos.x), Math.round(pos.y), brickKey)
-      
+
       // Get original texture dimensions to maintain aspect ratio
       const texture = this.textures.get(brickKey)
       const sourceImage = texture.getSourceImage() as HTMLImageElement
-      
+
       // Calculate logical size (since images are @2x resolution)
       const logicalWidth = sourceImage.width / 2
       const logicalHeight = sourceImage.height / 2
-      
+
       // Scale to exactly 256px while maintaining aspect ratio
       const aspectRatio = logicalWidth / logicalHeight
       let displayWidth, displayHeight
-      
+
       if (aspectRatio >= 1) {
         // Horizontal or square - base width on 256px
         displayWidth = 256
@@ -131,7 +131,7 @@ export class OpeningScene extends Phaser.Scene {
         displayWidth = 256 * aspectRatio
         displayHeight = 256
       }
-      
+
       // Set display size with proper aspect ratio (256px texture at 256px)
       brick.setDisplaySize(displayWidth, displayHeight)
 
