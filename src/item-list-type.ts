@@ -14,6 +14,7 @@ export type VenueOnlyAvailability = {
 export type BookType = 'illustration' | 'manga'
 
 export type ItemBook = {
+  itemType: 'book'
   name: string
   imageUrl: string
   links?: {
@@ -21,31 +22,50 @@ export type ItemBook = {
     onlinePhysical?: string[] // Link to the book on online physical store
     onlineDigital?: string[] // Link to the book on online digital store
   }
-  type: BookType // Whether it's an illustration book or manga book
+  bookType: BookType // Whether it's an illustration book or manga book
   availability: AvailabilityStatus
   price: string
 }
 
 export type ItemSticker = {
+  itemType: 'sticker'
   imageUrl: string
   availability: VenueOnlyAvailability
   price: string
 }
 
 export type ItemOther = {
+  itemType: 'other'
   name: string
+}
+
+export type ItemGroup = {
+  itemType: 'group'
+  id: string // Unique identifier for the group
+  name: string // Display name of the group/set
+  price: string // Set price
+  imageUrls: string[] // Thumbnails of items in the set
+  itemCount: number // Number of items in the set
+  availability: AvailabilityStatus
+  links?: {
+    website?: string
+    onlinePhysical?: string[]
+    onlineDigital?: string[]
+  }
 }
 
 export type Item = ItemBook | ItemSticker | ItemOther
 
-export type ItemListCategory<T extends Item> = {
+export type ItemOrGroup = Item | ItemGroup
+
+export type ItemListCategory = {
   title: string
-  items: T[]
+  items: ItemOrGroup[]
 }
 
 export type ItemList = {
-  newReleases: ItemListCategory<ItemBook>[]
-  backCatalog: ItemListCategory<ItemBook>[]
-  stickers: ItemListCategory<ItemSticker>[]
-  others: ItemListCategory<ItemOther>[]
+  newReleases: ItemListCategory[]
+  backCatalog: ItemListCategory[]
+  stickers: ItemListCategory[]
+  others: ItemListCategory[]
 }

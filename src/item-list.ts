@@ -7,22 +7,61 @@ import type { ItemList } from './item-list-type'
  * - Stickers
  * - Others
  */
-export const itemList = {
+export const itemList: ItemList = {
   newReleases: [
     {
       title: 'New Releases',
       items: [
         {
-          name: '漫画本（モノクロ）5',
-          imageUrl: '/images/item-list/book-05.jpg',
-          links: {
-            website: '/books/05',
-          },
-          type: 'illustration',
+          itemType: 'group',
+          id: 'spring-series-set',
+          name: '春シリーズ 3冊セット',
+          price: '1,200yen',
+          imageUrls: [
+            '/images/item-list/spring-01.jpg',
+            '/images/item-list/spring-02.jpg',
+            '/images/item-list/spring-03.jpg',
+          ],
+          itemCount: 3,
           availability: {
             venue: 'available',
             onlinePhysical: 'preparing',
-            onlineDigital: 'preparing',
+            onlineDigital: 'notApplicable',
+          },
+        },
+        {
+          itemType: 'book',
+          name: '春の本 1',
+          imageUrl: '/images/item-list/spring-01.jpg',
+          bookType: 'manga',
+          availability: {
+            venue: 'available',
+            onlinePhysical: 'preparing',
+            onlineDigital: 'notApplicable',
+          },
+          price: '500yen',
+        },
+        {
+          itemType: 'book',
+          name: '春の本 2',
+          imageUrl: '/images/item-list/spring-02.jpg',
+          bookType: 'manga',
+          availability: {
+            venue: 'available',
+            onlinePhysical: 'preparing',
+            onlineDigital: 'notApplicable',
+          },
+          price: '500yen',
+        },
+        {
+          itemType: 'book',
+          name: '春の本 3',
+          imageUrl: '/images/item-list/spring-03.jpg',
+          bookType: 'manga',
+          availability: {
+            venue: 'available',
+            onlinePhysical: 'preparing',
+            onlineDigital: 'notApplicable',
           },
           price: '500yen',
         },
@@ -34,6 +73,22 @@ export const itemList = {
       title: 'Back Catalog',
       items: [
         {
+          itemType: 'book',
+          name: '漫画本（モノクロ）5',
+          imageUrl: '/images/item-list/book-05.jpg',
+          links: {
+            website: '/books/05',
+          },
+          bookType: 'illustration',
+          availability: {
+            venue: 'available',
+            onlinePhysical: 'preparing',
+            onlineDigital: 'preparing',
+          },
+          price: '500yen',
+        },
+        {
+          itemType: 'book',
           name: '漫画本（モノクロ）1',
           imageUrl: '/images/item-list/book-01.jpg',
           links: {
@@ -41,7 +96,7 @@ export const itemList = {
             onlinePhysical: ['https://ponponcreamsoda.booth.pm/items/5347449'],
             onlineDigital: ['https://ponponcreamsoda.booth.pm/items/5893999'],
           },
-          type: 'manga',
+          bookType: 'manga',
           availability: {
             venue: 'unavailable',
             onlinePhysical: 'unavailable',
@@ -50,13 +105,14 @@ export const itemList = {
           price: '500yen',
         },
         {
+          itemType: 'book',
           name: 'イラスト本（フルカラー）1',
           imageUrl: '/images/item-list/book-02.jpg',
           links: {
             website: '/books/02',
             onlinePhysical: ['https://ponponcreamsoda.booth.pm/items/5347486'],
           },
-          type: 'illustration',
+          bookType: 'illustration',
           availability: {
             venue: 'available',
             onlinePhysical: 'available',
@@ -65,6 +121,7 @@ export const itemList = {
           price: '600yen',
         },
         {
+          itemType: 'book',
           name: '漫画本（モノクロ）2',
           imageUrl: '/images/item-list/book-03.jpg',
           links: {
@@ -72,7 +129,7 @@ export const itemList = {
             onlinePhysical: ['https://ponponcreamsoda.booth.pm/items/5347672'],
             onlineDigital: ['https://ponponcreamsoda.booth.pm/items/5894079'],
           },
-          type: 'manga',
+          bookType: 'manga',
           availability: {
             venue: 'available',
             onlinePhysical: 'available',
@@ -81,13 +138,14 @@ export const itemList = {
           price: '500yen',
         },
         {
+          itemType: 'book',
           name: 'イラスト本（フルカラー）2',
           imageUrl: '/images/item-list/book-04.jpg',
           links: {
             website: '/books/04',
             onlinePhysical: ['https://ponponcreamsoda.booth.pm/items/5781200'],
           },
-          type: 'illustration',
+          bookType: 'illustration',
           availability: {
             venue: 'available',
             onlinePhysical: 'available',
@@ -103,6 +161,7 @@ export const itemList = {
       title: 'Stickers',
       items: [
         {
+          itemType: 'sticker',
           imageUrl: '/images/item-list/sticker-r1.png',
           availability: {
             venue: 'available',
@@ -110,6 +169,7 @@ export const itemList = {
           price: '200yen',
         },
         {
+          itemType: 'sticker',
           imageUrl: '/images/item-list/sticker-r2.png',
           availability: {
             venue: 'available',
@@ -117,6 +177,7 @@ export const itemList = {
           price: '200yen',
         },
         {
+          itemType: 'sticker',
           imageUrl: '/images/item-list/sticker-d1.png',
           availability: {
             venue: 'available',
@@ -124,6 +185,7 @@ export const itemList = {
           price: '200yen',
         },
         {
+          itemType: 'sticker',
           imageUrl: '/images/item-list/sticker-d2.png',
           availability: {
             venue: 'available',
@@ -131,6 +193,7 @@ export const itemList = {
           price: '200yen',
         },
         {
+          itemType: 'sticker',
           imageUrl: '/images/item-list/sticker-t1.png',
           availability: {
             venue: 'available',
@@ -138,6 +201,7 @@ export const itemList = {
           price: '200yen',
         },
         {
+          itemType: 'sticker',
           imageUrl: '/images/item-list/sticker-t2.png',
           availability: {
             venue: 'available',
@@ -152,12 +216,14 @@ export const itemList = {
       title: 'Others',
       items: [
         {
+          itemType: 'other',
           name: '缶バッヂ',
         },
         {
+          itemType: 'other',
           name: 'シール',
         },
       ],
     },
   ],
-} as const satisfies ItemList
+}

@@ -5,7 +5,7 @@ import { useMemo } from 'react'
 import Link from 'next/link'
 import Menu from '@/components/Menu'
 import { itemList } from '@/item-list'
-import type { ItemBook, ItemSticker, ItemOther, AvailabilityState } from '@/item-list-type'
+import type { ItemBook, ItemSticker, ItemOther, ItemGroup, AvailabilityState } from '@/item-list-type'
 
 const useStyles = () => {
   const theme = useTheme()
@@ -341,6 +341,94 @@ const useStyles = () => {
           text-decoration: underline;
         }
       `,
+      groupSetCard: css`
+        background: rgba(255, 255, 255, 0.25);
+        border: 2px solid #d4a574;
+        border-radius: 0;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        position: relative;
+
+        &:hover {
+          transform: translateY(-2px);
+        }
+      `,
+      setBadge: css`
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: linear-gradient(135deg, #e67e22, #d35400);
+        color: white;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        z-index: 1;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+        @media ${theme.breakpoints.portrait} {
+          font-size: 0.7rem;
+          padding: 0.3rem 0.6rem;
+        }
+      `,
+      groupImageGrid: css`
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.5rem;
+        padding: 1rem;
+        background: rgba(236, 240, 241, 0.05);
+
+        @media ${theme.breakpoints.portrait} {
+          padding: 0.75rem;
+          gap: 0.4rem;
+        }
+      `,
+      groupThumbnail: css`
+        width: 100%;
+        height: 120px;
+        object-fit: contain;
+        display: block;
+
+        @media ${theme.breakpoints.portrait} {
+          height: 100px;
+        }
+      `,
+      groupSetInfo: css`
+        padding: 1rem;
+
+        @media ${theme.breakpoints.portrait} {
+          padding: 0.75rem;
+        }
+      `,
+      groupSetName: css`
+        ${theme.styles.text};
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #8b7355;
+        margin: 0 0 0.5rem 0;
+        line-height: 1.3;
+
+        @media ${theme.breakpoints.portrait} {
+          font-size: 1rem;
+        }
+      `,
+      groupSetPrice: css`
+        ${theme.styles.text};
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #e67e22;
+        margin: 0 0 0.75rem 0;
+
+        @media ${theme.breakpoints.portrait} {
+          font-size: 1.1rem;
+        }
+      `,
+      groupItemCount: css`
+        ${theme.styles.text};
+        font-size: 0.85rem;
+        color: #a68b5b;
+        margin: 0 0 0.75rem 0;
+      `,
     }),
     [theme],
   )
@@ -409,7 +497,7 @@ const BookItem = ({ item, isNewRelease = false }: { item: ItemBook; isNewRelease
       )}
       <div css={styles.itemInfo}>
         <div css={styles.itemTypeAndPrice}>
-          <p css={styles.itemType}>{item.type === 'manga' ? 'マンガ' : 'イラスト'}</p>
+          <p css={styles.itemType}>{item.bookType === 'manga' ? 'マンガ' : 'イラスト'}</p>
           <p css={styles.itemPrice}>{item.price}</p>
         </div>
         <div css={styles.availabilitySection}>
@@ -499,6 +587,87 @@ const OtherItem = ({ item }: { item: ItemOther }) => {
   )
 }
 
+const GroupSetItem = ({ group }: { group: ItemGroup }) => {
+  const styles = useStyles()
+
+  return (
+    <div css={styles.groupSetCard}>
+      <div css={styles.setBadge}>セット</div>
+      <div css={styles.groupImageGrid}>
+        {group.imageUrls.map((imageUrl, index) => (
+          <img key={index} src={imageUrl} alt={`${group.name} - ${index + 1}`} css={styles.groupThumbnail} />
+        ))}
+      </div>
+      <div css={styles.groupSetInfo}>
+        <h3 css={styles.groupSetName}>{group.name}</h3>
+        <p css={styles.groupItemCount}>{group.itemCount}冊セット</p>
+        <p css={styles.groupSetPrice}>{group.price}</p>
+        <div css={styles.availabilitySection}>
+          <h4 css={styles.availabilityTitle}>販売状況</h4>
+          <ul css={styles.availabilityList}>
+            <li css={styles.availabilityItem}>
+              <span>会場販売</span>
+              <span css={[styles.availabilityStatus, getAvailabilityStatusStyle(group.availability.venue)]}>
+                {getAvailabilityStatusText(group.availability.venue)}
+              </span>
+            </li>
+            <li css={styles.availabilityItem}>
+              {group.links?.onlinePhysical && group.links.onlinePhysical.length > 0 ? (
+                <a
+                  href={group.links.onlinePhysical[0]}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  css={styles.availabilityLink}
+                  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}
+                >
+                  <span>オンライン（物理）</span>
+                  <span
+                    css={[styles.availabilityStatus, getAvailabilityStatusStyle(group.availability.onlinePhysical)]}
+                  >
+                    {getAvailabilityStatusText(group.availability.onlinePhysical)}
+                  </span>
+                </a>
+              ) : (
+                <>
+                  <span>オンライン（物理）</span>
+                  <span
+                    css={[styles.availabilityStatus, getAvailabilityStatusStyle(group.availability.onlinePhysical)]}
+                  >
+                    {getAvailabilityStatusText(group.availability.onlinePhysical)}
+                  </span>
+                </>
+              )}
+            </li>
+            <li css={styles.availabilityItem}>
+              {group.links?.onlineDigital && group.links.onlineDigital.length > 0 ? (
+                <a
+                  href={group.links.onlineDigital[0]}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  css={styles.availabilityLink}
+                  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}
+                >
+                  <span>オンライン（デジタル）</span>
+                  <span css={[styles.availabilityStatus, getAvailabilityStatusStyle(group.availability.onlineDigital)]}>
+                    {getAvailabilityStatusText(group.availability.onlineDigital)}
+                  </span>
+                </a>
+              ) : (
+                <>
+                  <span>オンライン（デジタル）</span>
+                  <span css={[styles.availabilityStatus, getAvailabilityStatusStyle(group.availability.onlineDigital)]}>
+                    {getAvailabilityStatusText(group.availability.onlineDigital)}
+                  </span>
+                </>
+              )}
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function ItemListContent() {
   const styles = useStyles()
 
@@ -515,10 +684,15 @@ export default function ItemListContent() {
       {itemList.newReleases.map((category, categoryIndex) => (
         <section key={categoryIndex} css={styles.section}>
           <h2 css={styles.sectionTitle}>新刊</h2>
-          <div css={styles.newReleaseGrid}>
-            {category.items.map((item, itemIndex) => (
-              <BookItem key={itemIndex} item={item} isNewRelease={true} />
-            ))}
+          <div css={styles.itemGrid}>
+            {category.items.map((item, itemIndex) => {
+              if (item.itemType === 'group') {
+                return <GroupSetItem key={`item-${itemIndex}`} group={item} />
+              } else if (item.itemType === 'book') {
+                return <BookItem key={`item-${itemIndex}`} item={item} isNewRelease={false} />
+              }
+              return null
+            })}
           </div>
         </section>
       ))}
@@ -528,9 +702,14 @@ export default function ItemListContent() {
         <section key={categoryIndex} css={styles.section}>
           <h2 css={styles.sectionTitle}>既刊</h2>
           <div css={styles.itemGrid}>
-            {[...category.items].reverse().map((item, itemIndex) => (
-              <BookItem key={itemIndex} item={item} />
-            ))}
+            {category.items.toReversed().map((item, itemIndex) => {
+              if (item.itemType === 'group') {
+                return <GroupSetItem key={itemIndex} group={item} />
+              } else if (item.itemType === 'book') {
+                return <BookItem key={itemIndex} item={item} />
+              }
+              return null
+            })}
           </div>
         </section>
       ))}
@@ -540,9 +719,12 @@ export default function ItemListContent() {
         <section key={categoryIndex} css={styles.section}>
           <h2 css={styles.sectionTitle}>ステッカー</h2>
           <div css={styles.stickerGrid}>
-            {category.items.map((item, itemIndex) => (
-              <StickerItem key={itemIndex} item={item} />
-            ))}
+            {category.items.map((item, itemIndex) => {
+              if (item.itemType === 'sticker') {
+                return <StickerItem key={itemIndex} item={item} />
+              }
+              return null
+            })}
           </div>
         </section>
       ))}
@@ -552,9 +734,12 @@ export default function ItemListContent() {
         <section key={categoryIndex} css={styles.section}>
           <h2 css={styles.sectionTitle}>その他</h2>
           <div css={styles.otherItemsList}>
-            {category.items.map((item, itemIndex) => (
-              <OtherItem key={itemIndex} item={item} />
-            ))}
+            {category.items.map((item, itemIndex) => {
+              if (item.itemType === 'other') {
+                return <OtherItem key={itemIndex} item={item} />
+              }
+              return null
+            })}
           </div>
         </section>
       ))}
