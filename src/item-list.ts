@@ -33,7 +33,7 @@ export const itemList: ItemList = {
           itemType: 'book',
           name: '春の本 1',
           imageUrl: '/images/item-list/spring-01.jpg',
-          bookType: 'manga',
+          bookType: 'illustration',
           availability: {
             venue: 'available',
             onlinePhysical: 'preparing',
@@ -45,7 +45,7 @@ export const itemList: ItemList = {
           itemType: 'book',
           name: '春の本 2',
           imageUrl: '/images/item-list/spring-02.jpg',
-          bookType: 'manga',
+          bookType: 'illustration',
           availability: {
             venue: 'available',
             onlinePhysical: 'preparing',
@@ -57,7 +57,7 @@ export const itemList: ItemList = {
           itemType: 'book',
           name: '春の本 3',
           imageUrl: '/images/item-list/spring-03.jpg',
-          bookType: 'manga',
+          bookType: 'illustration',
           availability: {
             venue: 'available',
             onlinePhysical: 'preparing',
