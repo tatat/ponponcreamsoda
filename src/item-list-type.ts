@@ -12,6 +12,7 @@ export type VenueOnlyAvailability = {
 }
 
 export type BookType = 'illustration' | 'manga'
+export type ColorType = 'fullColor' | 'monochrome'
 
 export type ItemBook = {
   itemType: 'book'
@@ -23,6 +24,7 @@ export type ItemBook = {
     onlineDigital?: string[] // Link to the book on online digital store
   }
   bookType: BookType // Whether it's an illustration book or manga book
+  colorType?: ColorType // Whether it's full color or monochrome
   availability: AvailabilityStatus
   price: string
 }
@@ -46,6 +48,8 @@ export type ItemGroup = {
   price: string // Set price
   imageUrls: string[] // Thumbnails of items in the set
   itemCount: number // Number of items in the set
+  bookType?: BookType // Type of books in the set
+  colorType?: ColorType // Whether it's full color or monochrome
   availability: AvailabilityStatus
   links?: {
     website?: string

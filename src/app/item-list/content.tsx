@@ -532,12 +532,14 @@ const getAvailabilityStatusText = (status: AvailabilityState) => {
 const ItemInfo = ({
   title,
   itemType,
+  colorType,
   price,
   availability,
   links,
 }: {
   title: string
   itemType: string
+  colorType?: string
   price: string
   availability: {
     venue: AvailabilityState
@@ -551,11 +553,13 @@ const ItemInfo = ({
 }) => {
   const styles = useStyles()
 
+  const displayItemType = colorType ? `${itemType}・${colorType}` : itemType
+
   return (
     <div css={styles.itemInfo}>
       <h3 css={styles.itemName}>{title}</h3>
       <div css={styles.itemTypeAndPrice}>
-        <p css={styles.itemType}>{itemType}</p>
+        <p css={styles.itemType}>{displayItemType}</p>
         <p css={styles.itemPrice}>{price}</p>
       </div>
       <div css={styles.availabilitySection}>
@@ -642,6 +646,9 @@ const BookItem = ({ item, isFeatured = false }: { item: ItemBook; isFeatured?: b
       <ItemInfo
         title={item.name}
         itemType={item.bookType === 'manga' ? 'マンガ' : 'イラスト'}
+        colorType={
+          item.colorType === 'fullColor' ? 'フルカラー' : item.colorType === 'monochrome' ? 'モノクロ' : undefined
+        }
         price={item.price}
         availability={item.availability}
         links={item.links}
@@ -684,7 +691,7 @@ const GroupSetItem = ({ group, isFeatured = false }: { group: ItemGroup; isFeatu
       <div css={isFeatured ? styles.groupImageGridWrapperFeatured : styles.groupImageGridWrapper}>
         <div
           css={styles.groupImageGrid}
-          style={{ gridTemplateColumns: `repeat(${Math.min(group.itemCount, 3)}, auto)` }}
+          style={{ gridTemplateColumns: `repeat(${Math.min(group.imageUrls.length, 3)}, auto)` }}
         >
           {group.imageUrls.map((imageUrl, index) => (
             <img key={index} src={imageUrl} alt={`${group.name} - ${index + 1}`} css={styles.groupThumbnail} />
@@ -693,7 +700,10 @@ const GroupSetItem = ({ group, isFeatured = false }: { group: ItemGroup; isFeatu
       </div>
       <ItemInfo
         title={group.name}
-        itemType="セット"
+        itemType={group.bookType === 'manga' ? 'マンガ' : group.bookType === 'illustration' ? 'イラスト' : 'セット'}
+        colorType={
+          group.colorType === 'fullColor' ? 'フルカラー' : group.colorType === 'monochrome' ? 'モノクロ' : undefined
+        }
         price={group.price}
         availability={group.availability}
         links={group.links}

@@ -15,14 +15,11 @@ export const itemList: ItemList = {
         {
           itemType: 'group',
           id: 'spring-series-set',
-          name: '春シリーズ 3冊セット',
-          price: '1,200yen',
-          imageUrls: [
-            '/images/item-list/spring-01.jpg',
-            '/images/item-list/spring-02.jpg',
-            '/images/item-list/spring-03.jpg',
-          ],
+          name: 'イラスト本 3 - 3冊セット（クリアファイル付き）',
+          price: '900yen',
+          imageUrls: ['/images/item-list/book-06.jpg'],
           itemCount: 3,
+          bookType: 'illustration',
           availability: {
             venue: 'available',
             onlinePhysical: 'preparing',
@@ -31,39 +28,42 @@ export const itemList: ItemList = {
         },
         {
           itemType: 'book',
-          name: '春の本 1',
-          imageUrl: '/images/item-list/spring-01.jpg',
+          name: 'Now',
+          imageUrl: '/images/item-list/book-06-1.jpg',
           bookType: 'illustration',
+          colorType: 'fullColor',
           availability: {
             venue: 'available',
             onlinePhysical: 'preparing',
             onlineDigital: 'notApplicable',
           },
-          price: '500yen',
+          price: '300yen',
         },
         {
           itemType: 'book',
-          name: '春の本 2',
-          imageUrl: '/images/item-list/spring-02.jpg',
+          name: 'embalm',
+          imageUrl: '/images/item-list/book-06-2.jpg',
           bookType: 'illustration',
+          colorType: 'fullColor',
           availability: {
             venue: 'available',
             onlinePhysical: 'preparing',
             onlineDigital: 'notApplicable',
           },
-          price: '500yen',
+          price: '300yen',
         },
         {
           itemType: 'book',
-          name: '春の本 3',
-          imageUrl: '/images/item-list/spring-03.jpg',
+          name: 'A SONG RUNS THROUGH WORLD',
+          imageUrl: '/images/item-list/book-06-3.jpg',
           bookType: 'illustration',
+          colorType: 'fullColor',
           availability: {
             venue: 'available',
             onlinePhysical: 'preparing',
             onlineDigital: 'notApplicable',
           },
-          price: '500yen',
+          price: '300yen',
         },
       ],
     },
@@ -74,7 +74,7 @@ export const itemList: ItemList = {
       items: [
         {
           itemType: 'book',
-          name: '漫画本（モノクロ）1',
+          name: '漫画本 1',
           imageUrl: '/images/item-list/book-01.jpg',
           links: {
             website: '/books/01',
@@ -82,6 +82,7 @@ export const itemList: ItemList = {
             onlineDigital: ['https://ponponcreamsoda.booth.pm/items/5893999'],
           },
           bookType: 'manga',
+          colorType: 'monochrome',
           availability: {
             venue: 'unavailable',
             onlinePhysical: 'unavailable',
@@ -91,13 +92,14 @@ export const itemList: ItemList = {
         },
         {
           itemType: 'book',
-          name: 'イラスト本（フルカラー）1',
+          name: 'イラスト本 1',
           imageUrl: '/images/item-list/book-02.jpg',
           links: {
             website: '/books/02',
             onlinePhysical: ['https://ponponcreamsoda.booth.pm/items/5347486'],
           },
           bookType: 'illustration',
+          colorType: 'fullColor',
           availability: {
             venue: 'available',
             onlinePhysical: 'available',
@@ -107,7 +109,7 @@ export const itemList: ItemList = {
         },
         {
           itemType: 'book',
-          name: '漫画本（モノクロ）2',
+          name: '漫画本 2',
           imageUrl: '/images/item-list/book-03.jpg',
           links: {
             website: '/books/03',
@@ -115,6 +117,7 @@ export const itemList: ItemList = {
             onlineDigital: ['https://ponponcreamsoda.booth.pm/items/5894079'],
           },
           bookType: 'manga',
+          colorType: 'monochrome',
           availability: {
             venue: 'available',
             onlinePhysical: 'available',
@@ -124,13 +127,14 @@ export const itemList: ItemList = {
         },
         {
           itemType: 'book',
-          name: 'イラスト本（フルカラー）2',
+          name: 'イラスト本 2',
           imageUrl: '/images/item-list/book-04.jpg',
           links: {
             website: '/books/04',
             onlinePhysical: ['https://ponponcreamsoda.booth.pm/items/5781200'],
           },
           bookType: 'illustration',
+          colorType: 'fullColor',
           availability: {
             venue: 'available',
             onlinePhysical: 'available',
@@ -140,12 +144,13 @@ export const itemList: ItemList = {
         },
         {
           itemType: 'book',
-          name: '漫画本（モノクロ）3',
+          name: '漫画本 3',
           imageUrl: '/images/item-list/book-05.jpg',
           links: {
             website: '/books/05',
           },
-          bookType: 'illustration',
+          bookType: 'manga',
+          colorType: 'monochrome',
           availability: {
             venue: 'available',
             onlinePhysical: 'preparing',
