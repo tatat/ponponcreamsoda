@@ -93,6 +93,7 @@ const useStyles = () => {
           );
           pointer-events: none;
           z-index: 1;
+          transform: translateZ(0);
           animation: ${scanlineAnimation} 1s linear infinite;
         }
 
