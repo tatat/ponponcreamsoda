@@ -19,9 +19,9 @@ type SourceConfig = {
 type ConfigWithDefault<T> =
   | ({
       default?: undefined
-    } & {
+    } & Partial<{
       [K in Breakpoint]: T
-    })
+    }>)
   | ({
       default: T
     } & {

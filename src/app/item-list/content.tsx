@@ -21,7 +21,7 @@ const useStyles = () => {
         padding: 2rem;
         box-sizing: border-box;
 
-        @media ${theme.breakpoints.portrait} {
+        @media ${theme.breakpoints.compact} {
           padding: 1rem;
         }
       `,
@@ -30,7 +30,7 @@ const useStyles = () => {
         margin-bottom: 3rem;
         padding-top: 2rem;
 
-        @media ${theme.breakpoints.portrait} {
+        @media ${theme.breakpoints.compact} {
           margin-bottom: 2rem;
           padding-top: 1rem;
         }
@@ -44,7 +44,7 @@ const useStyles = () => {
         text-shadow: 1px 1px 2px rgba(139, 115, 85, 0.1);
         letter-spacing: 0.1em;
 
-        @media ${theme.breakpoints.portrait} {
+        @media ${theme.breakpoints.compact} {
           font-size: 2rem;
         }
       `,
@@ -56,7 +56,7 @@ const useStyles = () => {
         font-weight: 300;
         letter-spacing: 0.05em;
 
-        @media ${theme.breakpoints.portrait} {
+        @media ${theme.breakpoints.compact} {
           font-size: 1rem;
         }
       `,
@@ -79,7 +79,7 @@ const useStyles = () => {
           box-shadow: 0 4px 8px rgba(139, 115, 85, 0.3);
         }
 
-        @media ${theme.breakpoints.portrait} {
+        @media ${theme.breakpoints.compact} {
           font-size: 0.8rem;
           padding: 0.6rem 1.2rem;
         }
@@ -87,7 +87,7 @@ const useStyles = () => {
       section: css`
         margin-bottom: 4rem;
 
-        @media ${theme.breakpoints.portrait} {
+        @media ${theme.breakpoints.compact} {
           margin-bottom: 3rem;
         }
       `,
@@ -95,7 +95,7 @@ const useStyles = () => {
         text-align: center;
         margin-bottom: 2rem;
 
-        @media ${theme.breakpoints.portrait} {
+        @media ${theme.breakpoints.compact} {
           margin-bottom: 1.5rem;
         }
       `,
@@ -121,7 +121,7 @@ const useStyles = () => {
           background: linear-gradient(90deg, transparent, #d4a574, transparent);
         }
 
-        @media ${theme.breakpoints.portrait} {
+        @media ${theme.breakpoints.compact} {
           font-size: 1.5rem;
         }
       `,
@@ -132,7 +132,7 @@ const useStyles = () => {
         max-width: 1200px;
         margin: 0 auto;
 
-        @media ${theme.breakpoints.portrait} {
+        @media ${theme.breakpoints.compact} {
           grid-template-columns: 1fr;
           gap: 1.5rem;
           max-width: 600px;
@@ -151,7 +151,7 @@ const useStyles = () => {
           max-width: 600px;
         }
 
-        @media ${theme.breakpoints.portrait} {
+        @media ${theme.breakpoints.compact} {
           gap: 1.5rem;
           max-width: 600px;
 
@@ -168,7 +168,7 @@ const useStyles = () => {
         max-width: 800px;
         margin: 0 auto;
 
-        @media ${theme.breakpoints.portrait} {
+        @media ${theme.breakpoints.compact} {
           grid-template-columns: repeat(2, 1fr);
           gap: 1rem;
         }
@@ -219,7 +219,7 @@ const useStyles = () => {
         align-items: center;
         justify-content: center;
 
-        @media ${theme.breakpoints.portrait} {
+        @media ${theme.breakpoints.compact} {
           height: 280px;
           padding: 0.5rem 0.5rem 0 0.5rem;
         }
@@ -233,7 +233,7 @@ const useStyles = () => {
         align-items: center;
         justify-content: center;
 
-        @media ${theme.breakpoints.portrait} {
+        @media ${theme.breakpoints.compact} {
           height: 360px;
           padding: 0.5rem 0.5rem 0 0.5rem;
         }
@@ -259,7 +259,7 @@ const useStyles = () => {
         align-items: center;
         justify-content: center;
 
-        @media ${theme.breakpoints.portrait} {
+        @media ${theme.breakpoints.compact} {
           height: 160px;
           padding: 0.5rem;
         }
@@ -273,7 +273,7 @@ const useStyles = () => {
       itemInfo: css`
         padding: 0.75rem;
 
-        @media ${theme.breakpoints.portrait} {
+        @media ${theme.breakpoints.compact} {
           padding: 0.5rem;
         }
       `,
@@ -285,7 +285,7 @@ const useStyles = () => {
         margin: 0.5rem 0 0.5rem 0;
         line-height: 1.2;
 
-        @media ${theme.breakpoints.portrait} {
+        @media ${theme.breakpoints.compact} {
           font-size: 0.9rem;
           margin: 0.4rem 0 0.4rem 0;
         }
@@ -354,7 +354,7 @@ const useStyles = () => {
         max-width: 600px;
         margin: 0 auto;
 
-        @media ${theme.breakpoints.portrait} {
+        @media ${theme.breakpoints.compact} {
           grid-template-columns: 1fr;
         }
       `,
@@ -370,7 +370,7 @@ const useStyles = () => {
           transform: translateY(-2px);
         }
 
-        @media ${theme.breakpoints.portrait} {
+        @media ${theme.breakpoints.compact} {
           padding: 1rem;
         }
       `,
@@ -381,7 +381,7 @@ const useStyles = () => {
         color: #8b7355;
         margin: 0;
 
-        @media ${theme.breakpoints.portrait} {
+        @media ${theme.breakpoints.compact} {
           font-size: 1rem;
         }
       `,
@@ -433,7 +433,7 @@ const useStyles = () => {
         z-index: 1;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 
-        @media ${theme.breakpoints.portrait} {
+        @media ${theme.breakpoints.compact} {
           font-size: 0.7rem;
           padding: 0.3rem 0.6rem;
         }
@@ -447,7 +447,7 @@ const useStyles = () => {
         padding: 0.75rem 0.75rem 0 0.75rem;
         min-height: 360px;
 
-        @media ${theme.breakpoints.portrait} {
+        @media ${theme.breakpoints.compact} {
           padding: 0.5rem 0.5rem 0 0.5rem;
           min-height: 280px;
         }
@@ -461,7 +461,7 @@ const useStyles = () => {
         padding: 0.75rem 0.75rem 0 0.75rem;
         min-height: 480px;
 
-        @media ${theme.breakpoints.portrait} {
+        @media ${theme.breakpoints.compact} {
           padding: 0.5rem 0.5rem 0 0.5rem;
           min-height: 360px;
         }
@@ -472,7 +472,7 @@ const useStyles = () => {
         justify-content: space-between;
         width: 100%;
 
-        @media ${theme.breakpoints.portrait} {
+        @media ${theme.breakpoints.compact} {
           gap: 0.5rem;
         }
       `,
