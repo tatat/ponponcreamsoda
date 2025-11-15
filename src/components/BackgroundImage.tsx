@@ -6,9 +6,9 @@ import { Breakpoint, useBreakpoint } from '@/hooks/use-breakpoint'
 type ConfigWithDefault<T> =
   | ({
       default?: undefined
-    } & {
+    } & Partial<{
       [K in Breakpoint]: T
-    })
+    }>)
   | ({
       default: T
     } & {

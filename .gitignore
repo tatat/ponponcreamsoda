@@ -1,6 +1,7 @@
 .firebase
 tmp
 .claude/settings.local.json
+.playwright-mcp
 
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 

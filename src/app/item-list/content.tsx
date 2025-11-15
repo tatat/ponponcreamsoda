@@ -1,11 +1,67 @@
 'use client'
 
-import { css, useTheme } from '@emotion/react'
+import { css, keyframes, useTheme } from '@emotion/react'
 import { useMemo } from 'react'
 import Link from 'next/link'
+import html2canvas from 'html2canvas'
 import Menu from '@/components/Menu'
 import { itemList } from '@/item-list'
 import type { ItemBook, ItemSticker, ItemOther, AvailabilityState } from '@/item-list-type'
+
+const scanlineAnimation = keyframes`
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(4px);
+  }
+`
+
+const chromaticAberrationAnimation = keyframes`
+  0% {
+    filter: url(#chromatic-shift-1);
+  }
+  0.78125% {
+    filter: url(#chromatic-shift-2);
+  }
+  1.5625% {
+    filter: url(#lines-chromatic);
+  }
+  2.34375% {
+    filter: url(#chromatic-shift-1);
+  }
+  3.125% {
+    filter: url(#chromatic-normal);
+  }
+  50% {
+    filter: url(#chromatic-shift-1);
+  }
+  50.78125% {
+    filter: url(#chromatic-shift-2);
+  }
+  51.5625% {
+    filter: url(#lines-chromatic);
+  }
+  52.34375% {
+    filter: url(#chromatic-shift-1);
+  }
+  52.725% {
+    filter: url(#chromatic-shift-1);
+  }
+  53.50625% {
+    filter: url(#chromatic-shift-3);
+  }
+  54.2875% {
+    filter: url(#lines-chromatic);
+  }
+  55.06875% {
+    filter: url(#chromatic-shift-1);
+  }
+  56.25%,
+  100% {
+    filter: url(#chromatic-normal);
+  }
+`
 
 const useStyles = () => {
   const theme = useTheme()
@@ -14,13 +70,34 @@ const useStyles = () => {
     () => ({
       container: css`
         position: relative;
-        background: linear-gradient(135deg, #f8f4f0 0%, #e8ddd4 50%, #f0e6dc 100%);
+        background: #efe7e1;
         min-height: 100vh;
         min-height: 100lvh;
         padding: 2rem;
         box-sizing: border-box;
+        animation: ${chromaticAberrationAnimation} 16s step-end infinite;
 
-        @media ${theme.breakpoints.portrait} {
+        &::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(139, 115, 85, 0.08) 2px,
+            rgba(139, 115, 85, 0.08) 4px
+          );
+          pointer-events: none;
+          z-index: 1;
+          transform: translateZ(0);
+          animation: ${scanlineAnimation} 1s linear infinite;
+        }
+
+        @media ${theme.breakpoints.compact} {
           padding: 1rem;
         }
       `,
@@ -29,7 +106,7 @@ const useStyles = () => {
         margin-bottom: 3rem;
         padding-top: 2rem;
 
-        @media ${theme.breakpoints.portrait} {
+        @media ${theme.breakpoints.compact} {
           margin-bottom: 2rem;
           padding-top: 1rem;
         }
@@ -43,7 +120,7 @@ const useStyles = () => {
         text-shadow: 1px 1px 2px rgba(139, 115, 85, 0.1);
         letter-spacing: 0.1em;
 
-        @media ${theme.breakpoints.portrait} {
+        @media ${theme.breakpoints.compact} {
           font-size: 2rem;
         }
       `,
@@ -55,15 +132,47 @@ const useStyles = () => {
         font-weight: 300;
         letter-spacing: 0.05em;
 
-        @media ${theme.breakpoints.portrait} {
+        @media ${theme.breakpoints.compact} {
           font-size: 1rem;
+        }
+      `,
+      downloadButton: css`
+        ${theme.styles.text};
+        background: linear-gradient(135deg, #8b7355, #a68b5b);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        letter-spacing: 0.05em;
+        margin: 1.5rem auto 0;
+        display: block;
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 8px rgba(139, 115, 85, 0.3);
+        }
+
+        @media ${theme.breakpoints.compact} {
+          font-size: 0.8rem;
+          padding: 0.6rem 1.2rem;
         }
       `,
       section: css`
         margin-bottom: 4rem;
 
-        @media ${theme.breakpoints.portrait} {
+        @media ${theme.breakpoints.compact} {
           margin-bottom: 3rem;
+        }
+      `,
+      sectionTitleWrapper: css`
+        text-align: center;
+        margin-bottom: 2rem;
+
+        @media ${theme.breakpoints.compact} {
+          margin-bottom: 1.5rem;
         }
       `,
       sectionTitle: css`
@@ -71,26 +180,25 @@ const useStyles = () => {
         color: #8b7355;
         font-size: 2rem;
         font-weight: 700;
-        margin: 0 0 2rem 0;
-        text-align: center;
+        margin: 0;
         text-shadow: 1px 1px 2px rgba(139, 115, 85, 0.1);
         letter-spacing: 0.08em;
+        display: inline-block;
         position: relative;
+        padding-bottom: 0.5rem;
 
         &::after {
           content: '';
           position: absolute;
-          bottom: -0.5rem;
-          left: 50%;
-          transform: translateX(-50%);
+          bottom: 0;
+          left: calc(50% - 30px);
           width: 60px;
           height: 2px;
           background: linear-gradient(90deg, transparent, #d4a574, transparent);
         }
 
-        @media ${theme.breakpoints.portrait} {
+        @media ${theme.breakpoints.compact} {
           font-size: 1.5rem;
-          margin-bottom: 1.5rem;
         }
       `,
       itemGrid: css`
@@ -100,22 +208,33 @@ const useStyles = () => {
         max-width: 1200px;
         margin: 0 auto;
 
-        @media ${theme.breakpoints.portrait} {
+        @media ${theme.breakpoints.compact} {
           grid-template-columns: 1fr;
           gap: 1.5rem;
           max-width: 600px;
         }
       `,
-      newReleaseGrid: css`
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      featuredGrid: css`
+        display: flex;
+        flex-wrap: wrap;
         gap: 2rem;
-        max-width: 600px;
+        max-width: 1200px;
         margin: 0 auto;
+        justify-content: center;
 
-        @media ${theme.breakpoints.portrait} {
-          grid-template-columns: 1fr;
+        > * {
+          flex: 1 1 450px;
+          max-width: 600px;
+        }
+
+        @media ${theme.breakpoints.compact} {
           gap: 1.5rem;
+          max-width: 600px;
+
+          > * {
+            flex: 1 1 100%;
+            max-width: 100%;
+          }
         }
       `,
       stickerGrid: css`
@@ -125,30 +244,36 @@ const useStyles = () => {
         max-width: 800px;
         margin: 0 auto;
 
-        @media ${theme.breakpoints.portrait} {
+        @media ${theme.breakpoints.compact} {
           grid-template-columns: repeat(2, 1fr);
           gap: 1rem;
         }
       `,
       itemCard: css`
-        background: rgba(255, 255, 255, 0.15);
-        border: none;
+        background: #f1ebe6;
+        border: 2px solid rgba(212, 165, 116, 0.3);
         border-radius: 0;
         overflow: hidden;
         transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        z-index: 2;
 
         &:hover {
           transform: translateY(-2px);
         }
       `,
       stickerCard: css`
-        background: rgba(255, 255, 255, 0.15);
-        border: none;
+        background: #f1ebe6;
+        border: 2px solid rgba(212, 165, 116, 0.3);
         border-radius: 0;
         overflow: hidden;
         transition: all 0.3s ease;
         display: flex;
         flex-direction: column;
+        position: relative;
+        z-index: 2;
 
         &:hover {
           transform: translateY(-2px);
@@ -165,52 +290,70 @@ const useStyles = () => {
         color: #e67e22;
         margin: 0;
       `,
-      itemImage: css`
-        width: 100%;
+      itemImageWrapper: css`
         height: 360px;
-        object-fit: contain;
-        display: block;
         background: rgba(236, 240, 241, 0.05);
         padding: 0.75rem 0.75rem 0 0.75rem;
         box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
-        @media ${theme.breakpoints.portrait} {
+        @media ${theme.breakpoints.compact} {
           height: 280px;
           padding: 0.5rem 0.5rem 0 0.5rem;
         }
       `,
-      newReleaseImage: css`
-        width: 100%;
-        height: 500px;
-        object-fit: contain;
-        display: block;
+      featuredImageWrapper: css`
+        height: 480px;
         background: rgba(236, 240, 241, 0.05);
-        padding: 1rem 1rem 0 1rem;
+        padding: 0.75rem 0.75rem 0 0.75rem;
         box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
-        @media ${theme.breakpoints.portrait} {
-          height: 400px;
-          padding: 0.75rem 0.75rem 0 0.75rem;
+        @media ${theme.breakpoints.compact} {
+          height: 360px;
+          padding: 0.5rem 0.5rem 0 0.5rem;
         }
       `,
-      stickerImage: css`
-        width: 100%;
-        height: 200px;
+      itemImage: css`
+        max-width: 100%;
+        max-height: 100%;
         object-fit: contain;
         display: block;
+      `,
+      featuredImage: css`
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        display: block;
+      `,
+      stickerImageWrapper: css`
+        height: 200px;
         background: rgba(236, 240, 241, 0.1);
         padding: 1rem;
         box-sizing: border-box;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
-        @media ${theme.breakpoints.portrait} {
+        @media ${theme.breakpoints.compact} {
           height: 160px;
           padding: 0.5rem;
         }
       `,
+      stickerImage: css`
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        display: block;
+      `,
       itemInfo: css`
         padding: 0.75rem;
 
-        @media ${theme.breakpoints.portrait} {
+        @media ${theme.breakpoints.compact} {
           padding: 0.5rem;
         }
       `,
@@ -221,11 +364,9 @@ const useStyles = () => {
         color: #8b7355;
         margin: 0.5rem 0 0.5rem 0;
         line-height: 1.2;
-        padding: 0 0.75rem;
 
-        @media ${theme.breakpoints.portrait} {
+        @media ${theme.breakpoints.compact} {
           font-size: 0.9rem;
-          padding: 0 0.5rem;
           margin: 0.4rem 0 0.4rem 0;
         }
       `,
@@ -293,23 +434,25 @@ const useStyles = () => {
         max-width: 600px;
         margin: 0 auto;
 
-        @media ${theme.breakpoints.portrait} {
+        @media ${theme.breakpoints.compact} {
           grid-template-columns: 1fr;
         }
       `,
       otherItem: css`
-        background: rgba(255, 255, 255, 0.15);
-        border: none;
+        background: #f1ebe6;
+        border: 2px solid rgba(212, 165, 116, 0.3);
         border-radius: 0;
         padding: 1.5rem;
         text-align: center;
         transition: all 0.3s ease;
+        position: relative;
+        z-index: 2;
 
         &:hover {
           transform: translateY(-2px);
         }
 
-        @media ${theme.breakpoints.portrait} {
+        @media ${theme.breakpoints.compact} {
           padding: 1rem;
         }
       `,
@@ -320,7 +463,7 @@ const useStyles = () => {
         color: #8b7355;
         margin: 0;
 
-        @media ${theme.breakpoints.portrait} {
+        @media ${theme.breakpoints.compact} {
           font-size: 1rem;
         }
       `,
@@ -336,9 +479,46 @@ const useStyles = () => {
       availabilityLink: css`
         text-decoration: none;
         color: inherit;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
 
         &:hover {
           text-decoration: underline;
+        }
+      `,
+      groupSetCard: css`
+        background: #f1ebe6;
+        border: 2px solid #d4a574;
+        border-radius: 0;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        z-index: 2;
+
+        &:hover {
+          transform: translateY(-2px);
+        }
+      `,
+      setBadge: css`
+        position: absolute;
+        top: 0;
+        right: 0;
+        background: #e67e22;
+        color: white;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        z-index: 1;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+        @media ${theme.breakpoints.compact} {
+          font-size: 0.7rem;
+          padding: 0.3rem 0.6rem;
         }
       `,
     }),
@@ -388,92 +568,139 @@ const getAvailabilityStatusText = (status: AvailabilityState) => {
   }
 }
 
-const BookItem = ({ item, isNewRelease = false }: { item: ItemBook; isNewRelease?: boolean }) => {
+const ItemInfo = ({
+  title,
+  itemType,
+  colorType,
+  price,
+  availability,
+  links,
+}: {
+  title: string
+  itemType: string
+  colorType?: string
+  price: string
+  availability: {
+    venue: AvailabilityState
+    onlinePhysical?: AvailabilityState
+    onlineDigital?: AvailabilityState
+  }
+  links?: {
+    onlinePhysical?: string[]
+    onlineDigital?: string[]
+  }
+}) => {
   const styles = useStyles()
 
-  const imageAndTitle = (
-    <>
-      <img src={item.imageUrl} alt={item.name} css={isNewRelease ? styles.newReleaseImage : styles.itemImage} />
-      <h3 css={styles.itemName}>{item.name}</h3>
-    </>
-  )
+  const displayItemType = colorType ? `${itemType}・${colorType}` : itemType
 
-  const content = (
-    <div css={styles.itemCard}>
-      {item.links?.website ? (
-        <Link href={item.links.website} css={styles.websiteLink}>
-          {imageAndTitle}
-        </Link>
-      ) : (
-        imageAndTitle
-      )}
-      <div css={styles.itemInfo}>
-        <div css={styles.itemTypeAndPrice}>
-          <p css={styles.itemType}>{item.type === 'manga' ? 'マンガ' : 'イラスト'}</p>
-          <p css={styles.itemPrice}>{item.price}</p>
-        </div>
-        <div css={styles.availabilitySection}>
-          <h4 css={styles.availabilityTitle}>販売状況</h4>
-          <ul css={styles.availabilityList}>
+  return (
+    <div css={styles.itemInfo}>
+      <h3 css={styles.itemName}>{title}</h3>
+      <div css={styles.itemTypeAndPrice}>
+        <p css={styles.itemType}>{displayItemType}</p>
+        <p css={styles.itemPrice}>{price}</p>
+      </div>
+      <div css={styles.availabilitySection}>
+        <h4 css={styles.availabilityTitle}>販売状況</h4>
+        <ul css={styles.availabilityList}>
+          <li css={styles.availabilityItem}>
+            <span>会場販売</span>
+            <span css={[styles.availabilityStatus, getAvailabilityStatusStyle(availability.venue)]}>
+              {getAvailabilityStatusText(availability.venue)}
+            </span>
+          </li>
+          {availability.onlinePhysical && (
             <li css={styles.availabilityItem}>
-              <span>会場販売</span>
-              <span css={[styles.availabilityStatus, getAvailabilityStatusStyle(item.availability.venue)]}>
-                {getAvailabilityStatusText(item.availability.venue)}
-              </span>
-            </li>
-            <li css={styles.availabilityItem}>
-              {item.links?.onlinePhysical && item.links.onlinePhysical.length > 0 ? (
+              {links?.onlinePhysical && links.onlinePhysical.length > 0 ? (
                 <a
-                  href={item.links.onlinePhysical[0]}
+                  href={links.onlinePhysical[0]}
                   target="_blank"
                   rel="noopener noreferrer"
                   css={styles.availabilityLink}
-                  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}
                 >
                   <span>オンライン（物理）</span>
-                  <span css={[styles.availabilityStatus, getAvailabilityStatusStyle(item.availability.onlinePhysical)]}>
-                    {getAvailabilityStatusText(item.availability.onlinePhysical)}
+                  <span css={[styles.availabilityStatus, getAvailabilityStatusStyle(availability.onlinePhysical)]}>
+                    {getAvailabilityStatusText(availability.onlinePhysical)}
                   </span>
                 </a>
               ) : (
                 <>
                   <span>オンライン（物理）</span>
-                  <span css={[styles.availabilityStatus, getAvailabilityStatusStyle(item.availability.onlinePhysical)]}>
-                    {getAvailabilityStatusText(item.availability.onlinePhysical)}
+                  <span css={[styles.availabilityStatus, getAvailabilityStatusStyle(availability.onlinePhysical)]}>
+                    {getAvailabilityStatusText(availability.onlinePhysical)}
                   </span>
                 </>
               )}
             </li>
+          )}
+          {availability.onlineDigital && (
             <li css={styles.availabilityItem}>
-              {item.links?.onlineDigital && item.links.onlineDigital.length > 0 ? (
+              {links?.onlineDigital && links.onlineDigital.length > 0 ? (
                 <a
-                  href={item.links.onlineDigital[0]}
+                  href={links.onlineDigital[0]}
                   target="_blank"
                   rel="noopener noreferrer"
                   css={styles.availabilityLink}
-                  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}
                 >
                   <span>オンライン（デジタル）</span>
-                  <span css={[styles.availabilityStatus, getAvailabilityStatusStyle(item.availability.onlineDigital)]}>
-                    {getAvailabilityStatusText(item.availability.onlineDigital)}
+                  <span css={[styles.availabilityStatus, getAvailabilityStatusStyle(availability.onlineDigital)]}>
+                    {getAvailabilityStatusText(availability.onlineDigital)}
                   </span>
                 </a>
               ) : (
                 <>
                   <span>オンライン（デジタル）</span>
-                  <span css={[styles.availabilityStatus, getAvailabilityStatusStyle(item.availability.onlineDigital)]}>
-                    {getAvailabilityStatusText(item.availability.onlineDigital)}
+                  <span css={[styles.availabilityStatus, getAvailabilityStatusStyle(availability.onlineDigital)]}>
+                    {getAvailabilityStatusText(availability.onlineDigital)}
                   </span>
                 </>
               )}
             </li>
-          </ul>
-        </div>
+          )}
+        </ul>
       </div>
     </div>
   )
+}
 
-  return content
+const BookItem = ({ item, isFeatured = false }: { item: ItemBook; isFeatured?: boolean }) => {
+  const styles = useStyles()
+
+  const imageElement = (
+    <div
+      css={isFeatured ? styles.featuredImageWrapper : styles.itemImageWrapper}
+      data-testid={isFeatured ? 'featured-image-wrapper' : 'image-wrapper'}
+    >
+      <img src={item.imageUrl} alt={item.name} css={isFeatured ? styles.featuredImage : styles.itemImage} />
+    </div>
+  )
+
+  return (
+    <div
+      css={item.isSet ? styles.groupSetCard : styles.itemCard}
+      data-testid={isFeatured ? 'featured-book-item' : 'book-item'}
+    >
+      {item.isSet && <div css={styles.setBadge}>セット</div>}
+      {item.links?.website ? (
+        <Link href={item.links.website} css={styles.websiteLink}>
+          {imageElement}
+        </Link>
+      ) : (
+        imageElement
+      )}
+      <ItemInfo
+        title={item.name}
+        itemType={item.bookType === 'manga' ? 'マンガ' : 'イラスト'}
+        colorType={
+          item.colorType === 'fullColor' ? 'フルカラー' : item.colorType === 'monochrome' ? 'モノクロ' : undefined
+        }
+        price={item.price}
+        availability={item.availability}
+        links={item.links}
+      />
+    </div>
+  )
 }
 
 const StickerItem = ({ item }: { item: ItemSticker }) => {
@@ -481,7 +708,9 @@ const StickerItem = ({ item }: { item: ItemSticker }) => {
 
   return (
     <div css={styles.stickerCard}>
-      <img src={item.imageUrl} alt="ステッカー" css={styles.stickerImage} />
+      <div css={styles.stickerImageWrapper}>
+        <img src={item.imageUrl} alt="ステッカー" css={styles.stickerImage} />
+      </div>
       <div css={styles.stickerInfo}>
         <p css={styles.stickerPrice}>{item.price}</p>
       </div>
@@ -502,62 +731,326 @@ const OtherItem = ({ item }: { item: ItemOther }) => {
 export default function ItemListContent() {
   const styles = useStyles()
 
+  const handleDownloadImage = async () => {
+    const element = document.body
+    const canvas = await html2canvas(element, {
+      useCORS: true,
+      allowTaint: true,
+      scale: window.devicePixelRatio,
+      width: 1400,
+      windowWidth: 1400,
+    })
+
+    const link = document.createElement('a')
+    link.download = `item-list-${new Date().toISOString().split('T')[0]}.png`
+    link.href = canvas.toDataURL('image/png')
+    link.click()
+  }
+
   return (
-    <main css={styles.container}>
-      <Menu color="#8b7355" secondaryColor="#a68b5b" />
+    <>
+      <svg width="0" height="0" style={{ position: 'absolute' }}>
+        <defs>
+          <filter id="chromatic-normal">
+            <feColorMatrix
+              type="matrix"
+              values="1 0 0 0 0
+                      0 1 0 0 0
+                      0 0 1 0 0
+                      0 0 0 1 0"
+            />
+          </filter>
+          <filter id="lines-chromatic">
+            <feOffset in="SourceGraphic" dx="2" dy="1" result="red" />
+            <feColorMatrix
+              in="red"
+              type="matrix"
+              values="1 0 0 0 0
+                      0 0 0 0 0
+                      0 0 0 0 0
+                      0 0 0 1 0"
+              result="red"
+            />
+            <feOffset in="SourceGraphic" dx="-2" dy="-1" result="cyan" />
+            <feColorMatrix
+              in="cyan"
+              type="matrix"
+              values="0 0 0 0 0
+                      0 1 0 0 0
+                      0 0 1 0 0
+                      0 0 0 1 0"
+              result="cyan"
+            />
+            <feBlend in="red" in2="cyan" mode="screen" result="blend" />
+            <feBlend in="blend" in2="SourceGraphic" mode="normal" result="chromatic" />
+            <feTurbulence baseFrequency="0 0.5" numOctaves="1" seed="10" result="lines" />
+            <feDisplacementMap in="chromatic" in2="lines" scale="2 3" xChannelSelector="R" yChannelSelector="R" />
+          </filter>
+          <filter id="chromatic-shift-1">
+            <feOffset in="SourceGraphic" dx="1" dy="0.5" result="red" />
+            <feColorMatrix
+              in="red"
+              type="matrix"
+              values="1 0 0 0 0
+                      0 0 0 0 0
+                      0 0 0 0 0
+                      0 0 0 1 0"
+              result="red"
+            />
+            <feOffset in="SourceGraphic" dx="-1" dy="-0.5" result="cyan" />
+            <feColorMatrix
+              in="cyan"
+              type="matrix"
+              values="0 0 0 0 0
+                      0 1 0 0 0
+                      0 0 1 0 0
+                      0 0 0 1 0"
+              result="cyan"
+            />
+            <feBlend in="red" in2="cyan" mode="screen" result="blend" />
+            <feBlend in="blend" in2="SourceGraphic" mode="normal" />
+          </filter>
+          <filter id="chromatic-shift-2">
+            <feOffset in="SourceGraphic" dx="2" dy="1" result="red" />
+            <feColorMatrix
+              in="red"
+              type="matrix"
+              values="1 0 0 0 0
+                      0 0 0 0 0
+                      0 0 0 0 0
+                      0 0 0 1 0"
+              result="red"
+            />
+            <feOffset in="SourceGraphic" dx="-2" dy="-1" result="cyan" />
+            <feColorMatrix
+              in="cyan"
+              type="matrix"
+              values="0 0 0 0 0
+                      0 1 0 0 0
+                      0 0 1 0 0
+                      0 0 0 1 0"
+              result="cyan"
+            />
+            <feBlend in="red" in2="cyan" mode="screen" result="blend" />
+            <feBlend in="blend" in2="SourceGraphic" mode="normal" result="chromatic" />
+            <feTurbulence type="fractalNoise" baseFrequency="0 0.0012" numOctaves="2" seed="1" result="noise" />
+            <feComponentTransfer in="noise" result="highContrast">
+              <feFuncR type="linear" slope="20" intercept="-9.5" />
+              <feFuncG type="discrete" tableValues="0.5" />
+              <feFuncB type="linear" slope="20" intercept="-9.5" />
+              <feFuncA type="identity" />
+            </feComponentTransfer>
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0 0.01"
+              numOctaves="2"
+              seed="2"
+              result="noiseForDisplacement"
+            />
+            <feColorMatrix
+              in="noiseForDisplacement"
+              result="displacementSource"
+              type="matrix"
+              values="1 0 0 0 0
+                      0 0 0 0 0.5
+                      0 0 0 0 0
+                      0 0 0 0 1"
+            />
+            <feDisplacementMap
+              in="highContrast"
+              in2="displacementSource"
+              scale="10000"
+              xChannelSelector="R"
+              yChannelSelector="G"
+              result="displacedNoiseRaw"
+            />
+            <feColorMatrix
+              in="displacedNoiseRaw"
+              result="displacedNoise"
+              type="matrix"
+              values="1 0 0 0 0
+                      0 0 0 0 0.5
+                      0 0 0 0 0
+                      0 0 0 0 1"
+            />
+            <feDisplacementMap
+              in="chromatic"
+              in2="displacedNoise"
+              scale="15"
+              xChannelSelector="R"
+              yChannelSelector="G"
+              result="displaced"
+            />
+            <feTurbulence type="turbulence" baseFrequency="0.9" numOctaves="4" seed="3" result="grainNoise" />
+            <feColorMatrix in="grainNoise" type="saturate" values="10" result="grainSaturated" />
+            <feComponentTransfer in="grainSaturated" result="grainDark">
+              <feFuncR type="linear" slope="0.2" intercept="0.6" />
+              <feFuncG type="linear" slope="0.2" intercept="0.6" />
+              <feFuncB type="linear" slope="0.2" intercept="0.6" />
+            </feComponentTransfer>
+            <feBlend in="grainDark" in2="displaced" mode="multiply" result="withGrain" />
+          </filter>
+          <filter id="chromatic-shift-3">
+            <feOffset in="SourceGraphic" dx="2" dy="1" result="red" />
+            <feColorMatrix
+              in="red"
+              type="matrix"
+              values="1 0 0 0 0
+                      0 0 0 0 0
+                      0 0 0 0 0
+                      0 0 0 1 0"
+              result="red"
+            />
+            <feOffset in="SourceGraphic" dx="-2" dy="-1" result="cyan" />
+            <feColorMatrix
+              in="cyan"
+              type="matrix"
+              values="0 0 0 0 0
+                      0 1 0 0 0
+                      0 0 1 0 0
+                      0 0 0 1 0"
+              result="cyan"
+            />
+            <feBlend in="red" in2="cyan" mode="screen" result="blend" />
+            <feBlend in="blend" in2="SourceGraphic" mode="normal" result="chromatic" />
+            <feTurbulence type="fractalNoise" baseFrequency="0 0.0012" numOctaves="2" seed="14" result="noise" />
+            <feComponentTransfer in="noise" result="highContrast">
+              <feFuncR type="linear" slope="20" intercept="-9.5" />
+              <feFuncG type="discrete" tableValues="0.5" />
+              <feFuncB type="linear" slope="20" intercept="-9.5" />
+              <feFuncA type="identity" />
+            </feComponentTransfer>
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0 0.01"
+              numOctaves="2"
+              seed="6"
+              result="noiseForDisplacement"
+            />
+            <feColorMatrix
+              in="noiseForDisplacement"
+              result="displacementSource"
+              type="matrix"
+              values="1 0 0 0 0
+                      0 0 0 0 0.5
+                      0 0 0 0 0
+                      0 0 0 0 1"
+            />
+            <feDisplacementMap
+              in="highContrast"
+              in2="displacementSource"
+              scale="10000"
+              xChannelSelector="R"
+              yChannelSelector="G"
+              result="displacedNoiseRaw"
+            />
+            <feColorMatrix
+              in="displacedNoiseRaw"
+              result="displacedNoise"
+              type="matrix"
+              values="1 0 0 0 0
+                      0 0 0 0 0.5
+                      0 0 0 0 0
+                      0 0 0 0 1"
+            />
+            <feDisplacementMap
+              in="chromatic"
+              in2="displacedNoise"
+              scale="15"
+              xChannelSelector="R"
+              yChannelSelector="G"
+              result="displaced"
+            />
+            <feTurbulence type="turbulence" baseFrequency="0.9" numOctaves="4" seed="7" result="grainNoise" />
+            <feColorMatrix in="grainNoise" type="saturate" values="10" result="grainSaturated" />
+            <feComponentTransfer in="grainSaturated" result="grainDark">
+              <feFuncR type="linear" slope="0.2" intercept="0.6" />
+              <feFuncG type="linear" slope="0.2" intercept="0.6" />
+              <feFuncB type="linear" slope="0.2" intercept="0.6" />
+            </feComponentTransfer>
+            <feBlend in="grainDark" in2="displaced" mode="multiply" result="withGrain" />
+          </filter>
+        </defs>
+      </svg>
+      <main css={styles.container}>
+        <Menu color="#8b7355" secondaryColor="#a68b5b" />
 
-      <header css={styles.header}>
-        <h1 css={styles.title}>お品書き</h1>
-        <p css={styles.subtitle}>Pon Pon Creamsoda アイテム一覧</p>
-      </header>
+        <header css={styles.header}>
+          <h1 css={styles.title}>お品書き</h1>
+          <p css={styles.subtitle}>Pon Pon Creamsoda アイテム一覧</p>
+          <button data-html2canvas-ignore css={styles.downloadButton} onClick={handleDownloadImage}>
+            画像としてダウンロード
+          </button>
+        </header>
 
-      {/* New Releases */}
-      {itemList.newReleases.map((category, categoryIndex) => (
-        <section key={categoryIndex} css={styles.section}>
-          <h2 css={styles.sectionTitle}>新刊</h2>
-          <div css={styles.newReleaseGrid}>
-            {category.items.map((item, itemIndex) => (
-              <BookItem key={itemIndex} item={item} isNewRelease={true} />
-            ))}
-          </div>
-        </section>
-      ))}
+        {/* New Releases */}
+        {itemList.newReleases.map((category, categoryIndex) => (
+          <section key={categoryIndex} css={styles.section}>
+            <div css={styles.sectionTitleWrapper}>
+              <h2 css={styles.sectionTitle}>新刊</h2>
+            </div>
+            <div css={styles.featuredGrid}>
+              {category.items.map((item, itemIndex) => {
+                if (item.itemType === 'book') {
+                  return <BookItem key={`item-${itemIndex}`} item={item} isFeatured={true} />
+                }
+                return null
+              })}
+            </div>
+          </section>
+        ))}
 
-      {/* Back Catalog */}
-      {itemList.backCatalog.map((category, categoryIndex) => (
-        <section key={categoryIndex} css={styles.section}>
-          <h2 css={styles.sectionTitle}>既刊</h2>
-          <div css={styles.itemGrid}>
-            {[...category.items].reverse().map((item, itemIndex) => (
-              <BookItem key={itemIndex} item={item} />
-            ))}
-          </div>
-        </section>
-      ))}
+        {/* Back Catalog */}
+        {itemList.backCatalog.map((category, categoryIndex) => (
+          <section key={categoryIndex} css={styles.section}>
+            <div css={styles.sectionTitleWrapper}>
+              <h2 css={styles.sectionTitle}>既刊</h2>
+            </div>
+            <div css={styles.itemGrid}>
+              {category.items.toReversed().map((item, itemIndex) => {
+                if (item.itemType === 'book') {
+                  return <BookItem key={itemIndex} item={item} />
+                }
+                return null
+              })}
+            </div>
+          </section>
+        ))}
 
-      {/* Stickers */}
-      {itemList.stickers.map((category, categoryIndex) => (
-        <section key={categoryIndex} css={styles.section}>
-          <h2 css={styles.sectionTitle}>ステッカー</h2>
-          <div css={styles.stickerGrid}>
-            {category.items.map((item, itemIndex) => (
-              <StickerItem key={itemIndex} item={item} />
-            ))}
-          </div>
-        </section>
-      ))}
+        {/* Stickers */}
+        {itemList.stickers.map((category, categoryIndex) => (
+          <section key={categoryIndex} css={styles.section}>
+            <div css={styles.sectionTitleWrapper}>
+              <h2 css={styles.sectionTitle}>ステッカー</h2>
+            </div>
+            <div css={styles.stickerGrid}>
+              {category.items.map((item, itemIndex) => {
+                if (item.itemType === 'sticker') {
+                  return <StickerItem key={itemIndex} item={item} />
+                }
+                return null
+              })}
+            </div>
+          </section>
+        ))}
 
-      {/* Others */}
-      {itemList.others.map((category, categoryIndex) => (
-        <section key={categoryIndex} css={styles.section}>
-          <h2 css={styles.sectionTitle}>その他</h2>
-          <div css={styles.otherItemsList}>
-            {category.items.map((item, itemIndex) => (
-              <OtherItem key={itemIndex} item={item} />
-            ))}
-          </div>
-        </section>
-      ))}
-    </main>
+        {/* Others */}
+        {itemList.others.map((category, categoryIndex) => (
+          <section key={categoryIndex} css={styles.section}>
+            <div css={styles.sectionTitleWrapper}>
+              <h2 css={styles.sectionTitle}>その他</h2>
+            </div>
+            <div css={styles.otherItemsList}>
+              {category.items.map((item, itemIndex) => {
+                if (item.itemType === 'other') {
+                  return <OtherItem key={itemIndex} item={item} />
+                }
+                return null
+              })}
+            </div>
+          </section>
+        ))}
+      </main>
+    </>
   )
 }

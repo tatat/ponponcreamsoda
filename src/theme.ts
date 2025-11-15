@@ -3,6 +3,7 @@ import { css } from '@emotion/react'
 const breakpoints = {
   landscape: '(orientation: landscape)',
   portrait: '(orientation: portrait)',
+  compact: '(max-width: 1399px)',
 }
 
 const styles = {
