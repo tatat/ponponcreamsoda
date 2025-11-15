@@ -13,12 +13,11 @@ export const itemList: ItemList = {
       title: 'New Releases',
       items: [
         {
-          itemType: 'group',
-          id: 'spring-series-set',
+          itemType: 'book',
           name: 'イラスト本 3 - 3冊セット（クリアファイル付き）',
+          imageUrl: '/images/item-list/book-06.jpg',
+          isSet: true,
           price: '900yen',
-          imageUrls: ['/images/item-list/book-06.jpg'],
-          itemCount: 3,
           bookType: 'illustration',
           availability: {
             venue: 'available',

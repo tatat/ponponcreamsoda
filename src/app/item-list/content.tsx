@@ -6,7 +6,7 @@ import Link from 'next/link'
 import html2canvas from 'html2canvas'
 import Menu from '@/components/Menu'
 import { itemList } from '@/item-list'
-import type { ItemBook, ItemSticker, ItemOther, ItemGroup, AvailabilityState } from '@/item-list-type'
+import type { ItemBook, ItemSticker, ItemOther, AvailabilityState } from '@/item-list-type'
 
 const useStyles = () => {
   const theme = useTheme()
@@ -422,8 +422,8 @@ const useStyles = () => {
       `,
       setBadge: css`
         position: absolute;
-        top: 1rem;
-        right: 1rem;
+        top: 0;
+        right: 0;
         background: linear-gradient(135deg, #e67e22, #d35400);
         color: white;
         padding: 0.4rem 0.8rem;
@@ -437,50 +437,6 @@ const useStyles = () => {
           font-size: 0.7rem;
           padding: 0.3rem 0.6rem;
         }
-      `,
-      groupImageGridWrapper: css`
-        flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(236, 240, 241, 0.05);
-        padding: 0.75rem 0.75rem 0 0.75rem;
-        min-height: 360px;
-
-        @media ${theme.breakpoints.compact} {
-          padding: 0.5rem 0.5rem 0 0.5rem;
-          min-height: 280px;
-        }
-      `,
-      groupImageGridWrapperFeatured: css`
-        flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(236, 240, 241, 0.05);
-        padding: 0.75rem 0.75rem 0 0.75rem;
-        min-height: 480px;
-
-        @media ${theme.breakpoints.compact} {
-          padding: 0.5rem 0.5rem 0 0.5rem;
-          min-height: 360px;
-        }
-      `,
-      groupImageGrid: css`
-        display: grid;
-        gap: 0.75rem;
-        justify-content: space-between;
-        width: 100%;
-
-        @media ${theme.breakpoints.compact} {
-          gap: 0.5rem;
-        }
-      `,
-      groupThumbnail: css`
-        width: 100%;
-        height: auto;
-        object-fit: contain;
-        display: block;
       `,
     }),
     [theme],
@@ -629,13 +585,20 @@ const BookItem = ({ item, isFeatured = false }: { item: ItemBook; isFeatured?: b
   const styles = useStyles()
 
   const imageElement = (
-    <div css={isFeatured ? styles.featuredImageWrapper : styles.itemImageWrapper}>
+    <div
+      css={isFeatured ? styles.featuredImageWrapper : styles.itemImageWrapper}
+      data-testid={isFeatured ? 'featured-image-wrapper' : 'image-wrapper'}
+    >
       <img src={item.imageUrl} alt={item.name} css={isFeatured ? styles.featuredImage : styles.itemImage} />
     </div>
   )
 
   return (
-    <div css={styles.itemCard}>
+    <div
+      css={item.isSet ? styles.groupSetCard : styles.itemCard}
+      data-testid={isFeatured ? 'featured-book-item' : 'book-item'}
+    >
+      {item.isSet && <div css={styles.setBadge}>セット</div>}
       {item.links?.website ? (
         <Link href={item.links.website} css={styles.websiteLink}>
           {imageElement}
@@ -682,36 +645,6 @@ const OtherItem = ({ item }: { item: ItemOther }) => {
   )
 }
 
-const GroupSetItem = ({ group, isFeatured = false }: { group: ItemGroup; isFeatured?: boolean }) => {
-  const styles = useStyles()
-
-  return (
-    <div css={styles.groupSetCard}>
-      <div css={styles.setBadge}>セット</div>
-      <div css={isFeatured ? styles.groupImageGridWrapperFeatured : styles.groupImageGridWrapper}>
-        <div
-          css={styles.groupImageGrid}
-          style={{ gridTemplateColumns: `repeat(${Math.min(group.imageUrls.length, 3)}, auto)` }}
-        >
-          {group.imageUrls.map((imageUrl, index) => (
-            <img key={index} src={imageUrl} alt={`${group.name} - ${index + 1}`} css={styles.groupThumbnail} />
-          ))}
-        </div>
-      </div>
-      <ItemInfo
-        title={group.name}
-        itemType={group.bookType === 'manga' ? 'マンガ' : group.bookType === 'illustration' ? 'イラスト' : 'セット'}
-        colorType={
-          group.colorType === 'fullColor' ? 'フルカラー' : group.colorType === 'monochrome' ? 'モノクロ' : undefined
-        }
-        price={group.price}
-        availability={group.availability}
-        links={group.links}
-      />
-    </div>
-  )
-}
-
 export default function ItemListContent() {
   const styles = useStyles()
 
@@ -751,9 +684,7 @@ export default function ItemListContent() {
           </div>
           <div css={styles.featuredGrid}>
             {category.items.map((item, itemIndex) => {
-              if (item.itemType === 'group') {
-                return <GroupSetItem key={`item-${itemIndex}`} group={item} isFeatured={true} />
-              } else if (item.itemType === 'book') {
+              if (item.itemType === 'book') {
                 return <BookItem key={`item-${itemIndex}`} item={item} isFeatured={true} />
               }
               return null
@@ -770,9 +701,7 @@ export default function ItemListContent() {
           </div>
           <div css={styles.itemGrid}>
             {category.items.toReversed().map((item, itemIndex) => {
-              if (item.itemType === 'group') {
-                return <GroupSetItem key={itemIndex} group={item} />
-              } else if (item.itemType === 'book') {
+              if (item.itemType === 'book') {
                 return <BookItem key={itemIndex} item={item} />
               }
               return null

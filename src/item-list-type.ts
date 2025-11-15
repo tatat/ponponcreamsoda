@@ -18,6 +18,7 @@ export type ItemBook = {
   itemType: 'book'
   name: string
   imageUrl: string
+  isSet?: boolean // Whether this is a set of multiple items
   links?: {
     website?: string // Link to the book on the website
     onlinePhysical?: string[] // Link to the book on online physical store
@@ -41,30 +42,11 @@ export type ItemOther = {
   name: string
 }
 
-export type ItemGroup = {
-  itemType: 'group'
-  id: string // Unique identifier for the group
-  name: string // Display name of the group/set
-  price: string // Set price
-  imageUrls: string[] // Thumbnails of items in the set
-  itemCount: number // Number of items in the set
-  bookType?: BookType // Type of books in the set
-  colorType?: ColorType // Whether it's full color or monochrome
-  availability: AvailabilityStatus
-  links?: {
-    website?: string
-    onlinePhysical?: string[]
-    onlineDigital?: string[]
-  }
-}
-
 export type Item = ItemBook | ItemSticker | ItemOther
-
-export type ItemOrGroup = Item | ItemGroup
 
 export type ItemListCategory = {
   title: string
-  items: ItemOrGroup[]
+  items: Item[]
 }
 
 export type ItemList = {
