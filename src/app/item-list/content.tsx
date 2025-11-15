@@ -63,7 +63,53 @@ const chromaticAberrationAnimation = keyframes`
   }
 `
 
-const useStyles = (isChrome: boolean = false) => {
+const chromaticAberrationAnimationSimple = keyframes`
+  0% {
+    filter: url(#chromatic-shift-1);
+  }
+  0.78125% {
+    filter: url(#chromatic-shift-1);
+  }
+  1.5625% {
+    filter: url(#lines-chromatic);
+  }
+  2.34375% {
+    filter: url(#chromatic-shift-1);
+  }
+  3.125% {
+    filter: url(#chromatic-normal);
+  }
+  50% {
+    filter: url(#chromatic-shift-1);
+  }
+  50.78125% {
+    filter: url(#chromatic-shift-1);
+  }
+  51.5625% {
+    filter: url(#lines-chromatic);
+  }
+  52.34375% {
+    filter: url(#chromatic-shift-1);
+  }
+  52.725% {
+    filter: url(#chromatic-shift-1);
+  }
+  53.50625% {
+    filter: url(#chromatic-shift-1);
+  }
+  54.2875% {
+    filter: url(#lines-chromatic);
+  }
+  55.06875% {
+    filter: url(#chromatic-shift-1);
+  }
+  56.25%,
+  100% {
+    filter: url(#chromatic-normal);
+  }
+`
+
+const useStyles = (isChrome: boolean = false, isFirefox: boolean = false) => {
   const theme = useTheme()
 
   return useMemo(
@@ -79,6 +125,10 @@ const useStyles = (isChrome: boolean = false) => {
         ${isChrome &&
         css`
           animation: ${chromaticAberrationAnimation} 16s step-end infinite;
+        `}
+        ${isFirefox &&
+        css`
+          animation: ${chromaticAberrationAnimationSimple} 16s step-end infinite;
         `}
 
         &::before {
@@ -526,7 +576,7 @@ const useStyles = (isChrome: boolean = false) => {
         }
       `,
     }),
-    [theme, isChrome],
+    [theme, isChrome, isFirefox],
   )
 }
 
@@ -734,17 +784,23 @@ const OtherItem = ({ item }: { item: ItemOther }) => {
 
 export default function ItemListContent() {
   const [isChrome, setIsChrome] = useState(false)
+  const [isFirefox, setIsFirefox] = useState(false)
 
   useEffect(() => {
-    // Detect Chrome browser (excluding Edge)
-    // Safari: CSS animation with filter: url(#id) is not properly supported
-    // Firefox: The animation is too heavy and causes performance issues
     const userAgent = navigator.userAgent
+    // Detect Chrome browser (excluding Edge)
     const isChromeBrowser = /Chrome/.test(userAgent) && !/Edg/.test(userAgent)
+    // Detect Firefox browser
+    const isFirefoxBrowser = /Firefox/.test(userAgent)
+
     setIsChrome(isChromeBrowser)
+    setIsFirefox(isFirefoxBrowser)
+
+    // Safari: CSS animation with filter: url(#id) is not properly supported
+    // Firefox: Testing simplified animation (chromatic-shift-2/3 replaced with chromatic-shift-1)
   }, [])
 
-  const styles = useStyles(isChrome)
+  const styles = useStyles(isChrome, isFirefox)
 
   const handleDownloadImage = async () => {
     const element = document.body
