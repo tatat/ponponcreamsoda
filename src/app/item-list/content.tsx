@@ -1,12 +1,67 @@
 'use client'
 
-import { css, useTheme } from '@emotion/react'
+import { css, keyframes, useTheme } from '@emotion/react'
 import { useMemo } from 'react'
 import Link from 'next/link'
 import html2canvas from 'html2canvas'
 import Menu from '@/components/Menu'
 import { itemList } from '@/item-list'
 import type { ItemBook, ItemSticker, ItemOther, AvailabilityState } from '@/item-list-type'
+
+const scanlineAnimation = keyframes`
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(4px);
+  }
+`
+
+const chromaticAberrationAnimation = keyframes`
+  0% {
+    filter: url(#chromatic-shift-1);
+  }
+  0.78125% {
+    filter: url(#chromatic-shift-2);
+  }
+  1.5625% {
+    filter: url(#lines-chromatic);
+  }
+  2.34375% {
+    filter: url(#chromatic-shift-1);
+  }
+  3.125% {
+    filter: url(#chromatic-normal);
+  }
+  50% {
+    filter: url(#chromatic-shift-1);
+  }
+  50.78125% {
+    filter: url(#chromatic-shift-2);
+  }
+  51.5625% {
+    filter: url(#lines-chromatic);
+  }
+  52.34375% {
+    filter: url(#chromatic-shift-1);
+  }
+  52.725% {
+    filter: url(#chromatic-shift-1);
+  }
+  53.50625% {
+    filter: url(#chromatic-shift-3);
+  }
+  54.2875% {
+    filter: url(#lines-chromatic);
+  }
+  55.06875% {
+    filter: url(#chromatic-shift-1);
+  }
+  56.25%,
+  100% {
+    filter: url(#chromatic-normal);
+  }
+`
 
 const useStyles = () => {
   const theme = useTheme()
@@ -20,23 +75,25 @@ const useStyles = () => {
         min-height: 100lvh;
         padding: 2rem;
         box-sizing: border-box;
-        animation: chromatic-aberration 8s step-end infinite;
+        animation: ${chromaticAberrationAnimation} 16s step-end infinite;
 
-        @keyframes chromatic-aberration {
-          0%,
-          80%,
-          100% {
-            filter: url(#chromatic-normal);
-          }
-          94% {
-            filter: url(#chromatic-shift-1);
-          }
-          95% {
-            filter: url(#chromatic-shift-2);
-          }
-          99% {
-            filter: url(#chromatic-shift-1);
-          }
+        &::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(139, 115, 85, 0.08) 2px,
+            rgba(139, 115, 85, 0.08) 4px
+          );
+          pointer-events: none;
+          z-index: 1;
+          animation: ${scanlineAnimation} 1s linear infinite;
         }
 
         @media ${theme.breakpoints.compact} {
@@ -702,8 +759,8 @@ export default function ItemListContent() {
                       0 0 0 1 0"
             />
           </filter>
-          <filter id="chromatic-shift-1">
-            <feOffset in="SourceGraphic" dx="1" dy="0" result="red" />
+          <filter id="lines-chromatic">
+            <feOffset in="SourceGraphic" dx="2" dy="1" result="red" />
             <feColorMatrix
               in="red"
               type="matrix"
@@ -713,7 +770,33 @@ export default function ItemListContent() {
                       0 0 0 1 0"
               result="red"
             />
-            <feOffset in="SourceGraphic" dx="-1" dy="0" result="cyan" />
+            <feOffset in="SourceGraphic" dx="-2" dy="-1" result="cyan" />
+            <feColorMatrix
+              in="cyan"
+              type="matrix"
+              values="0 0 0 0 0
+                      0 1 0 0 0
+                      0 0 1 0 0
+                      0 0 0 1 0"
+              result="cyan"
+            />
+            <feBlend in="red" in2="cyan" mode="screen" result="blend" />
+            <feBlend in="blend" in2="SourceGraphic" mode="normal" result="chromatic" />
+            <feTurbulence baseFrequency="0 0.5" numOctaves="1" seed="10" result="lines" />
+            <feDisplacementMap in="chromatic" in2="lines" scale="2 3" xChannelSelector="R" yChannelSelector="R" />
+          </filter>
+          <filter id="chromatic-shift-1">
+            <feOffset in="SourceGraphic" dx="1" dy="0.5" result="red" />
+            <feColorMatrix
+              in="red"
+              type="matrix"
+              values="1 0 0 0 0
+                      0 0 0 0 0
+                      0 0 0 0 0
+                      0 0 0 1 0"
+              result="red"
+            />
+            <feOffset in="SourceGraphic" dx="-1" dy="-0.5" result="cyan" />
             <feColorMatrix
               in="cyan"
               type="matrix"
@@ -727,7 +810,7 @@ export default function ItemListContent() {
             <feBlend in="blend" in2="SourceGraphic" mode="normal" />
           </filter>
           <filter id="chromatic-shift-2">
-            <feOffset in="SourceGraphic" dx="2" dy="0" result="red" />
+            <feOffset in="SourceGraphic" dx="2" dy="1" result="red" />
             <feColorMatrix
               in="red"
               type="matrix"
@@ -737,7 +820,7 @@ export default function ItemListContent() {
                       0 0 0 1 0"
               result="red"
             />
-            <feOffset in="SourceGraphic" dx="-2" dy="0" result="cyan" />
+            <feOffset in="SourceGraphic" dx="-2" dy="-1" result="cyan" />
             <feColorMatrix
               in="cyan"
               type="matrix"
@@ -748,7 +831,143 @@ export default function ItemListContent() {
               result="cyan"
             />
             <feBlend in="red" in2="cyan" mode="screen" result="blend" />
-            <feBlend in="blend" in2="SourceGraphic" mode="normal" />
+            <feBlend in="blend" in2="SourceGraphic" mode="normal" result="chromatic" />
+            <feTurbulence type="fractalNoise" baseFrequency="0 0.0012" numOctaves="2" seed="1" result="noise" />
+            <feComponentTransfer in="noise" result="highContrast">
+              <feFuncR type="linear" slope="20" intercept="-9.5" />
+              <feFuncG type="discrete" tableValues="0.5" />
+              <feFuncB type="linear" slope="20" intercept="-9.5" />
+              <feFuncA type="identity" />
+            </feComponentTransfer>
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0 0.01"
+              numOctaves="2"
+              seed="2"
+              result="noiseForDisplacement"
+            />
+            <feColorMatrix
+              in="noiseForDisplacement"
+              result="displacementSource"
+              type="matrix"
+              values="1 0 0 0 0
+                      0 0 0 0 0.5
+                      0 0 0 0 0
+                      0 0 0 0 1"
+            />
+            <feDisplacementMap
+              in="highContrast"
+              in2="displacementSource"
+              scale="10000"
+              xChannelSelector="R"
+              yChannelSelector="G"
+              result="displacedNoiseRaw"
+            />
+            <feColorMatrix
+              in="displacedNoiseRaw"
+              result="displacedNoise"
+              type="matrix"
+              values="1 0 0 0 0
+                      0 0 0 0 0.5
+                      0 0 0 0 0
+                      0 0 0 0 1"
+            />
+            <feDisplacementMap
+              in="chromatic"
+              in2="displacedNoise"
+              scale="15"
+              xChannelSelector="R"
+              yChannelSelector="G"
+              result="displaced"
+            />
+            <feTurbulence type="turbulence" baseFrequency="0.9" numOctaves="4" seed="3" result="grainNoise" />
+            <feColorMatrix in="grainNoise" type="saturate" values="10" result="grainSaturated" />
+            <feComponentTransfer in="grainSaturated" result="grainDark">
+              <feFuncR type="linear" slope="0.2" intercept="0.6" />
+              <feFuncG type="linear" slope="0.2" intercept="0.6" />
+              <feFuncB type="linear" slope="0.2" intercept="0.6" />
+            </feComponentTransfer>
+            <feBlend in="grainDark" in2="displaced" mode="multiply" result="withGrain" />
+          </filter>
+          <filter id="chromatic-shift-3">
+            <feOffset in="SourceGraphic" dx="2" dy="1" result="red" />
+            <feColorMatrix
+              in="red"
+              type="matrix"
+              values="1 0 0 0 0
+                      0 0 0 0 0
+                      0 0 0 0 0
+                      0 0 0 1 0"
+              result="red"
+            />
+            <feOffset in="SourceGraphic" dx="-2" dy="-1" result="cyan" />
+            <feColorMatrix
+              in="cyan"
+              type="matrix"
+              values="0 0 0 0 0
+                      0 1 0 0 0
+                      0 0 1 0 0
+                      0 0 0 1 0"
+              result="cyan"
+            />
+            <feBlend in="red" in2="cyan" mode="screen" result="blend" />
+            <feBlend in="blend" in2="SourceGraphic" mode="normal" result="chromatic" />
+            <feTurbulence type="fractalNoise" baseFrequency="0 0.0012" numOctaves="2" seed="14" result="noise" />
+            <feComponentTransfer in="noise" result="highContrast">
+              <feFuncR type="linear" slope="20" intercept="-9.5" />
+              <feFuncG type="discrete" tableValues="0.5" />
+              <feFuncB type="linear" slope="20" intercept="-9.5" />
+              <feFuncA type="identity" />
+            </feComponentTransfer>
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0 0.01"
+              numOctaves="2"
+              seed="6"
+              result="noiseForDisplacement"
+            />
+            <feColorMatrix
+              in="noiseForDisplacement"
+              result="displacementSource"
+              type="matrix"
+              values="1 0 0 0 0
+                      0 0 0 0 0.5
+                      0 0 0 0 0
+                      0 0 0 0 1"
+            />
+            <feDisplacementMap
+              in="highContrast"
+              in2="displacementSource"
+              scale="10000"
+              xChannelSelector="R"
+              yChannelSelector="G"
+              result="displacedNoiseRaw"
+            />
+            <feColorMatrix
+              in="displacedNoiseRaw"
+              result="displacedNoise"
+              type="matrix"
+              values="1 0 0 0 0
+                      0 0 0 0 0.5
+                      0 0 0 0 0
+                      0 0 0 0 1"
+            />
+            <feDisplacementMap
+              in="chromatic"
+              in2="displacedNoise"
+              scale="15"
+              xChannelSelector="R"
+              yChannelSelector="G"
+              result="displaced"
+            />
+            <feTurbulence type="turbulence" baseFrequency="0.9" numOctaves="4" seed="7" result="grainNoise" />
+            <feColorMatrix in="grainNoise" type="saturate" values="10" result="grainSaturated" />
+            <feComponentTransfer in="grainSaturated" result="grainDark">
+              <feFuncR type="linear" slope="0.2" intercept="0.6" />
+              <feFuncG type="linear" slope="0.2" intercept="0.6" />
+              <feFuncB type="linear" slope="0.2" intercept="0.6" />
+            </feComponentTransfer>
+            <feBlend in="grainDark" in2="displaced" mode="multiply" result="withGrain" />
           </filter>
         </defs>
       </svg>
