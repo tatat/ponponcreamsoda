@@ -746,42 +746,48 @@ export default function ItemListContent() {
   const styles = useStyles(enableAnimation)
 
   const handleDownloadImage = async () => {
-    const element = document.body
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+
+    const element = document.querySelector('main')
+    if (!element) return
+
     const canvas = await html2canvas(element, {
       useCORS: true,
       allowTaint: true,
-      scale: window.devicePixelRatio,
+      scale: Math.min(window.devicePixelRatio, 2),
       width: 1400,
       windowWidth: 1400,
     })
 
-    // Use Share API only on mobile devices (iOS/Android)
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+    // Use Share API on mobile devices if available (iOS/Android)
     if (isMobile && navigator.share && navigator.canShare) {
       try {
         const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'))
-        if (!blob) return
+        if (!blob) {
+          // Fall through to traditional download
+        } else {
+          const fileName = `item-list-${new Date().toISOString().split('T')[0]}.png`
+          const file = new File([blob], fileName, { type: 'image/png' })
 
-        const fileName = `item-list-${new Date().toISOString().split('T')[0]}.png`
-        const file = new File([blob], fileName, { type: 'image/png' })
-
-        if (navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            files: [file],
-            title: 'お品書き',
-          })
-          return
+          if (navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              files: [file],
+              title: 'お品書き',
+            })
+            return
+          }
         }
       } catch (error) {
-        // Fall through to traditional download if share fails or is cancelled
         console.log('Share cancelled or failed:', error)
+        // Fall through to traditional download
       }
     }
 
-    // Fallback to traditional download (for desktop browsers)
+    // Fallback: Traditional download (desktop and older mobile browsers)
+    const dataUrl = canvas.toDataURL('image/png')
     const link = document.createElement('a')
     link.download = `item-list-${new Date().toISOString().split('T')[0]}.png`
-    link.href = canvas.toDataURL('image/png')
+    link.href = dataUrl
     link.click()
   }
 
