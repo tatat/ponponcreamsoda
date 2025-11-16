@@ -759,36 +759,45 @@ export default function ItemListContent() {
       windowWidth: 1400,
     })
 
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'))
+    if (!blob) return
+
+    const fileName = `item-list-${new Date().toISOString().split('T')[0]}.png`
+
     // Use Share API on mobile devices if available (iOS/Android)
     if (isMobile && navigator.share && navigator.canShare) {
-      try {
-        const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'))
-        if (!blob) {
-          // Fall through to traditional download
-        } else {
-          const fileName = `item-list-${new Date().toISOString().split('T')[0]}.png`
-          const file = new File([blob], fileName, { type: 'image/png' })
+      const file = new File([blob], fileName, { type: 'image/png' })
 
-          if (navigator.canShare({ files: [file] })) {
-            await navigator.share({
-              files: [file],
-              title: 'お品書き',
-            })
-            return
+      if (navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            files: [file],
+            title: 'お品書き',
+          })
+          return
+        } catch (error) {
+          if (error instanceof Error) {
+            if (error.name === 'AbortError') {
+              // User cancelled the share dialog - don't fall through to download
+              return
+            }
+            // Log other errors (e.g., NotAllowedError from user gesture timeout)
+            console.warn('Share API failed:', error.name, error.message)
           }
+          // Fall through to traditional download
         }
-      } catch (error) {
-        console.log('Share cancelled or failed:', error)
-        // Fall through to traditional download
       }
     }
 
     // Fallback: Traditional download (desktop and older mobile browsers)
-    const dataUrl = canvas.toDataURL('image/png')
+    const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
-    link.download = `item-list-${new Date().toISOString().split('T')[0]}.png`
-    link.href = dataUrl
+    link.download = fileName
+    link.href = url
     link.click()
+
+    // Clean up the object URL after download starts
+    setTimeout(() => URL.revokeObjectURL(url), 1000)
   }
 
   return (
