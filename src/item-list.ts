@@ -17,7 +17,7 @@ export const itemList: ItemList = {
           name: 'イラスト本 3 - 3冊セット（クリアファイル付き）',
           imageUrl: '/images/item-list/book-06.jpg',
           isSet: true,
-          price: '900yen',
+          price: '1200yen',
           bookType: 'illustration',
           availability: {
             venue: 'available',
@@ -36,7 +36,7 @@ export const itemList: ItemList = {
             onlinePhysical: 'preparing',
             onlineDigital: 'notApplicable',
           },
-          price: '300yen',
+          price: '400yen',
         },
         {
           itemType: 'book',
@@ -49,7 +49,7 @@ export const itemList: ItemList = {
             onlinePhysical: 'preparing',
             onlineDigital: 'notApplicable',
           },
-          price: '300yen',
+          price: '400yen',
         },
         {
           itemType: 'book',
@@ -62,7 +62,7 @@ export const itemList: ItemList = {
             onlinePhysical: 'preparing',
             onlineDigital: 'notApplicable',
           },
-          price: '300yen',
+          price: '400yen',
         },
       ],
     },
