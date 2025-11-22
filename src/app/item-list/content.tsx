@@ -5,7 +5,6 @@ import { useMemo, useState, useEffect } from 'react'
 import html2canvas from 'html2canvas'
 import { AiOutlinePrinter } from 'react-icons/ai'
 import Menu from '@/components/Menu'
-import Logo from '@/components/Logo'
 import { itemList } from '@/item-list'
 import { isGroupItem } from '@/item-list-type'
 import { scanlineAnimation, chromaticAberrationAnimation } from './animations'
@@ -67,14 +66,16 @@ const useStyles = (enableAnimation: boolean = false) => {
           padding-top: 1rem;
         }
       `,
-      logo: css`
+      logoImage: css`
         width: 100%;
         max-width: 800px;
         height: auto;
-        margin: 0 auto 0.5rem;
+        margin: 0 auto 0.75rem;
+        display: block;
 
         .print-mode & {
           max-width: 1200px;
+          margin-bottom: 1.125rem;
         }
 
         @media ${theme.breakpoints.compact} {
@@ -499,7 +500,7 @@ export default function ItemListContent() {
         <Menu color="#8b7355" secondaryColor="#a68b5b" />
 
         <header css={styles.header}>
-          <Logo colors={{ primary: '#8b7355' }} css={styles.logo} />
+          <img src="/images/logo-kana-brown.png" alt="Pon Pon Creamsoda" css={styles.logoImage} />
           <p css={styles.subtitle}>〜お品書き〜</p>
           <button data-html2canvas-ignore css={styles.downloadButton} onClick={handleDownloadImage}>
             画像としてダウンロード
