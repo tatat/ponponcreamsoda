@@ -21,7 +21,6 @@ const useStyles = () => {
         z-index: 2;
 
         &:hover {
-          transform: translateY(-2px);
           z-index: 3;
         }
       `,
@@ -37,7 +36,6 @@ const useStyles = () => {
         z-index: 2;
 
         &:hover {
-          transform: translateY(-2px);
           z-index: 3;
         }
       `,
@@ -58,6 +56,11 @@ const useStyles = () => {
         max-height: 100%;
         object-fit: contain;
         display: block;
+        transition: transform 0.3s ease;
+
+        &:hover {
+          transform: scale(1.05);
+        }
       `,
       featuredImageWrapper: css`
         height: 480px;
@@ -76,6 +79,11 @@ const useStyles = () => {
         max-height: 100%;
         object-fit: contain;
         display: block;
+        transition: transform 0.3s ease;
+
+        &:hover {
+          transform: scale(1.05);
+        }
       `,
       websiteLink: css`
         text-decoration: none;
