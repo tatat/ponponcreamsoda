@@ -7,7 +7,7 @@ import html2canvas from 'html2canvas'
 import { AiOutlineInfoCircle } from 'react-icons/ai'
 import Menu from '@/components/Menu'
 import { itemList } from '@/item-list'
-import type { ItemBook, ItemSticker, ItemOther, GroupItem, AvailabilityState } from '@/item-list-type'
+import type { Item, ItemBook, ItemSticker, ItemOther, GroupItem, AvailabilityState } from '@/item-list-type'
 import { isGroupItem } from '@/item-list-type'
 
 const scanlineAnimation = keyframes`
@@ -220,37 +220,38 @@ const useStyles = (enableAnimation: boolean = false) => {
           max-width: 600px;
         }
       `,
-      featuredGrid: css`
+      featuredGridWrapper: css`
         display: flex;
-        flex-wrap: wrap;
-        gap: 1rem;
-        max-width: 1200px;
-        margin: 0 auto;
-        justify-content: center;
-
-        @media ${theme.breakpoints.wide} {
-          max-width: 1790px;
-        }
+        flex-direction: column;
+        gap: 2rem;
 
         @media ${theme.breakpoints.compact} {
           gap: 1.5rem;
+        }
+      `,
+      featuredGrid: css`
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(586px, 1fr));
+        gap: 1rem;
+        width: 1200px;
+        margin: 0 auto;
+
+        @media ${theme.breakpoints.wide} {
+          width: 1790px;
+        }
+
+        @media ${theme.breakpoints.compact} {
+          grid-template-columns: 1fr;
+          gap: 1.5rem;
+          width: 100%;
           max-width: 600px;
         }
       `,
-      featuredBookWrapper: css`
-        flex: 0 0 600px;
-
-        @media ${theme.breakpoints.compact} {
-          flex: 1 1 100%;
-          max-width: 100%;
-        }
-      `,
       featuredGroupWrapper: css`
-        flex: 1 1 100%;
+        grid-column: 1 / -1;
         width: 100%;
 
         @media ${theme.breakpoints.compact} {
-          flex: 1 1 100%;
           max-width: 100%;
         }
       `,
@@ -927,7 +928,7 @@ const BookItem = ({
     </div>
   )
 
-  return isFeatured ? <div css={styles.featuredBookWrapper}>{content}</div> : content
+  return content
 }
 
 const StickerItem = ({ item, inGroup = false }: { item: ItemSticker; inGroup?: boolean }) => {
@@ -1026,6 +1027,32 @@ export default function ItemListContent() {
   }, [])
 
   const styles = useStyles(enableAnimation)
+
+  // Group items by type (consecutive items of same type are grouped together)
+  const groupItemsByType = (items: Item[]) => {
+    const groups: Item[][] = []
+    let currentGroup: Item[] = []
+    let currentType: 'group' | 'book' | null = null
+
+    items.forEach((item) => {
+      const itemType = isGroupItem(item) ? 'group' : 'book'
+
+      if (currentType === null || currentType === itemType) {
+        currentGroup.push(item)
+        currentType = itemType
+      } else {
+        groups.push(currentGroup)
+        currentGroup = [item]
+        currentType = itemType
+      }
+    })
+
+    if (currentGroup.length > 0) {
+      groups.push(currentGroup)
+    }
+
+    return groups
+  }
 
   const handleDownloadImage = async () => {
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
@@ -1215,16 +1242,20 @@ export default function ItemListContent() {
           <div css={styles.sectionTitleWrapper}>
             <h2 css={styles.sectionTitle}>新刊</h2>
           </div>
-          <div css={styles.featuredGrid}>
-            {itemList.newReleases.map((item, itemIndex) => {
-              if (isGroupItem(item)) {
-                return <GroupItemComponent key={`item-${itemIndex}`} item={item} isFeatured={true} />
-              }
-              if (item.itemType === 'book') {
-                return <BookItem key={`item-${itemIndex}`} item={item} isFeatured={true} />
-              }
-              return null
-            })}
+          <div css={styles.featuredGridWrapper}>
+            {groupItemsByType(itemList.newReleases).map((group, groupIndex) => (
+              <div key={`group-${groupIndex}`} css={styles.featuredGrid}>
+                {group.map((item, itemIndex) => {
+                  if (isGroupItem(item)) {
+                    return <GroupItemComponent key={`item-${itemIndex}`} item={item} isFeatured={true} />
+                  }
+                  if (item.itemType === 'book') {
+                    return <BookItem key={`item-${itemIndex}`} item={item} isFeatured={true} />
+                  }
+                  return null
+                })}
+              </div>
+            ))}
           </div>
         </section>
 

@@ -213,12 +213,12 @@ export const itemList: ItemList = {
 }
 
 // Sample data flag - set to true to include sample items
-const includeSample = false
+const includeSample = true
 
 // Sample data definitions
-const sampleNewRelease: Item = {
+const sampleNewRelease1: Item = {
   itemType: 'book',
-  name: 'Sample Book',
+  name: 'Sample Book 1',
   imageUrl: '/images/item-list/sample-01.jpg',
   bookType: 'illustration',
   colorType: 'fullColor',
@@ -230,14 +230,49 @@ const sampleNewRelease: Item = {
   price: '500yen',
 }
 
-const sampleBackCatalog: Item = {
+const sampleNewRelease2: Item = {
+  itemType: 'book',
+  name: 'Sample Book 2',
+  imageUrl: '/images/item-list/sample-02.jpg',
+  bookType: 'manga',
+  colorType: 'monochrome',
+  availability: {
+    venue: 'available',
+    onlinePhysical: 'preparing',
+    onlineDigital: 'available',
+  },
+  price: '600yen',
+}
+
+const sampleNewRelease3: Item = {
+  itemType: 'book',
+  name: 'Sample Book 3',
+  imageUrl: '/images/item-list/sample-03.jpg',
+  bookType: 'illustration',
+  colorType: 'fullColor',
+  availability: {
+    venue: 'available',
+    onlinePhysical: 'available',
+    onlineDigital: 'notApplicable',
+  },
+  price: '400yen',
+}
+
+const sampleBackCatalogGroup: Item = {
   itemType: 'group',
   name: 'Sample Group - 3冊セット',
+  description: (
+    <div>
+      <p style={{ margin: 0 }}>『Sample A』『Sample B』『Sample C』</p>
+      <p style={{ margin: '0.5rem 0 0 0' }}>3冊セットでの購入で、特典としてクリアファイルが付きます。</p>
+    </div>
+  ),
+  imageUrls: ['/images/item-list/clear-folder-01-b.svg', '/images/item-list/clear-folder-01-f.svg'],
   items: [
     {
       itemType: 'book',
-      name: 'Sample Book 2',
-      imageUrl: '/images/item-list/sample-02.jpg',
+      name: 'Sample A',
+      imageUrl: '/images/item-list/book-06-1.jpg',
       bookType: 'illustration',
       colorType: 'fullColor',
       availability: {
@@ -249,8 +284,8 @@ const sampleBackCatalog: Item = {
     },
     {
       itemType: 'book',
-      name: 'Sample Book 3',
-      imageUrl: '/images/item-list/sample-03.jpg',
+      name: 'Sample B',
+      imageUrl: '/images/item-list/book-06-2.jpg',
       bookType: 'manga',
       colorType: 'monochrome',
       availability: {
@@ -262,8 +297,8 @@ const sampleBackCatalog: Item = {
     },
     {
       itemType: 'book',
-      name: 'Sample Book 4',
-      imageUrl: '/images/item-list/sample-04.jpg',
+      name: 'Sample C',
+      imageUrl: '/images/item-list/book-06-3.jpg',
       bookType: 'illustration',
       colorType: 'fullColor',
       availability: {
@@ -278,6 +313,8 @@ const sampleBackCatalog: Item = {
 
 // Add sample data if flag is enabled
 if (includeSample) {
-  itemList.newReleases.push(sampleNewRelease)
-  itemList.backCatalog.push(sampleBackCatalog)
+  itemList.newReleases.push(sampleNewRelease1)
+  itemList.newReleases.push(sampleNewRelease2)
+  itemList.newReleases.push(sampleNewRelease3)
+  itemList.backCatalog.push(sampleBackCatalogGroup)
 }
