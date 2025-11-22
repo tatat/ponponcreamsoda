@@ -10,12 +10,11 @@ export async function generateMetadata(_props: unknown, parent: ResolvingMetadat
   const description = `同人サークル Pon Pon Creamsoda 「${gameInfo.description}」`
   const url = `${siteOrigin}/games/sticker-drift/`
 
-  // Use a generic OG image or specific one if available
   const images = {
-    url: `${siteOrigin}/images/og-image-breakout-clone.png`, // Fallback for now
+    url: `${siteOrigin}/images/og-image-sticker-drift.jpg`,
     width: 1200,
     height: 630,
-    type: 'image/png',
+    type: 'image/jpeg',
   }
 
   return {
