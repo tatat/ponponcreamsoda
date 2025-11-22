@@ -204,7 +204,7 @@ const useStyles = (enableAnimation: boolean = false) => {
         }
 
         @media ${theme.breakpoints.compact} {
-          font-size: 1.5rem;
+          font-size: 2rem;
         }
       `,
       itemGrid: css`
@@ -347,9 +347,7 @@ const useStyles = (enableAnimation: boolean = false) => {
       `,
       itemImageWrapper: css`
         height: 360px;
-        background: rgba(236, 240, 241, 0.05);
-        padding: 1rem 1rem 0 1rem;
-        box-sizing: border-box;
+        background: linear-gradient(to bottom, rgb(150, 125, 95), rgb(130, 110, 80));
         display: flex;
         align-items: center;
         justify-content: center;
@@ -357,14 +355,11 @@ const useStyles = (enableAnimation: boolean = false) => {
 
         @media ${theme.breakpoints.compact} {
           height: 280px;
-          padding: 0.5rem 0.5rem 0 0.5rem;
         }
       `,
       featuredImageWrapper: css`
         height: 480px;
-        background: rgba(236, 240, 241, 0.05);
-        padding: 1rem 1rem 0 1rem;
-        box-sizing: border-box;
+        background: linear-gradient(to bottom, rgb(150, 125, 95), rgb(130, 110, 80));
         display: flex;
         align-items: center;
         justify-content: center;
@@ -372,7 +367,6 @@ const useStyles = (enableAnimation: boolean = false) => {
 
         @media ${theme.breakpoints.compact} {
           height: 360px;
-          padding: 0.5rem 0.5rem 0 0.5rem;
         }
       `,
       itemImage: css`
@@ -661,6 +655,7 @@ const useStyles = (enableAnimation: boolean = false) => {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         gap: 1rem;
+        align-items: start;
 
         @media ${theme.breakpoints.wide} {
           grid-template-columns: repeat(3, 1fr);
@@ -675,6 +670,7 @@ const useStyles = (enableAnimation: boolean = false) => {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
         gap: 1rem;
+        align-items: start;
 
         @media ${theme.breakpoints.compact} {
           grid-template-columns: 1fr;
