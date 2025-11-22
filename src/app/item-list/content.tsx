@@ -5,6 +5,7 @@ import { useMemo, useState, useEffect } from 'react'
 import html2canvas from 'html2canvas'
 import { AiOutlinePrinter } from 'react-icons/ai'
 import Menu from '@/components/Menu'
+import Logo from '@/components/Logo'
 import { itemList } from '@/item-list'
 import { isGroupItem } from '@/item-list-type'
 import { scanlineAnimation, chromaticAberrationAnimation } from './animations'
@@ -66,59 +67,57 @@ const useStyles = (enableAnimation: boolean = false) => {
           padding-top: 1rem;
         }
       `,
-      title: css`
-        ${theme.styles.text};
-        color: #8b7355;
-        font-size: 3.5rem;
-        font-weight: 700;
-        margin: 0 0 1rem 0;
-        text-shadow: 1px 1px 2px rgba(139, 115, 85, 0.1);
-        letter-spacing: 0.1em;
+      logo: css`
+        width: 100%;
+        max-width: 800px;
+        height: auto;
+        margin: 0 auto 0.5rem;
 
         .print-mode & {
-          font-size: 7.1rem;
+          max-width: 1200px;
         }
 
         @media ${theme.breakpoints.compact} {
-          font-size: 2.5rem;
+          max-width: 400px;
         }
       `,
       subtitle: css`
         ${theme.styles.text};
-        color: #a68b5b;
-        font-size: 1.2rem;
-        margin: 0;
-        font-weight: 300;
-        letter-spacing: 0.05em;
+        color: #e67e22;
+        font-size: 1.5rem;
+        margin: 0 0 1.5rem 0;
+        font-weight: 600;
+        letter-spacing: 0.1em;
 
         .print-mode & {
-          font-size: 2.5rem;
+          font-size: 3rem;
         }
 
         @media ${theme.breakpoints.compact} {
-          font-size: 1rem;
+          font-size: 1.2rem;
         }
       `,
       downloadButton: css`
         ${theme.styles.text};
-        background: linear-gradient(135deg, #8b7355, #a68b5b);
+        background: #d4a574;
         color: white;
         border: none;
-        padding: 0.75rem 1.5rem;
+        padding: 0 1.5rem;
         font-size: 0.9rem;
         font-weight: 600;
         cursor: pointer;
-        transition: all 0.3s ease;
         letter-spacing: 0.05em;
-        margin: 1.5rem auto 0;
-        display: block;
-
-        &:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 8px rgba(139, 115, 85, 0.3);
-        }
+        position: fixed;
+        top: 0;
+        right: 110px;
+        height: 39px;
+        z-index: 1000;
 
         @media ${theme.breakpoints.compact} {
+          position: static;
+          margin: 0 auto;
+          display: block;
+          height: auto;
           font-size: 0.8rem;
           padding: 0.6rem 1.2rem;
         }
@@ -500,8 +499,8 @@ export default function ItemListContent() {
         <Menu color="#8b7355" secondaryColor="#a68b5b" />
 
         <header css={styles.header}>
-          <h1 css={styles.title}>お品書き</h1>
-          <p css={styles.subtitle}>Pon Pon Creamsoda アイテム一覧</p>
+          <Logo colors={{ primary: '#8b7355' }} css={styles.logo} />
+          <p css={styles.subtitle}>〜お品書き〜</p>
           <button data-html2canvas-ignore css={styles.downloadButton} onClick={handleDownloadImage}>
             画像としてダウンロード
           </button>
