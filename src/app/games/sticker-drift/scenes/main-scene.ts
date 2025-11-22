@@ -217,14 +217,15 @@ export class MainScene extends Phaser.Scene {
 
       // Space key for floating
       this.input.keyboard.on('keydown-SPACE', () => {
-        if (!this.isGameStarted) {
-          this.startGame()
-          return
-        }
         if (this.isGameOver) {
           this.scene.restart({ isRestart: true })
           return
         }
+
+        if (!this.isGameStarted) {
+          this.startGame()
+        }
+
         this.isFloating = true
       })
 
@@ -235,14 +236,13 @@ export class MainScene extends Phaser.Scene {
 
     // Touch/Click controls
     this.input.on('pointerdown', () => {
-      if (!this.isGameStarted) {
-        this.startGame()
-        return
-      }
-
       if (this.isGameOver) {
         this.scene.restart({ isRestart: true })
         return
+      }
+
+      if (!this.isGameStarted) {
+        this.startGame()
       }
 
       // Hold to float
