@@ -12,6 +12,13 @@ export const itemList: ItemList = {
     {
       itemType: 'group',
       name: 'イラスト本 3 - 3冊セット（クリアファイル付き）',
+      description: (
+        <div>
+          <p style={{ margin: 0 }}>『Now』『embalm』『A SONG RUNS THROUGH WORLD』</p>
+          <p style={{ margin: '0.5rem 0 0 0' }}>3冊セットでの購入で、特典としてクリアファイルが付きます。</p>
+        </div>
+      ),
+      imageUrls: ['/images/item-list/book-06.jpg'],
       items: [
         {
           itemType: 'book',

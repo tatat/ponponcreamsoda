@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react'
+
 export type AvailabilityState = 'available' | 'unavailable' | 'unknown' | 'preparing' | 'notApplicable'
 
 export type AvailabilityStatus = {
@@ -39,6 +41,8 @@ export type ItemSticker = {
 export type GroupItem = {
   itemType: 'group'
   name: string
+  description?: ReactNode
+  imageUrls?: string[]
   items: (ItemBook | ItemSticker | ItemOther)[]
 }
 

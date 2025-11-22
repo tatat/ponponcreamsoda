@@ -629,8 +629,10 @@ const useStyles = (enableAnimation: boolean = false) => {
         border-radius: 0;
         padding: 2rem;
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
+        gap: 1rem;
         min-height: 200px;
 
         @media ${theme.breakpoints.compact} {
@@ -645,9 +647,37 @@ const useStyles = (enableAnimation: boolean = false) => {
         color: #5a4a3a;
         text-align: center;
         line-height: 1.6;
+        margin: 0;
 
         @media ${theme.breakpoints.compact} {
           font-size: 1rem;
+        }
+      `,
+      groupInfoDescription: css`
+        ${theme.styles.text};
+        font-size: 0.9rem;
+        color: #6a5a4a;
+        text-align: center;
+        line-height: 1.6;
+        width: 100%;
+
+        @media ${theme.breakpoints.compact} {
+          font-size: 0.85rem;
+        }
+      `,
+      groupInfoImages: css`
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+      `,
+      groupInfoImage: css`
+        max-width: 100%;
+        max-height: 360px;
+        object-fit: contain;
+
+        @media ${theme.breakpoints.compact} {
+          max-height: 280px;
         }
       `,
     }),
@@ -879,6 +909,14 @@ const GroupItemComponent = ({ item, isFeatured = false }: { item: GroupItem; isF
           })}
           <div css={groupInfoCardStyle}>
             <h3 css={styles.groupInfoTitle}>{item.name}</h3>
+            {item.description && <div css={styles.groupInfoDescription}>{item.description}</div>}
+            {item.imageUrls && item.imageUrls.length > 0 && (
+              <div css={styles.groupInfoImages}>
+                {item.imageUrls.map((imageUrl, index) => (
+                  <img key={index} src={imageUrl} alt={`${item.name} - ${index + 1}`} css={styles.groupInfoImage} />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
