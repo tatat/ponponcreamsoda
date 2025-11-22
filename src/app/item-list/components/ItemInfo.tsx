@@ -165,6 +165,13 @@ const useStyles = () => {
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         pointer-events: none;
       `,
+      infoIcon: css`
+        transform: translateY(1px);
+
+        .print-mode & {
+          display: none;
+        }
+      `,
       availabilityTagsContainer: css`
         display: flex;
         flex-wrap: wrap;
@@ -240,7 +247,7 @@ export const ItemInfo = ({
       <div css={styles.availabilitySection}>
         <div css={styles.availabilityLabelWithTooltip}>
           <span>販売状況</span>
-          <AiOutlineInfoCircle style={{ transform: 'translateY(1px)' }} />
+          <AiOutlineInfoCircle css={styles.infoIcon} />
           <div className="tooltip" css={styles.availabilityTooltip}>
             <ul css={styles.availabilityList}>
               <li css={styles.availabilityItem}>

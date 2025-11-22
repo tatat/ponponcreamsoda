@@ -213,7 +213,7 @@ export const itemList: ItemList = {
 }
 
 // Sample data flag - set to true to include sample items
-const includeSample = true
+const includeSample = false
 
 // Sample data definitions
 const sampleNewRelease1: Item = {
