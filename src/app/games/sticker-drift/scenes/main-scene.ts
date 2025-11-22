@@ -148,7 +148,6 @@ export class MainScene extends Phaser.Scene {
     const offsetX = (origWidth - radius * 2) / 2
     const offsetY = (origHeight - radius * 2) / 2
     obstacle.setCircle(radius, offsetX, offsetY)
-    obstacle.refreshBody() // Update physics body to match new size
 
     // Move toward player direction
     const speed = Phaser.Math.Between(constants.OBSTACLE_SPEED_MIN, constants.OBSTACLE_SPEED_MAX) * this.gameSpeed
