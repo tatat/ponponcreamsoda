@@ -4,6 +4,7 @@ import { css, keyframes, useTheme } from '@emotion/react'
 import { useMemo, useState, useEffect } from 'react'
 import Link from 'next/link'
 import html2canvas from 'html2canvas'
+import { AiOutlineInfoCircle } from 'react-icons/ai'
 import Menu from '@/components/Menu'
 import { itemList } from '@/item-list'
 import type { ItemBook, ItemSticker, ItemOther, GroupItem, AvailabilityState } from '@/item-list-type'
@@ -269,7 +270,7 @@ const useStyles = (enableAnimation: boolean = false) => {
         background: #f1ebe6;
         border: 2px solid rgba(212, 165, 116, 0.3);
         border-radius: 0;
-        overflow: hidden;
+        overflow: visible;
         transition: all 0.3s ease;
         display: flex;
         flex-direction: column;
@@ -278,6 +279,7 @@ const useStyles = (enableAnimation: boolean = false) => {
 
         &:hover {
           transform: translateY(-2px);
+          z-index: 3;
         }
       `,
       stickerCard: css`
@@ -314,6 +316,7 @@ const useStyles = (enableAnimation: boolean = false) => {
         display: flex;
         align-items: center;
         justify-content: center;
+        overflow: hidden;
 
         @media ${theme.breakpoints.compact} {
           height: 280px;
@@ -328,6 +331,7 @@ const useStyles = (enableAnimation: boolean = false) => {
         display: flex;
         align-items: center;
         justify-content: center;
+        overflow: hidden;
 
         @media ${theme.breakpoints.compact} {
           height: 360px;
@@ -368,6 +372,9 @@ const useStyles = (enableAnimation: boolean = false) => {
       `,
       itemInfo: css`
         padding: 0.75rem;
+        overflow: visible;
+        position: relative;
+        z-index: 10;
 
         @media ${theme.breakpoints.compact} {
           padding: 0.5rem;
@@ -410,6 +417,11 @@ const useStyles = (enableAnimation: boolean = false) => {
       `,
       availabilitySection: css`
         margin-top: 0.5rem;
+        position: relative;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
       `,
       availabilityTitle: css`
         ${theme.styles.text};
@@ -442,6 +454,71 @@ const useStyles = (enableAnimation: boolean = false) => {
         min-width: 60px;
         text-align: center;
         display: inline-block;
+      `,
+      availabilityLabelWithTooltip: css`
+        ${theme.styles.text};
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #a68b5b;
+        margin: 0;
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.2rem;
+        cursor: help;
+        flex-shrink: 0;
+
+        &:hover .tooltip {
+          opacity: 1;
+          visibility: visible;
+        }
+      `,
+      availabilityTooltip: css`
+        position: absolute;
+        top: 100%;
+        left: 0;
+        margin-top: 0.5rem;
+        background: #fff;
+        border: 2px solid #d4a574;
+        border-radius: 4px;
+        padding: 0.8rem;
+        min-width: 250px;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition:
+          opacity 0.2s,
+          visibility 0.2s;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        pointer-events: none;
+      `,
+      availabilityTagsContainer: css`
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+        flex: 1;
+        justify-content: flex-end;
+      `,
+      availabilityTag: css`
+        ${theme.styles.text};
+        padding: 0.2rem 0.6rem;
+        border-radius: 2px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        background-color: #a8d5a8;
+        color: #2d5a2d;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.2s ease;
+
+        &:hover {
+          opacity: 0.8;
+          transform: translateY(-1px);
+        }
+
+        a& {
+          text-decoration: underline;
+        }
       `,
       otherItemsList: css`
         display: grid;
@@ -654,63 +731,55 @@ const ItemInfo = ({
         <p css={styles.itemPrice}>{price}</p>
       </div>
       <div css={styles.availabilitySection}>
-        <h4 css={styles.availabilityTitle}>販売状況</h4>
-        <ul css={styles.availabilityList}>
-          <li css={styles.availabilityItem}>
-            <span>会場販売</span>
-            <span css={[styles.availabilityStatus, getAvailabilityStatusStyle(availability.venue)]}>
-              {getAvailabilityStatusText(availability.venue)}
-            </span>
-          </li>
-          {availability.onlinePhysical && (
-            <li css={styles.availabilityItem}>
-              {links?.onlinePhysical && links.onlinePhysical.length > 0 ? (
-                <a
-                  href={links.onlinePhysical[0]}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  css={styles.availabilityLink}
-                >
-                  <span>オンライン（物理）</span>
+        <div css={styles.availabilityLabelWithTooltip}>
+          <span>販売状況</span>
+          <AiOutlineInfoCircle style={{ transform: 'translateY(1px)' }} />
+          <div className="tooltip" css={styles.availabilityTooltip}>
+            <ul css={styles.availabilityList}>
+              <li css={styles.availabilityItem}>
+                <span>イベント会場</span>
+                <span css={[styles.availabilityStatus, getAvailabilityStatusStyle(availability.venue)]}>
+                  {getAvailabilityStatusText(availability.venue)}
+                </span>
+              </li>
+              {availability.onlinePhysical && (
+                <li css={styles.availabilityItem}>
+                  <span>通信販売</span>
                   <span css={[styles.availabilityStatus, getAvailabilityStatusStyle(availability.onlinePhysical)]}>
                     {getAvailabilityStatusText(availability.onlinePhysical)}
                   </span>
-                </a>
-              ) : (
-                <>
-                  <span>オンライン（物理）</span>
-                  <span css={[styles.availabilityStatus, getAvailabilityStatusStyle(availability.onlinePhysical)]}>
-                    {getAvailabilityStatusText(availability.onlinePhysical)}
-                  </span>
-                </>
+                </li>
               )}
-            </li>
-          )}
-          {availability.onlineDigital && (
-            <li css={styles.availabilityItem}>
-              {links?.onlineDigital && links.onlineDigital.length > 0 ? (
-                <a
-                  href={links.onlineDigital[0]}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  css={styles.availabilityLink}
-                >
-                  <span>オンライン（デジタル）</span>
+              {availability.onlineDigital && (
+                <li css={styles.availabilityItem}>
+                  <span>デジタル</span>
                   <span css={[styles.availabilityStatus, getAvailabilityStatusStyle(availability.onlineDigital)]}>
                     {getAvailabilityStatusText(availability.onlineDigital)}
                   </span>
-                </a>
-              ) : (
-                <>
-                  <span>オンライン（デジタル）</span>
-                  <span css={[styles.availabilityStatus, getAvailabilityStatusStyle(availability.onlineDigital)]}>
-                    {getAvailabilityStatusText(availability.onlineDigital)}
-                  </span>
-                </>
+                </li>
               )}
-            </li>
-          )}
-        </ul>
+            </ul>
+          </div>
+        </div>
+        <div css={styles.availabilityTagsContainer}>
+          {availability.venue === 'available' && <span css={styles.availabilityTag}>イベント会場</span>}
+          {availability.onlinePhysical === 'available' &&
+            (links?.onlinePhysical && links.onlinePhysical.length > 0 ? (
+              <a href={links.onlinePhysical[0]} target="_blank" rel="noopener noreferrer" css={styles.availabilityTag}>
+                通信販売
+              </a>
+            ) : (
+              <span css={styles.availabilityTag}>通信販売</span>
+            ))}
+          {availability.onlineDigital === 'available' &&
+            (links?.onlineDigital && links.onlineDigital.length > 0 ? (
+              <a href={links.onlineDigital[0]} target="_blank" rel="noopener noreferrer" css={styles.availabilityTag}>
+                デジタル
+              </a>
+            ) : (
+              <span css={styles.availabilityTag}>デジタル</span>
+            ))}
+        </div>
       </div>
     </div>
   )
