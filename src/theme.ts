@@ -10,7 +10,7 @@ const breakpoints = {
 const styles = {
   text: css`
     letter-spacing: 0.05em;
-    font-family: 'Kaisei Decol', serif;
+    font-family: var(--font-kaisei-decol), 'Kaisei Decol', serif;
     line-height: 1.3;
   `,
   textMenu: css`

@@ -3,6 +3,14 @@ import './global.scss'
 import RootStyleRegistry from './emotion'
 import { FirebaseProvider } from './firebase'
 import { firebaseConfig, inactivateAnalytics } from '@/config'
+import { Kaisei_Decol } from 'next/font/google'
+
+const kaiseiDecol = Kaisei_Decol({
+  weight: ['400', '500', '700'],
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-kaisei-decol',
+})
 
 export const metadata = {
   title: 'Pon Pon Creamsoda',
@@ -18,7 +26,10 @@ type RootLayoutProps = {
 
 export default function RootLayout({ children }: RootLayoutProps): React.ReactElement {
   return (
-    <html lang="ja">
+    <html lang="ja" className={kaiseiDecol.variable}>
+      <head>
+        <link rel="stylesheet" href="https://use.typekit.net/ebk1gqb.css" />
+      </head>
       <body>
         <RootStyleRegistry>
           <FirebaseProvider config={firebaseConfig} inactivateAnalytics={inactivateAnalytics}>
