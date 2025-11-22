@@ -35,7 +35,7 @@ export default function StickerDriftGame() {
         default: 'arcade',
         arcade: {
           gravity: { x: 0, y: constants.GRAVITY }, // Constant downward gravity
-          debug: true,
+          debug: false,
         },
       },
     }

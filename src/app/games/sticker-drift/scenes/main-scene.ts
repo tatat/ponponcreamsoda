@@ -15,12 +15,15 @@ export class MainScene extends Phaser.Scene {
   private isFloating: boolean = false
   private startText!: Phaser.GameObjects.Text
   private gameOverText!: Phaser.GameObjects.Text
+  private overlay!: Phaser.GameObjects.Graphics
+  private debugButton!: Phaser.GameObjects.Text
+  private static debugMode: boolean = false
 
   constructor() {
     super({ key: 'MainScene' })
   }
 
-  create(data?: { isRestart: boolean }) {
+  create(data?: { isRestart: boolean; shouldFloat?: boolean }) {
     this.isGameOver = false
     this.isGameStarted = false
     this.isFloating = false
@@ -37,11 +40,21 @@ export class MainScene extends Phaser.Scene {
     // Collision - using collider like breakout-clone
     this.physics.add.collider(this.player, this.obstacles, this.handleCollision, undefined, this)
 
+    // Apply saved debug mode
+    this.physics.world.drawDebug = MainScene.debugMode
+    if (MainScene.debugMode) {
+      this.physics.world.createDebugGraphic()
+    }
+
     // Pause physics initially
     this.physics.pause()
 
     if (data && data.isRestart) {
       this.startGame()
+      // Preserve floating state if space/pointer was held during restart
+      if (data.shouldFloat) {
+        this.isFloating = true
+      }
     }
   }
 
@@ -175,40 +188,80 @@ export class MainScene extends Phaser.Scene {
   }
 
   private createUI() {
+    // Semi-transparent overlay for start and game over screens
+    this.overlay = this.add.graphics()
+    this.overlay.fillStyle(0x000000, 0.6)
+    this.overlay.fillRect(0, 0, constants.GAME_WIDTH, constants.GAME_HEIGHT)
+    this.overlay.setDepth(100)
+
     this.scoreText = this.add.text(20, 50, 'Score: 0', {
-      fontSize: '32px',
+      fontSize: '16px',
       color: '#ffffff',
     })
-    this.scoreText.setDepth(100)
+    this.scoreText.setDepth(101)
 
     this.startText = this.add.text(
       constants.GAME_WIDTH / 2,
       constants.GAME_HEIGHT / 2,
-      'STICKER DRIFT\nTap or Click to Start',
+      `Press SPACE or TAP to start
+
+--- CONTROLS ---
+SPACE / TAP : Float (hold to rise)
+Release : Fall (gravity)`,
       {
-        fontSize: '64px',
-        fontFamily: '"Kaisei Decol", serif',
+        fontSize: '24px',
         color: '#ffffff',
         align: 'center',
+        lineSpacing: 8,
       },
     )
     this.startText.setOrigin(0.5)
-    this.startText.setDepth(100)
+    this.startText.setDepth(101)
 
     this.gameOverText = this.add.text(
       constants.GAME_WIDTH / 2,
       constants.GAME_HEIGHT / 2,
-      'GAME OVER\nTap or Click to Restart',
+      `GAME OVER
+Press SPACE or TAP to restart`,
       {
-        fontSize: '64px',
-        fontFamily: '"Kaisei Decol", serif',
+        fontSize: '32px',
         color: '#ff6b6b',
         align: 'center',
       },
     )
     this.gameOverText.setOrigin(0.5)
-    this.gameOverText.setDepth(100)
+    this.gameOverText.setDepth(101)
     this.gameOverText.setVisible(false)
+
+    // Debug toggle button
+    const initialText = MainScene.debugMode ? 'Debug: ON' : 'Debug: OFF'
+    const initialColor = MainScene.debugMode ? '#00ff00' : '#ffffff'
+    this.debugButton = this.add.text(constants.GAME_WIDTH - 20, 50, initialText, {
+      fontSize: '16px',
+      color: initialColor,
+    })
+    this.debugButton.setOrigin(1, 0)
+    this.debugButton.setDepth(101)
+    this.debugButton.setInteractive({ useHandCursor: true })
+    this.debugButton.on(
+      'pointerdown',
+      (_pointer: Phaser.Input.Pointer, _localX: number, _localY: number, event: Phaser.Types.Input.EventData) => {
+        // Stop event propagation to prevent game start
+        event.stopPropagation()
+
+        MainScene.debugMode = !MainScene.debugMode
+        this.physics.world.drawDebug = MainScene.debugMode
+        this.debugButton.setText(MainScene.debugMode ? 'Debug: ON' : 'Debug: OFF')
+        this.debugButton.setColor(MainScene.debugMode ? '#00ff00' : '#ffffff')
+
+        // Clear or recreate debug graphics
+        if (MainScene.debugMode) {
+          this.physics.world.createDebugGraphic()
+        } else {
+          this.physics.world.debugGraphic?.clear()
+        }
+      },
+    )
   }
 
   private setupControls() {
@@ -218,7 +271,7 @@ export class MainScene extends Phaser.Scene {
       // Space key for floating
       this.input.keyboard.on('keydown-SPACE', () => {
         if (this.isGameOver) {
-          this.scene.restart({ isRestart: true })
+          this.scene.restart({ isRestart: true, shouldFloat: true })
           return
         }
 
@@ -237,7 +290,7 @@ export class MainScene extends Phaser.Scene {
     // Touch/Click controls
     this.input.on('pointerdown', () => {
       if (this.isGameOver) {
-        this.scene.restart({ isRestart: true })
+        this.scene.restart({ isRestart: true, shouldFloat: true })
         return
       }
 
@@ -257,6 +310,8 @@ export class MainScene extends Phaser.Scene {
   private startGame() {
     this.isGameStarted = true
     this.startText.setVisible(false)
+    this.overlay.setVisible(false)
+    this.debugButton.setVisible(false)
     this.physics.resume()
   }
 
@@ -344,6 +399,16 @@ export class MainScene extends Phaser.Scene {
     this.isGameOver = true
     this.player.setTint(0xff0000)
 
+    // Update game over text with final score
+    const finalScore = Math.floor(this.score)
+    this.gameOverText.setText(
+      `GAME OVER
+Final Score: ${finalScore}
+Press SPACE or TAP to restart`,
+    )
+
+    this.overlay.setVisible(true)
     this.gameOverText.setVisible(true)
+    this.debugButton.setVisible(true)
   }
 }
