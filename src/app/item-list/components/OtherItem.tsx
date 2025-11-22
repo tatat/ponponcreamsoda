@@ -30,6 +30,10 @@ const useStyles = () => {
         color: #8b7355;
         margin: 0;
 
+        .print-mode & {
+          font-size: 2.08rem;
+        }
+
         @media ${theme.breakpoints.compact} {
           font-size: 1.1rem;
         }

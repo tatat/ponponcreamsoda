@@ -28,9 +28,7 @@ const useStyles = () => {
         line-height: 1.2;
 
         .print-mode & {
-          @media ${theme.breakpoints.wide} {
-            font-size: 1.65rem;
-          }
+          font-size: 1.76rem;
         }
 
         @media ${theme.breakpoints.compact} {
@@ -47,9 +45,7 @@ const useStyles = () => {
         line-height: 1.2;
 
         .print-mode & {
-          @media ${theme.breakpoints.wide} {
-            font-size: 1.95rem;
-          }
+          font-size: 2.08rem;
         }
 
         @media ${theme.breakpoints.compact} {
@@ -73,9 +69,7 @@ const useStyles = () => {
         font-weight: 500;
 
         .print-mode & {
-          @media ${theme.breakpoints.wide} {
-            font-size: 1.05rem;
-          }
+          font-size: 1.12rem;
         }
       `,
       itemPrice: css`
@@ -86,9 +80,7 @@ const useStyles = () => {
         margin: 0;
 
         .print-mode & {
-          @media ${theme.breakpoints.wide} {
-            font-size: 1.35rem;
-          }
+          font-size: 1.44rem;
         }
       `,
       availabilitySection: css`
@@ -114,9 +106,7 @@ const useStyles = () => {
         color: #a68b5b;
 
         .print-mode & {
-          @media ${theme.breakpoints.wide} {
-            font-size: 1.05rem;
-          }
+          font-size: 1.12rem;
         }
       `,
       availabilityStatus: css`
@@ -131,9 +121,7 @@ const useStyles = () => {
         display: inline-block;
 
         .print-mode & {
-          @media ${theme.breakpoints.wide} {
-            font-size: 1.05rem;
-          }
+          font-size: 1.12rem;
         }
       `,
       availabilityLabelWithTooltip: css`
@@ -155,9 +143,7 @@ const useStyles = () => {
         }
 
         .print-mode & {
-          @media ${theme.breakpoints.wide} {
-            font-size: 1.2rem;
-          }
+          font-size: 1.28rem;
         }
       `,
       availabilityTooltip: css`
@@ -208,9 +194,7 @@ const useStyles = () => {
         }
 
         .print-mode & {
-          @media ${theme.breakpoints.wide} {
-            font-size: 1.05rem;
-          }
+          font-size: 1.12rem;
         }
       `,
     }),

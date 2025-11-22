@@ -77,9 +77,7 @@ const useStyles = () => {
         margin: 0;
 
         .print-mode & {
-          @media ${theme.breakpoints.wide} {
-            font-size: 1.8rem;
-          }
+          font-size: 2.4rem;
         }
 
         @media ${theme.breakpoints.compact} {
@@ -95,9 +93,7 @@ const useStyles = () => {
         width: 100%;
 
         .print-mode & {
-          @media ${theme.breakpoints.wide} {
-            font-size: 1.35rem;
-          }
+          font-size: 1.44rem;
         }
 
         @media ${theme.breakpoints.compact} {

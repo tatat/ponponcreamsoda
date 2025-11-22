@@ -47,6 +47,10 @@ const useStyles = () => {
         font-weight: 600;
         color: #e67e22;
         margin: 0;
+
+        .print-mode & {
+          font-size: 1.44rem;
+        }
       `,
       stickerImageWrapper: css`
         height: 200px;

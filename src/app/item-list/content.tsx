@@ -3,6 +3,7 @@
 import { css, useTheme } from '@emotion/react'
 import { useMemo, useState, useEffect } from 'react'
 import html2canvas from 'html2canvas'
+import { AiOutlinePrinter } from 'react-icons/ai'
 import Menu from '@/components/Menu'
 import { itemList } from '@/item-list'
 import { isGroupItem } from '@/item-list-type'
@@ -75,9 +76,7 @@ const useStyles = (enableAnimation: boolean = false) => {
         letter-spacing: 0.1em;
 
         .print-mode & {
-          @media ${theme.breakpoints.wide} {
-            font-size: 5.25rem;
-          }
+          font-size: 7rem;
         }
 
         @media ${theme.breakpoints.compact} {
@@ -93,9 +92,7 @@ const useStyles = (enableAnimation: boolean = false) => {
         letter-spacing: 0.05em;
 
         .print-mode & {
-          @media ${theme.breakpoints.wide} {
-            font-size: 1.8rem;
-          }
+          font-size: 2.4rem;
         }
 
         @media ${theme.breakpoints.compact} {
@@ -127,26 +124,30 @@ const useStyles = (enableAnimation: boolean = false) => {
         }
       `,
       printModeToggle: css`
-        ${theme.styles.text};
-        background: linear-gradient(135deg, #8b7355, #a68b5b);
-        color: white;
+        position: fixed;
+        top: 1rem;
+        left: 1rem;
+        background: rgba(241, 235, 230, 0.9);
+        color: #8b7355;
         border: none;
-        padding: 0.6rem 1.2rem;
-        font-size: 0.85rem;
-        font-weight: 600;
+        padding: 0.5rem;
+        font-size: 1.2rem;
         cursor: pointer;
         transition: all 0.3s ease;
-        letter-spacing: 0.05em;
-        margin: 1rem auto 0.5rem;
+        border-radius: 4px;
         display: none;
+        z-index: 1000;
+        line-height: 1;
 
-        &:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 8px rgba(139, 115, 85, 0.3);
+        .print-mode & {
+          background: rgba(230, 126, 34, 0.8);
+          color: white;
         }
 
         @media ${theme.breakpoints.wide} {
-          display: block;
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
       `,
       section: css`
@@ -187,9 +188,13 @@ const useStyles = (enableAnimation: boolean = false) => {
         }
 
         .print-mode & {
-          @media ${theme.breakpoints.wide} {
-            font-size: 3.75rem;
-          }
+          font-size: 5rem;
+        }
+
+        .print-mode &::after {
+          left: calc(50% - 60px);
+          width: 120px;
+          height: 4px;
         }
 
         @media ${theme.breakpoints.compact} {
@@ -310,8 +315,13 @@ export default function ItemListContent() {
     const element = document.querySelector('main')
     if (!element) return
 
-    // Auto-apply print-mode class for download
-    element.classList.add('print-mode')
+    // Remember the original print mode state
+    const wasPrintModeOn = printMode
+
+    // Auto-apply print-mode class for download (only if not already on)
+    if (!wasPrintModeOn) {
+      element.classList.add('print-mode')
+    }
 
     try {
       const canvas = await html2canvas(element, {
@@ -362,8 +372,10 @@ export default function ItemListContent() {
       // Clean up the object URL after download starts
       setTimeout(() => URL.revokeObjectURL(url), 1000)
     } finally {
-      // Always remove print-mode class after download
-      element.classList.remove('print-mode')
+      // Only remove print-mode if it wasn't on before download
+      if (!wasPrintModeOn) {
+        element.classList.remove('print-mode')
+      }
     }
   }
 
@@ -493,10 +505,16 @@ export default function ItemListContent() {
           <button data-html2canvas-ignore css={styles.downloadButton} onClick={handleDownloadImage}>
             画像としてダウンロード
           </button>
-          <button data-html2canvas-ignore css={styles.printModeToggle} onClick={handleTogglePrintMode}>
-            {printMode ? '印刷モード: ON' : '印刷モード: OFF'}
-          </button>
         </header>
+
+        <button
+          data-html2canvas-ignore
+          css={styles.printModeToggle}
+          onClick={handleTogglePrintMode}
+          title={printMode ? '印刷モード: ON' : '印刷モード: OFF'}
+        >
+          <AiOutlinePrinter />
+        </button>
 
         {/* New Releases */}
         <section css={styles.section}>
