@@ -282,9 +282,40 @@ const useStyles = (enableAnimation: boolean = false) => {
           z-index: 3;
         }
       `,
+      itemCardNoBorder: css`
+        background: #f1ebe6;
+        border: none;
+        border-radius: 0;
+        overflow: visible;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        z-index: 2;
+
+        &:hover {
+          transform: translateY(-2px);
+          z-index: 3;
+        }
+      `,
       stickerCard: css`
         background: #f1ebe6;
         border: 2px solid rgba(212, 165, 116, 0.3);
+        border-radius: 0;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        z-index: 2;
+
+        &:hover {
+          transform: translateY(-2px);
+        }
+      `,
+      stickerCardNoBorder: css`
+        background: #f1ebe6;
+        border: none;
         border-radius: 0;
         overflow: hidden;
         transition: all 0.3s ease;
@@ -311,7 +342,7 @@ const useStyles = (enableAnimation: boolean = false) => {
       itemImageWrapper: css`
         height: 360px;
         background: rgba(236, 240, 241, 0.05);
-        padding: 0.75rem 0.75rem 0 0.75rem;
+        padding: 1rem 1rem 0 1rem;
         box-sizing: border-box;
         display: flex;
         align-items: center;
@@ -326,7 +357,7 @@ const useStyles = (enableAnimation: boolean = false) => {
       featuredImageWrapper: css`
         height: 480px;
         background: rgba(236, 240, 241, 0.05);
-        padding: 0.75rem 0.75rem 0 0.75rem;
+        padding: 1rem 1rem 0 1rem;
         box-sizing: border-box;
         display: flex;
         align-items: center;
@@ -353,7 +384,7 @@ const useStyles = (enableAnimation: boolean = false) => {
       stickerImageWrapper: css`
         height: 200px;
         background: rgba(236, 240, 241, 0.1);
-        padding: 1rem;
+        padding: 1rem 1rem 0 1rem;
         box-sizing: border-box;
         display: flex;
         align-items: center;
@@ -361,7 +392,7 @@ const useStyles = (enableAnimation: boolean = false) => {
 
         @media ${theme.breakpoints.compact} {
           height: 160px;
-          padding: 0.5rem;
+          padding: 0.5rem 0.5rem 0 0.5rem;
         }
       `,
       stickerImage: css`
@@ -371,7 +402,7 @@ const useStyles = (enableAnimation: boolean = false) => {
         display: block;
       `,
       itemInfo: css`
-        padding: 0.75rem;
+        padding: 1rem;
         overflow: visible;
         position: relative;
         z-index: 10;
@@ -382,15 +413,28 @@ const useStyles = (enableAnimation: boolean = false) => {
       `,
       itemName: css`
         ${theme.styles.text};
-        font-size: 1rem;
+        font-size: 1.1rem;
         font-weight: 700;
         color: #8b7355;
-        margin: 0.5rem 0 0.5rem 0;
+        margin: 0.5rem 0 0.1rem 0;
         line-height: 1.2;
 
         @media ${theme.breakpoints.compact} {
-          font-size: 0.9rem;
-          margin: 0.4rem 0 0.4rem 0;
+          font-size: 1rem;
+          margin: 0.4rem 0 0.1rem 0;
+        }
+      `,
+      featuredItemName: css`
+        ${theme.styles.text};
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #8b7355;
+        margin: 0.5rem 0 0.1rem 0;
+        line-height: 1.2;
+
+        @media ${theme.breakpoints.compact} {
+          font-size: 1rem;
+          margin: 0.4rem 0 0.1rem 0;
         }
       `,
       itemTypeAndPrice: css`
@@ -551,13 +595,13 @@ const useStyles = (enableAnimation: boolean = false) => {
       `,
       otherItemName: css`
         ${theme.styles.text};
-        font-size: 1.2rem;
+        font-size: 1.3rem;
         font-weight: 600;
         color: #8b7355;
         margin: 0;
 
         @media ${theme.breakpoints.compact} {
-          font-size: 1rem;
+          font-size: 1.1rem;
         }
       `,
       websiteLink: css`
@@ -582,13 +626,17 @@ const useStyles = (enableAnimation: boolean = false) => {
         }
       `,
       groupItemContainer: css`
-        background: #f1ebe6;
+        background: rgba(210, 200, 185, 0.3);
         border: 3px solid #d4a574;
         border-radius: 0;
         padding: 1rem;
         position: relative;
         margin: 0 auto;
         z-index: 2;
+
+        @media ${theme.breakpoints.compact} {
+          padding: 0.5rem;
+        }
       `,
       groupItemTitle: css`
         font-size: 1.2rem;
@@ -614,6 +662,7 @@ const useStyles = (enableAnimation: boolean = false) => {
 
         @media ${theme.breakpoints.compact} {
           grid-template-columns: 1fr;
+          gap: 0.5rem;
         }
       `,
       groupItemsGridNormal: css`
@@ -623,6 +672,7 @@ const useStyles = (enableAnimation: boolean = false) => {
 
         @media ${theme.breakpoints.compact} {
           grid-template-columns: 1fr;
+          gap: 0.5rem;
         }
       `,
       groupInfoCard: css`
@@ -645,7 +695,7 @@ const useStyles = (enableAnimation: boolean = false) => {
       `,
       groupInfoTitle: css`
         ${theme.styles.text};
-        font-size: 1.1rem;
+        font-size: 1.2rem;
         font-weight: 700;
         color: #5a4a3a;
         text-align: center;
@@ -653,7 +703,7 @@ const useStyles = (enableAnimation: boolean = false) => {
         margin: 0;
 
         @media ${theme.breakpoints.compact} {
-          font-size: 1rem;
+          font-size: 1.1rem;
         }
       `,
       groupInfoDescription: css`
@@ -743,6 +793,7 @@ const ItemInfo = ({
   price,
   availability,
   links,
+  isFeatured = false,
 }: {
   title: string
   itemType: string
@@ -757,6 +808,7 @@ const ItemInfo = ({
     onlinePhysical?: string[]
     onlineDigital?: string[]
   }
+  isFeatured?: boolean
 }) => {
   const styles = useStyles()
 
@@ -764,7 +816,7 @@ const ItemInfo = ({
 
   return (
     <div css={styles.itemInfo}>
-      <h3 css={styles.itemName}>{title}</h3>
+      <h3 css={isFeatured ? styles.featuredItemName : styles.itemName}>{title}</h3>
       <div css={styles.itemTypeAndPrice}>
         <p css={styles.itemType}>{displayItemType}</p>
         <p css={styles.itemPrice}>{price}</p>
@@ -824,7 +876,15 @@ const ItemInfo = ({
   )
 }
 
-const BookItem = ({ item, isFeatured = false }: { item: ItemBook; isFeatured?: boolean }) => {
+const BookItem = ({
+  item,
+  isFeatured = false,
+  inGroup = false,
+}: {
+  item: ItemBook
+  isFeatured?: boolean
+  inGroup?: boolean
+}) => {
   const styles = useStyles()
 
   const imageElement = (
@@ -837,7 +897,10 @@ const BookItem = ({ item, isFeatured = false }: { item: ItemBook; isFeatured?: b
   )
 
   const content = (
-    <div css={styles.itemCard} data-testid={isFeatured ? 'featured-book-item' : 'book-item'}>
+    <div
+      css={inGroup ? styles.itemCardNoBorder : styles.itemCard}
+      data-testid={isFeatured ? 'featured-book-item' : 'book-item'}
+    >
       {item.links?.website ? (
         <Link href={item.links.website} css={styles.websiteLink}>
           {imageElement}
@@ -854,6 +917,7 @@ const BookItem = ({ item, isFeatured = false }: { item: ItemBook; isFeatured?: b
         price={item.price}
         availability={item.availability}
         links={item.links}
+        isFeatured={isFeatured}
       />
     </div>
   )
@@ -861,11 +925,11 @@ const BookItem = ({ item, isFeatured = false }: { item: ItemBook; isFeatured?: b
   return isFeatured ? <div css={styles.featuredBookWrapper}>{content}</div> : content
 }
 
-const StickerItem = ({ item }: { item: ItemSticker }) => {
+const StickerItem = ({ item, inGroup = false }: { item: ItemSticker; inGroup?: boolean }) => {
   const styles = useStyles()
 
   return (
-    <div css={styles.stickerCard}>
+    <div css={inGroup ? styles.stickerCardNoBorder : styles.stickerCard}>
       <div css={styles.stickerImageWrapper}>
         <img src={item.imageUrl} alt="ステッカー" css={styles.stickerImage} />
       </div>
@@ -906,10 +970,10 @@ const GroupItemComponent = ({ item, isFeatured = false }: { item: GroupItem; isF
         <div css={gridStyle}>
           {item.items.map((childItem, index) => {
             if (childItem.itemType === 'book') {
-              return <BookItem key={`group-item-${index}`} item={childItem} isFeatured={isFeatured} />
+              return <BookItem key={`group-item-${index}`} item={childItem} isFeatured={isFeatured} inGroup={true} />
             }
             if (childItem.itemType === 'sticker') {
-              return <StickerItem key={`group-item-${index}`} item={childItem} />
+              return <StickerItem key={`group-item-${index}`} item={childItem} inGroup={true} />
             }
             if (childItem.itemType === 'other') {
               return <OtherItem key={`group-item-${index}`} item={childItem} />
