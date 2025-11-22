@@ -103,6 +103,12 @@ export class MainScene extends Phaser.Scene {
     const scale = targetSize / Math.max(origWidth, origHeight)
     this.player.setScale(scale)
 
+    // Reset visual properties (important for restart after game over animation)
+    this.player.setAlpha(1)
+    this.player.setAngle(0)
+    this.player.setVisible(true)
+    this.player.clearTint()
+
     // Set circular collision body - smaller radius to match visible part of sticker
     const radius = Math.min(origWidth, origHeight) * 0.35
     // Center the circle by offsetting from top-left
@@ -270,8 +276,14 @@ Press SPACE or TAP to restart`,
 
       // Space key for floating
       this.input.keyboard.on('keydown-SPACE', () => {
-        if (this.isGameOver) {
+        // Only allow restart after game over UI is visible (after animation)
+        if (this.isGameOver && this.gameOverText.visible) {
           this.scene.restart({ isRestart: true, shouldFloat: true })
+          return
+        }
+
+        // Ignore input during game over animation
+        if (this.isGameOver) {
           return
         }
 
@@ -289,8 +301,14 @@ Press SPACE or TAP to restart`,
 
     // Touch/Click controls
     this.input.on('pointerdown', () => {
-      if (this.isGameOver) {
+      // Only allow restart after game over UI is visible (after animation)
+      if (this.isGameOver && this.gameOverText.visible) {
         this.scene.restart({ isRestart: true, shouldFloat: true })
+        return
+      }
+
+      // Ignore input during game over animation
+      if (this.isGameOver) {
         return
       }
 
@@ -316,54 +334,59 @@ Press SPACE or TAP to restart`,
   }
 
   update(time: number, delta: number) {
-    if (this.isGameOver || !this.isGameStarted) return
+    if (!this.isGameStarted) return
 
-    // Update Score
-    this.score += delta * 0.01
-    this.scoreText.setText(`Score: ${Math.floor(this.score)}`)
+    // Only update gameplay if not game over
+    if (!this.isGameOver) {
+      // Update Score
+      this.score += delta * 0.01
+      this.scoreText.setText(`Score: ${Math.floor(this.score)}`)
 
-    // Increase difficulty over time
-    this.gameSpeed += delta * 0.00005
+      // Increase difficulty over time
+      this.gameSpeed += delta * 0.00005
 
-    // Dynamic obstacle spawning based on gameSpeed
-    const spawnInterval = constants.OBSTACLE_SPAWN_RATE / this.gameSpeed
-    if (time - this.lastSpawnTime >= spawnInterval) {
-      this.spawnObstacle()
-      this.lastSpawnTime = time
-    }
-
-    // Player Movement - Float when holding, fall when released
-    if (this.isFloating) {
-      this.player.setAccelerationY(-constants.FLOAT_ACCELERATION)
-    } else {
-      this.player.setAccelerationY(0) // Let gravity handle falling
-    }
-
-    // Check if player hit top or bottom walls (game over)
-    const wallHeight = 30
-    const playerRadius = 32 // Half of player display size (64/2)
-    if (
-      this.player.y - playerRadius <= wallHeight ||
-      this.player.y + playerRadius >= constants.GAME_HEIGHT - wallHeight
-    ) {
-      this.handleCollision()
-    }
-
-    // Background parallax
-    this.backgroundStars.forEach((star) => {
-      star.x -= 2 * this.gameSpeed
-      if (star.x < 0) {
-        star.x = constants.GAME_WIDTH
-        star.y = Phaser.Math.Between(0, constants.GAME_HEIGHT)
+      // Dynamic obstacle spawning based on gameSpeed
+      const spawnInterval = constants.OBSTACLE_SPAWN_RATE / this.gameSpeed
+      if (time - this.lastSpawnTime >= spawnInterval) {
+        this.spawnObstacle()
+        this.lastSpawnTime = time
       }
-    })
 
-    // Homing obstacles and cleanup
+      // Player Movement - Float when holding, fall when released
+      if (this.isFloating) {
+        this.player.setAccelerationY(-constants.FLOAT_ACCELERATION)
+      } else {
+        this.player.setAccelerationY(0) // Let gravity handle falling
+      }
+
+      // Check if player hit top or bottom walls (game over)
+      const wallHeight = 30
+      const playerRadius = 32 // Half of player display size (64/2)
+      if (
+        this.player.y - playerRadius <= wallHeight ||
+        this.player.y + playerRadius >= constants.GAME_HEIGHT - wallHeight
+      ) {
+        this.handleCollision()
+      }
+    }
+
+    // Background parallax (continue during death animation, stop after overlay is shown)
+    if (!this.isGameOver || !this.overlay.visible) {
+      this.backgroundStars.forEach((star) => {
+        star.x -= 2 * this.gameSpeed
+        if (star.x < 0) {
+          star.x = constants.GAME_WIDTH
+          star.y = Phaser.Math.Between(0, constants.GAME_HEIGHT)
+        }
+      })
+    }
+
+    // Homing obstacles and cleanup (continue during death animation)
     this.obstacles.children.entries.forEach((obstacle) => {
       const sprite = obstacle as Phaser.Physics.Arcade.Sprite
 
-      // Homing behavior - gently track player Y position with smooth curves
-      if (sprite.getData('isHoming') && sprite.body) {
+      // Homing behavior - gently track player Y position with smooth curves (only if game is active)
+      if (!this.isGameOver && sprite.getData('isHoming') && sprite.body) {
         const homingSpeed = sprite.getData('homingSpeed')
         const playerY = this.player.y
         const obstacleY = sprite.y
@@ -379,8 +402,9 @@ Press SPACE or TAP to restart`,
           const body = sprite.body as Phaser.Physics.Arcade.Body
           const currentVelocity = body.velocity.y
 
-          // Gradually accelerate towards target velocity (0.15 = 15% change for smooth curves)
-          const acceleration = (targetVelocity - currentVelocity) * 0.15
+          // Gradually accelerate towards target velocity - scale with gameSpeed for consistent curve
+          const accelerationRate = 0.15 * Math.min(this.gameSpeed, 2.0) // Cap at 2x for playability
+          const acceleration = (targetVelocity - currentVelocity) * accelerationRate
           sprite.setAccelerationY(acceleration)
         } else {
           sprite.setAccelerationY(0)
@@ -395,9 +419,51 @@ Press SPACE or TAP to restart`,
   }
 
   private handleCollision() {
-    this.physics.pause()
     this.isGameOver = true
-    this.player.setTint(0xff0000)
+
+    const playerX = this.player.x
+    const playerY = this.player.y
+
+    // Stop player physics but keep obstacles moving
+    this.player.disableBody()
+
+    // Hide player immediately (Mega Man style)
+    this.player.setVisible(false)
+
+    // Create debris particles flying in 10 directions (like Mega Man death)
+    const numDebris = 10
+    const debrisSpeed = 300
+    const debrisSize = 16
+    const glowColor = 0xffffff // White
+
+    for (let i = 0; i < numDebris; i++) {
+      const angle = (i * 360) / numDebris
+      const angleRad = Phaser.Math.DegToRad(angle)
+
+      // Create a small ring debris with glowing color
+      const debris = this.add.graphics()
+      debris.lineStyle(3, glowColor, 1)
+      debris.strokeCircle(0, 0, debrisSize)
+      debris.setPosition(playerX, playerY)
+      debris.setBlendMode(Phaser.BlendModes.ADD)
+
+      // Calculate velocity
+      const velocityX = Math.cos(angleRad) * debrisSpeed
+      const velocityY = Math.sin(angleRad) * debrisSpeed
+
+      // Animate debris flying out
+      this.tweens.add({
+        targets: debris,
+        x: playerX + velocityX * 1.5,
+        y: playerY + velocityY * 1.5,
+        alpha: 0,
+        duration: 800,
+        ease: 'Linear',
+        onComplete: () => {
+          debris.destroy()
+        },
+      })
+    }
 
     // Update game over text with final score
     const finalScore = Math.floor(this.score)
@@ -407,8 +473,12 @@ Final Score: ${finalScore}
 Press SPACE or TAP to restart`,
     )
 
-    this.overlay.setVisible(true)
-    this.gameOverText.setVisible(true)
-    this.debugButton.setVisible(true)
+    // Show game over UI after animation
+    this.time.delayedCall(1000, () => {
+      this.physics.pause() // Pause all physics after animation
+      this.overlay.setVisible(true)
+      this.gameOverText.setVisible(true)
+      this.debugButton.setVisible(true)
+    })
   }
 }
