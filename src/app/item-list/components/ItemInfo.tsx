@@ -27,6 +27,12 @@ const useStyles = () => {
         margin: 0.5rem 0 0.1rem 0;
         line-height: 1.2;
 
+        .print-mode & {
+          @media ${theme.breakpoints.wide} {
+            font-size: 1.65rem;
+          }
+        }
+
         @media ${theme.breakpoints.compact} {
           font-size: 1rem;
           margin: 0.4rem 0 0.1rem 0;
@@ -39,6 +45,12 @@ const useStyles = () => {
         color: #8b7355;
         margin: 0.5rem 0 0.1rem 0;
         line-height: 1.2;
+
+        .print-mode & {
+          @media ${theme.breakpoints.wide} {
+            font-size: 1.95rem;
+          }
+        }
 
         @media ${theme.breakpoints.compact} {
           font-size: 1rem;
@@ -59,6 +71,12 @@ const useStyles = () => {
         text-transform: uppercase;
         letter-spacing: 0.1em;
         font-weight: 500;
+
+        .print-mode & {
+          @media ${theme.breakpoints.wide} {
+            font-size: 1.05rem;
+          }
+        }
       `,
       itemPrice: css`
         ${theme.styles.text};
@@ -66,6 +84,12 @@ const useStyles = () => {
         font-weight: 600;
         color: #e67e22;
         margin: 0;
+
+        .print-mode & {
+          @media ${theme.breakpoints.wide} {
+            font-size: 1.35rem;
+          }
+        }
       `,
       availabilitySection: css`
         margin-top: 0.5rem;
@@ -88,6 +112,12 @@ const useStyles = () => {
         justify-content: space-between;
         align-items: center;
         color: #a68b5b;
+
+        .print-mode & {
+          @media ${theme.breakpoints.wide} {
+            font-size: 1.05rem;
+          }
+        }
       `,
       availabilityStatus: css`
         padding: 0.15rem 0.5rem;
@@ -99,6 +129,12 @@ const useStyles = () => {
         min-width: 60px;
         text-align: center;
         display: inline-block;
+
+        .print-mode & {
+          @media ${theme.breakpoints.wide} {
+            font-size: 1.05rem;
+          }
+        }
       `,
       availabilityLabelWithTooltip: css`
         ${theme.styles.text};
@@ -116,6 +152,12 @@ const useStyles = () => {
         &:hover .tooltip {
           opacity: 1;
           visibility: visible;
+        }
+
+        .print-mode & {
+          @media ${theme.breakpoints.wide} {
+            font-size: 1.2rem;
+          }
         }
       `,
       availabilityTooltip: css`
@@ -163,6 +205,12 @@ const useStyles = () => {
 
         a& {
           text-decoration: underline;
+        }
+
+        .print-mode & {
+          @media ${theme.breakpoints.wide} {
+            font-size: 1.05rem;
+          }
         }
       `,
     }),

@@ -74,6 +74,12 @@ const useStyles = (enableAnimation: boolean = false) => {
         text-shadow: 1px 1px 2px rgba(139, 115, 85, 0.1);
         letter-spacing: 0.1em;
 
+        .print-mode & {
+          @media ${theme.breakpoints.wide} {
+            font-size: 5.25rem;
+          }
+        }
+
         @media ${theme.breakpoints.compact} {
           font-size: 2.5rem;
         }
@@ -85,6 +91,12 @@ const useStyles = (enableAnimation: boolean = false) => {
         margin: 0;
         font-weight: 300;
         letter-spacing: 0.05em;
+
+        .print-mode & {
+          @media ${theme.breakpoints.wide} {
+            font-size: 1.8rem;
+          }
+        }
 
         @media ${theme.breakpoints.compact} {
           font-size: 1rem;
@@ -112,6 +124,29 @@ const useStyles = (enableAnimation: boolean = false) => {
         @media ${theme.breakpoints.compact} {
           font-size: 0.8rem;
           padding: 0.6rem 1.2rem;
+        }
+      `,
+      printModeToggle: css`
+        ${theme.styles.text};
+        background: linear-gradient(135deg, #8b7355, #a68b5b);
+        color: white;
+        border: none;
+        padding: 0.6rem 1.2rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        letter-spacing: 0.05em;
+        margin: 1rem auto 0.5rem;
+        display: none;
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 8px rgba(139, 115, 85, 0.3);
+        }
+
+        @media ${theme.breakpoints.wide} {
+          display: block;
         }
       `,
       section: css`
@@ -149,6 +184,12 @@ const useStyles = (enableAnimation: boolean = false) => {
           width: 60px;
           height: 2px;
           background: linear-gradient(90deg, transparent, #d4a574, transparent);
+        }
+
+        .print-mode & {
+          @media ${theme.breakpoints.wide} {
+            font-size: 3.75rem;
+          }
         }
 
         @media ${theme.breakpoints.compact} {
@@ -238,6 +279,7 @@ const useStyles = (enableAnimation: boolean = false) => {
 
 export default function ItemListContent() {
   const [enableAnimation, setEnableAnimation] = useState(false)
+  const [printMode, setPrintMode] = useState(false)
 
   useEffect(() => {
     const userAgent = navigator.userAgent
@@ -247,6 +289,19 @@ export default function ItemListContent() {
     setEnableAnimation(!isSafari)
   }, [])
 
+  useEffect(() => {
+    const stored = localStorage.getItem('item-list-print-mode')
+    if (stored !== null) {
+      setPrintMode(stored === 'true')
+    }
+  }, [])
+
+  const handleTogglePrintMode = () => {
+    const newValue = !printMode
+    setPrintMode(newValue)
+    localStorage.setItem('item-list-print-mode', String(newValue))
+  }
+
   const styles = useStyles(enableAnimation)
 
   const handleDownloadImage = async () => {
@@ -255,53 +310,61 @@ export default function ItemListContent() {
     const element = document.querySelector('main')
     if (!element) return
 
-    const canvas = await html2canvas(element, {
-      useCORS: true,
-      allowTaint: true,
-      scale: Math.min(window.devicePixelRatio, 2),
-      width: 1864,
-      windowWidth: 1864,
-    })
+    // Auto-apply print-mode class for download
+    element.classList.add('print-mode')
 
-    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'))
-    if (!blob) return
+    try {
+      const canvas = await html2canvas(element, {
+        useCORS: true,
+        allowTaint: true,
+        scale: Math.min(window.devicePixelRatio, 2),
+        width: 1864,
+        windowWidth: 1864,
+      })
 
-    const fileName = `item-list-${new Date().toISOString().split('T')[0]}.png`
+      const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'))
+      if (!blob) return
 
-    // Use Share API on mobile devices if available (iOS/Android)
-    if (isMobile && navigator.share && navigator.canShare) {
-      const file = new File([blob], fileName, { type: 'image/png' })
+      const fileName = `item-list-${new Date().toISOString().split('T')[0]}.png`
 
-      if (navigator.canShare({ files: [file] })) {
-        try {
-          await navigator.share({
-            files: [file],
-            title: 'お品書き',
-          })
-          return
-        } catch (error) {
-          if (error instanceof Error) {
-            if (error.name === 'AbortError') {
-              // User cancelled the share dialog - don't fall through to download
-              return
+      // Use Share API on mobile devices if available (iOS/Android)
+      if (isMobile && navigator.share && navigator.canShare) {
+        const file = new File([blob], fileName, { type: 'image/png' })
+
+        if (navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({
+              files: [file],
+              title: 'お品書き',
+            })
+            return
+          } catch (error) {
+            if (error instanceof Error) {
+              if (error.name === 'AbortError') {
+                // User cancelled the share dialog - don't fall through to download
+                return
+              }
+              // Log other errors (e.g., NotAllowedError from user gesture timeout)
+              console.warn('Share API failed:', error.name, error.message)
             }
-            // Log other errors (e.g., NotAllowedError from user gesture timeout)
-            console.warn('Share API failed:', error.name, error.message)
+            // Fall through to traditional download
           }
-          // Fall through to traditional download
         }
       }
+
+      // Fallback: Traditional download (desktop and older mobile browsers)
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.download = fileName
+      link.href = url
+      link.click()
+
+      // Clean up the object URL after download starts
+      setTimeout(() => URL.revokeObjectURL(url), 1000)
+    } finally {
+      // Always remove print-mode class after download
+      element.classList.remove('print-mode')
     }
-
-    // Fallback: Traditional download (desktop and older mobile browsers)
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.download = fileName
-    link.href = url
-    link.click()
-
-    // Clean up the object URL after download starts
-    setTimeout(() => URL.revokeObjectURL(url), 1000)
   }
 
   return (
@@ -421,7 +484,7 @@ export default function ItemListContent() {
           </filter>
         </defs>
       </svg>
-      <main css={styles.container}>
+      <main css={styles.container} className={printMode ? 'print-mode' : ''}>
         <Menu color="#8b7355" secondaryColor="#a68b5b" />
 
         <header css={styles.header}>
@@ -429,6 +492,9 @@ export default function ItemListContent() {
           <p css={styles.subtitle}>Pon Pon Creamsoda アイテム一覧</p>
           <button data-html2canvas-ignore css={styles.downloadButton} onClick={handleDownloadImage}>
             画像としてダウンロード
+          </button>
+          <button data-html2canvas-ignore css={styles.printModeToggle} onClick={handleTogglePrintMode}>
+            {printMode ? '印刷モード: ON' : '印刷モード: OFF'}
           </button>
         </header>
 

@@ -76,6 +76,12 @@ const useStyles = () => {
         line-height: 1.6;
         margin: 0;
 
+        .print-mode & {
+          @media ${theme.breakpoints.wide} {
+            font-size: 1.8rem;
+          }
+        }
+
         @media ${theme.breakpoints.compact} {
           font-size: 1.1rem;
         }
@@ -87,6 +93,12 @@ const useStyles = () => {
         text-align: center;
         line-height: 1.6;
         width: 100%;
+
+        .print-mode & {
+          @media ${theme.breakpoints.wide} {
+            font-size: 1.35rem;
+          }
+        }
 
         @media ${theme.breakpoints.compact} {
           font-size: 0.85rem;
