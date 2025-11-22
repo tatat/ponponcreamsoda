@@ -223,23 +223,30 @@ const useStyles = (enableAnimation: boolean = false) => {
         display: flex;
         flex-wrap: wrap;
         gap: 2rem;
-        max-width: 1200px;
+        max-width: 1900px;
         margin: 0 auto;
         justify-content: center;
-
-        > * {
-          flex: 1 1 450px;
-          max-width: 600px;
-        }
 
         @media ${theme.breakpoints.compact} {
           gap: 1.5rem;
           max-width: 600px;
+        }
+      `,
+      featuredBookWrapper: css`
+        flex: 0 0 600px;
 
-          > * {
-            flex: 1 1 100%;
-            max-width: 100%;
-          }
+        @media ${theme.breakpoints.compact} {
+          flex: 1 1 100%;
+          max-width: 100%;
+        }
+      `,
+      featuredGroupWrapper: css`
+        flex: 1 1 100%;
+        width: 100%;
+
+        @media ${theme.breakpoints.compact} {
+          flex: 1 1 100%;
+          max-width: 100%;
         }
       `,
       stickerGrid: css`
@@ -499,7 +506,7 @@ const useStyles = (enableAnimation: boolean = false) => {
         border-radius: 8px;
         padding: 1.5rem;
         position: relative;
-        max-width: 1200px;
+        max-width: 1900px;
         margin: 0 auto;
 
         @media ${theme.breakpoints.compact} {
@@ -521,8 +528,8 @@ const useStyles = (enableAnimation: boolean = false) => {
       `,
       groupItemsGrid: css`
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-        gap: 1.5rem;
+        grid-template-columns: repeat(auto-fit, minmax(599px, 1fr));
+        gap: 1rem;
 
         @media ${theme.breakpoints.compact} {
           grid-template-columns: 1fr;
@@ -530,6 +537,7 @@ const useStyles = (enableAnimation: boolean = false) => {
         }
       `,
       groupInfoCard: css`
+        grid-column: 1 / -1;
         background: #faf7f5;
         border: 2px dashed #d4a574;
         border-radius: 4px;
@@ -710,7 +718,7 @@ const BookItem = ({ item, isFeatured = false }: { item: ItemBook; isFeatured?: b
     </div>
   )
 
-  return (
+  const content = (
     <div css={styles.itemCard} data-testid={isFeatured ? 'featured-book-item' : 'book-item'}>
       {item.links?.website ? (
         <Link href={item.links.website} css={styles.websiteLink}>
@@ -731,6 +739,8 @@ const BookItem = ({ item, isFeatured = false }: { item: ItemBook; isFeatured?: b
       />
     </div>
   )
+
+  return isFeatured ? <div css={styles.featuredBookWrapper}>{content}</div> : content
 }
 
 const StickerItem = ({ item }: { item: ItemSticker }) => {
@@ -752,22 +762,24 @@ const GroupItemComponent = ({ item, isFeatured = false }: { item: GroupItem; isF
   const styles = useStyles()
 
   return (
-    <div css={styles.groupItemContainer}>
-      <div css={styles.groupItemsGrid}>
-        {item.items.map((childItem, index) => {
-          if (childItem.itemType === 'book') {
-            return <BookItem key={`group-item-${index}`} item={childItem} isFeatured={isFeatured} />
-          }
-          if (childItem.itemType === 'sticker') {
-            return <StickerItem key={`group-item-${index}`} item={childItem} />
-          }
-          if (childItem.itemType === 'other') {
-            return <OtherItem key={`group-item-${index}`} item={childItem} />
-          }
-          return null
-        })}
-        <div css={styles.groupInfoCard}>
-          <h3 css={styles.groupInfoTitle}>{item.name}</h3>
+    <div css={isFeatured ? styles.featuredGroupWrapper : undefined}>
+      <div css={styles.groupItemContainer}>
+        <div css={styles.groupItemsGrid}>
+          {item.items.map((childItem, index) => {
+            if (childItem.itemType === 'book') {
+              return <BookItem key={`group-item-${index}`} item={childItem} isFeatured={true} />
+            }
+            if (childItem.itemType === 'sticker') {
+              return <StickerItem key={`group-item-${index}`} item={childItem} />
+            }
+            if (childItem.itemType === 'other') {
+              return <OtherItem key={`group-item-${index}`} item={childItem} />
+            }
+            return null
+          })}
+          <div css={styles.groupInfoCard}>
+            <h3 css={styles.groupInfoTitle}>{item.name}</h3>
+          </div>
         </div>
       </div>
     </div>
