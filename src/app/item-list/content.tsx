@@ -588,6 +588,7 @@ const useStyles = (enableAnimation: boolean = false) => {
         padding: 1rem;
         position: relative;
         margin: 0 auto;
+        z-index: 2;
       `,
       groupItemTitle: css`
         font-size: 1.2rem;
@@ -634,6 +635,8 @@ const useStyles = (enableAnimation: boolean = false) => {
         justify-content: center;
         gap: 1rem;
         min-height: 200px;
+        position: relative;
+        z-index: 2;
 
         @media ${theme.breakpoints.compact} {
           padding: 1.5rem;
@@ -671,10 +674,16 @@ const useStyles = (enableAnimation: boolean = false) => {
         justify-content: center;
         flex-wrap: wrap;
       `,
+      groupInfoImageWrapper: css`
+        padding: 1rem;
+        background: repeating-linear-gradient(45deg, #e0e0e0, #e0e0e0 10px, #d0d0d0 10px, #d0d0d0 20px);
+        border-radius: 4px;
+      `,
       groupInfoImage: css`
         max-width: 100%;
         max-height: 360px;
         object-fit: contain;
+        display: block;
 
         @media ${theme.breakpoints.compact} {
           max-height: 280px;
@@ -913,7 +922,9 @@ const GroupItemComponent = ({ item, isFeatured = false }: { item: GroupItem; isF
             {item.imageUrls && item.imageUrls.length > 0 && (
               <div css={styles.groupInfoImages}>
                 {item.imageUrls.map((imageUrl, index) => (
-                  <img key={index} src={imageUrl} alt={`${item.name} - ${index + 1}`} css={styles.groupInfoImage} />
+                  <div key={index} css={styles.groupInfoImageWrapper}>
+                    <img src={imageUrl} alt={`${item.name} - ${index + 1}`} css={styles.groupInfoImage} />
+                  </div>
                 ))}
               </div>
             )}

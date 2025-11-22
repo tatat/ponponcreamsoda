@@ -18,7 +18,7 @@ export const itemList: ItemList = {
           <p style={{ margin: '0.5rem 0 0 0' }}>3冊セットでの購入で、特典としてクリアファイルが付きます。</p>
         </div>
       ),
-      imageUrls: ['/images/item-list/book-06.jpg'],
+      imageUrls: ['/images/item-list/clear-folder-01-b.svg', '/images/item-list/clear-folder-01-f.svg'],
       items: [
         {
           itemType: 'book',
