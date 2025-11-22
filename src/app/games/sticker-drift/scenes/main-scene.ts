@@ -140,17 +140,15 @@ export class MainScene extends Phaser.Scene {
   }
 
   private createPlayer() {
-    // Use d1 as player
-    this.player = this.physics.add.sprite(200, constants.GAME_HEIGHT / 2, 'sticker-d1')
+    // Use d1-64 (64@2x image, actual size 128px) for crisp 2x display
+    this.player = this.physics.add.sprite(200, constants.GAME_HEIGHT / 2, 'd1-64')
 
-    // Get original texture size
+    // Get original texture size before scaling
     const origWidth = this.player.width
     const origHeight = this.player.height
 
-    // Set scale to maintain aspect ratio (target height: 64px)
-    const targetSize = 64
-    const scale = targetSize / Math.max(origWidth, origHeight)
-    this.player.setScale(scale)
+    // Set scale to 0.5 to display @2x image at correct size (128px → 64px)
+    this.player.setScale(0.5)
 
     // Reset visual properties (important for restart after game over animation)
     this.player.setAlpha(1)
@@ -194,20 +192,25 @@ export class MainScene extends Phaser.Scene {
     const stickers = ['d2', 'r1', 'r2', 't1', 't2']
     const randomSticker = stickers[Math.floor(Math.random() * stickers.length)]
 
+    // Randomly choose target display size
+    const targetSize = Phaser.Math.Between(48, 96)
+
+    // Select appropriate @2x image size based on target display size
+    // For crisp 2x display: use next power of 2 or closest available size
+    const imageSize = targetSize <= 64 ? 64 : 96
+    const textureKey = `${randomSticker}-${imageSize}`
+
     const y = Phaser.Math.Between(50, constants.GAME_HEIGHT - 50)
-    const obstacle = this.obstacles.create(
-      constants.GAME_WIDTH + 100,
-      y,
-      `sticker-${randomSticker}`,
-    ) as Phaser.Physics.Arcade.Sprite
+    const obstacle = this.obstacles.create(constants.GAME_WIDTH + 100, y, textureKey) as Phaser.Physics.Arcade.Sprite
 
     // Get original texture size before scaling
     const origWidth = obstacle.width
     const origHeight = obstacle.height
 
-    // Set scale to maintain aspect ratio
-    const targetSize = Phaser.Math.Between(48, 96)
-    const scale = targetSize / Math.max(origWidth, origHeight)
+    // @2x images are 2x the target size, so scale down
+    // Then apply additional scaling to reach exact target size
+    const actualImageSize = imageSize * 2 // @2x image is double
+    const scale = (targetSize / actualImageSize) * 1.0 // Scale to exact target size
     obstacle.setScale(scale)
 
     // Set circular collision body - smaller radius to match visible part of sticker

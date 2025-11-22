@@ -21,7 +21,7 @@ export class OpeningScene extends Phaser.Scene {
   preload() {
     // Load brick images for floating effect (using 256 size for better quality)
     constants.BRICK_NAMES.forEach((name) => {
-      this.load.image(`brick-${name}-256`, `/games/breakout-clone/images/i-${name}-256@2x.png`)
+      this.load.image(`brick-${name}-256`, `/games/common/images/stickers/${name}-256@2x.png`)
     })
 
     // Load logo for title with specific size to avoid scaling blur
