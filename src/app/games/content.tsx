@@ -119,6 +119,11 @@ const gameItems = [
     description: 'クラシックなブロック崩しゲーム。音楽的な要素とボス戦が楽しめる',
     href: '/games/breakout-clone/',
   },
+  {
+    title: 'Sticker Drift',
+    description: '無重力空間で障害物を避けよう！',
+    href: '/games/sticker-drift/',
+  },
 ]
 
 export default function GamesContent() {

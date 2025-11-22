@@ -6,6 +6,7 @@ import * as Phaser from 'phaser'
 import { BootScene } from './scenes/boot-scene'
 import { MainScene } from './scenes/main-scene'
 import { constants } from './config'
+import Menu from '@/components/Menu'
 
 export default function StickerDriftGame() {
   const gameContainerRef = useRef<HTMLDivElement | null>(null)
@@ -58,8 +59,10 @@ export default function StickerDriftGame() {
         width: 100%;
         height: 100vh;
         background-color: #000;
+        position: relative;
       `}
     >
+      <Menu />
       <div
         ref={gameContainerRef}
         css={css`
