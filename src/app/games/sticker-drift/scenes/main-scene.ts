@@ -68,26 +68,75 @@ export class MainScene extends Phaser.Scene {
       this.backgroundStars.push(star)
     }
 
-    // Create ceiling and floor walls
+    // Create ceiling and floor walls with danger stripes
     const wallHeight = 30
-    const wallColor = 0x2a2a3e // Dark blue-gray
-    const edgeColor = 0xff6b6b // Red edge for danger
+    const stripeWidth = 40
+    const yellowColor = 0xffdd33 // Light yellow (slightly warmer)
+    const blackColor = 0x111111 // Almost black
 
-    // Ceiling (top wall)
+    // Ceiling (top wall) with diagonal stripes
     const ceiling = this.add.graphics()
-    ceiling.fillStyle(wallColor, 1)
-    ceiling.fillRect(0, 0, constants.GAME_WIDTH, wallHeight)
-    ceiling.fillStyle(edgeColor, 1)
-    ceiling.fillRect(0, wallHeight - 3, constants.GAME_WIDTH, 3) // Red danger edge
     ceiling.setDepth(10)
 
-    // Floor (bottom wall)
+    // Draw diagonal stripes for ceiling
+    for (let x = -wallHeight; x < constants.GAME_WIDTH + wallHeight; x += stripeWidth * 2) {
+      // Yellow stripe
+      ceiling.fillStyle(yellowColor, 1)
+      ceiling.fillTriangle(x, 0, x + stripeWidth, 0, x + stripeWidth + wallHeight, wallHeight)
+      ceiling.fillTriangle(x, 0, x + wallHeight, wallHeight, x + stripeWidth + wallHeight, wallHeight)
+
+      // Black stripe
+      ceiling.fillStyle(blackColor, 1)
+      ceiling.fillTriangle(x + stripeWidth, 0, x + stripeWidth * 2, 0, x + stripeWidth * 2 + wallHeight, wallHeight)
+      ceiling.fillTriangle(
+        x + stripeWidth,
+        0,
+        x + stripeWidth + wallHeight,
+        wallHeight,
+        x + stripeWidth * 2 + wallHeight,
+        wallHeight,
+      )
+    }
+
+    // Floor (bottom wall) with diagonal stripes
     const floor = this.add.graphics()
-    floor.fillStyle(wallColor, 1)
-    floor.fillRect(0, constants.GAME_HEIGHT - wallHeight, constants.GAME_WIDTH, wallHeight)
-    floor.fillStyle(edgeColor, 1)
-    floor.fillRect(0, constants.GAME_HEIGHT - wallHeight, constants.GAME_WIDTH, 3) // Red danger edge
     floor.setDepth(10)
+
+    const floorY = constants.GAME_HEIGHT - wallHeight
+
+    // Draw diagonal stripes for floor
+    for (let x = -wallHeight; x < constants.GAME_WIDTH + wallHeight; x += stripeWidth * 2) {
+      // Yellow stripe
+      floor.fillStyle(yellowColor, 1)
+      floor.fillTriangle(x, floorY, x + stripeWidth, floorY, x + stripeWidth + wallHeight, constants.GAME_HEIGHT)
+      floor.fillTriangle(
+        x,
+        floorY,
+        x + wallHeight,
+        constants.GAME_HEIGHT,
+        x + stripeWidth + wallHeight,
+        constants.GAME_HEIGHT,
+      )
+
+      // Black stripe
+      floor.fillStyle(blackColor, 1)
+      floor.fillTriangle(
+        x + stripeWidth,
+        floorY,
+        x + stripeWidth * 2,
+        floorY,
+        x + stripeWidth * 2 + wallHeight,
+        constants.GAME_HEIGHT,
+      )
+      floor.fillTriangle(
+        x + stripeWidth,
+        floorY,
+        x + stripeWidth + wallHeight,
+        constants.GAME_HEIGHT,
+        x + stripeWidth * 2 + wallHeight,
+        constants.GAME_HEIGHT,
+      )
+    }
   }
 
   private createPlayer() {
