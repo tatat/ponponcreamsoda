@@ -4,6 +4,7 @@ const breakpoints = {
   landscape: '(orientation: landscape)',
   portrait: '(orientation: portrait)',
   compact: '(max-width: 1399px)',
+  wide: '(min-width: 1864px)',
 }
 
 const styles = {

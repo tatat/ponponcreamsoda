@@ -1,67 +1,19 @@
 'use client'
 
-import { css, keyframes, useTheme } from '@emotion/react'
+import { css, useTheme } from '@emotion/react'
 import { useMemo, useState, useEffect } from 'react'
-import Link from 'next/link'
 import html2canvas from 'html2canvas'
+import { AiOutlinePrinter } from 'react-icons/ai'
 import Menu from '@/components/Menu'
+import Logo from '@/components/Logo'
 import { itemList } from '@/item-list'
-import type { ItemBook, ItemSticker, ItemOther, AvailabilityState } from '@/item-list-type'
-
-const scanlineAnimation = keyframes`
-  0% {
-    transform: translateY(0);
-  }
-  100% {
-    transform: translateY(4px);
-  }
-`
-
-const chromaticAberrationAnimation = keyframes`
-  0% {
-    filter: url(#chromatic-shift-1);
-  }
-  0.78125% {
-    filter: url(#chromatic-shift-2);
-  }
-  1.5625% {
-    filter: url(#lines-chromatic);
-  }
-  2.34375% {
-    filter: url(#chromatic-shift-1);
-  }
-  3.125% {
-    filter: url(#chromatic-normal);
-  }
-  50% {
-    filter: url(#chromatic-shift-1);
-  }
-  50.78125% {
-    filter: url(#chromatic-shift-2);
-  }
-  51.5625% {
-    filter: url(#lines-chromatic);
-  }
-  52.34375% {
-    filter: url(#chromatic-shift-1);
-  }
-  52.725% {
-    filter: url(#chromatic-shift-1);
-  }
-  53.50625% {
-    filter: url(#chromatic-shift-3);
-  }
-  54.2875% {
-    filter: url(#lines-chromatic);
-  }
-  55.06875% {
-    filter: url(#chromatic-shift-1);
-  }
-  56.25%,
-  100% {
-    filter: url(#chromatic-normal);
-  }
-`
+import { isGroupItem } from '@/item-list-type'
+import { scanlineAnimation, chromaticAberrationAnimation } from './animations'
+import { groupItemsByType } from './utils'
+import { BookItem } from './components/BookItem'
+import { StickerItem } from './components/StickerItem'
+import { OtherItem } from './components/OtherItem'
+import { GroupItemComponent } from './components/GroupItem'
 
 const useStyles = (enableAnimation: boolean = false) => {
   const theme = useTheme()
@@ -115,53 +67,86 @@ const useStyles = (enableAnimation: boolean = false) => {
           padding-top: 1rem;
         }
       `,
-      title: css`
-        ${theme.styles.text};
-        color: #8b7355;
-        font-size: 3rem;
-        font-weight: 700;
-        margin: 0 0 1rem 0;
-        text-shadow: 1px 1px 2px rgba(139, 115, 85, 0.1);
-        letter-spacing: 0.1em;
+      logo: css`
+        width: 100%;
+        max-width: 800px;
+        height: auto;
+        margin: 0 auto 0.5rem;
+
+        .print-mode & {
+          max-width: 1200px;
+        }
 
         @media ${theme.breakpoints.compact} {
-          font-size: 2rem;
+          max-width: 400px;
         }
       `,
       subtitle: css`
         ${theme.styles.text};
-        color: #a68b5b;
-        font-size: 1.2rem;
-        margin: 0;
-        font-weight: 300;
-        letter-spacing: 0.05em;
+        color: #e67e22;
+        font-size: 1.5rem;
+        margin: 0 0 1.5rem 0;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+
+        .print-mode & {
+          font-size: 3rem;
+        }
 
         @media ${theme.breakpoints.compact} {
-          font-size: 1rem;
+          font-size: 1.2rem;
         }
       `,
       downloadButton: css`
         ${theme.styles.text};
-        background: linear-gradient(135deg, #8b7355, #a68b5b);
+        background: #d4a574;
         color: white;
         border: none;
-        padding: 0.75rem 1.5rem;
+        padding: 0 1.5rem;
         font-size: 0.9rem;
         font-weight: 600;
         cursor: pointer;
-        transition: all 0.3s ease;
         letter-spacing: 0.05em;
-        margin: 1.5rem auto 0;
-        display: block;
-
-        &:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 8px rgba(139, 115, 85, 0.3);
-        }
+        position: fixed;
+        top: 0;
+        right: 110px;
+        height: 39px;
+        z-index: 1000;
 
         @media ${theme.breakpoints.compact} {
+          position: static;
+          margin: 0 auto;
+          display: block;
+          height: auto;
           font-size: 0.8rem;
           padding: 0.6rem 1.2rem;
+        }
+      `,
+      printModeToggle: css`
+        position: fixed;
+        top: 1rem;
+        left: 1rem;
+        background: rgba(241, 235, 230, 0.9);
+        color: #8b7355;
+        border: none;
+        padding: 0.5rem;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border-radius: 4px;
+        display: none;
+        z-index: 1000;
+        line-height: 1;
+
+        .print-mode & {
+          background: rgba(230, 126, 34, 0.8);
+          color: white;
+        }
+
+        @media ${theme.breakpoints.wide} {
+          display: flex;
+          align-items: center;
+          justify-content: center;
         }
       `,
       section: css`
@@ -182,7 +167,7 @@ const useStyles = (enableAnimation: boolean = false) => {
       sectionTitle: css`
         ${theme.styles.text};
         color: #8b7355;
-        font-size: 2rem;
+        font-size: 2.5rem;
         font-weight: 700;
         margin: 0;
         text-shadow: 1px 1px 2px rgba(139, 115, 85, 0.1);
@@ -201,14 +186,24 @@ const useStyles = (enableAnimation: boolean = false) => {
           background: linear-gradient(90deg, transparent, #d4a574, transparent);
         }
 
+        .print-mode & {
+          font-size: 5.1rem;
+        }
+
+        .print-mode &::after {
+          left: calc(50% - 60px);
+          width: 120px;
+          height: 4px;
+        }
+
         @media ${theme.breakpoints.compact} {
-          font-size: 1.5rem;
+          font-size: 2rem;
         }
       `,
       itemGrid: css`
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 2rem;
+        gap: 1rem;
         max-width: 1200px;
         margin: 0 auto;
 
@@ -218,218 +213,57 @@ const useStyles = (enableAnimation: boolean = false) => {
           max-width: 600px;
         }
       `,
-      featuredGrid: css`
+      featuredGridWrapper: css`
         display: flex;
-        flex-wrap: wrap;
+        flex-direction: column;
         gap: 2rem;
-        max-width: 1200px;
-        margin: 0 auto;
-        justify-content: center;
-
-        > * {
-          flex: 1 1 450px;
-          max-width: 600px;
-        }
 
         @media ${theme.breakpoints.compact} {
           gap: 1.5rem;
-          max-width: 600px;
+        }
+      `,
+      featuredGrid: css`
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(586px, 1fr));
+        gap: 1rem;
+        width: 1200px;
+        margin: 0 auto;
 
-          > * {
-            flex: 1 1 100%;
-            max-width: 100%;
-          }
+        @media ${theme.breakpoints.wide} {
+          width: 1790px;
+        }
+
+        @media ${theme.breakpoints.compact} {
+          grid-template-columns: 1fr;
+          gap: 1.5rem;
+          width: 100%;
+          max-width: 600px;
+        }
+      `,
+      featuredGroupWrapper: css`
+        grid-column: 1 / -1;
+        width: 100%;
+
+        @media ${theme.breakpoints.compact} {
+          max-width: 100%;
         }
       `,
       stickerGrid: css`
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1.5rem;
-        max-width: 800px;
+        gap: 1rem;
+        max-width: 1200px;
         margin: 0 auto;
+
+        @media ${theme.breakpoints.wide} {
+          max-width: 1790px;
+        }
 
         @media ${theme.breakpoints.compact} {
           grid-template-columns: repeat(2, 1fr);
           gap: 1rem;
+          max-width: 600px;
         }
-      `,
-      itemCard: css`
-        background: #f1ebe6;
-        border: 2px solid rgba(212, 165, 116, 0.3);
-        border-radius: 0;
-        overflow: hidden;
-        transition: all 0.3s ease;
-        display: flex;
-        flex-direction: column;
-        position: relative;
-        z-index: 2;
-
-        &:hover {
-          transform: translateY(-2px);
-        }
-      `,
-      stickerCard: css`
-        background: #f1ebe6;
-        border: 2px solid rgba(212, 165, 116, 0.3);
-        border-radius: 0;
-        overflow: hidden;
-        transition: all 0.3s ease;
-        display: flex;
-        flex-direction: column;
-        position: relative;
-        z-index: 2;
-
-        &:hover {
-          transform: translateY(-2px);
-        }
-      `,
-      stickerInfo: css`
-        padding: 0.75rem;
-        text-align: center;
-      `,
-      stickerPrice: css`
-        ${theme.styles.text};
-        font-size: 0.9rem;
-        font-weight: 600;
-        color: #e67e22;
-        margin: 0;
-      `,
-      itemImageWrapper: css`
-        height: 360px;
-        background: rgba(236, 240, 241, 0.05);
-        padding: 0.75rem 0.75rem 0 0.75rem;
-        box-sizing: border-box;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        @media ${theme.breakpoints.compact} {
-          height: 280px;
-          padding: 0.5rem 0.5rem 0 0.5rem;
-        }
-      `,
-      featuredImageWrapper: css`
-        height: 480px;
-        background: rgba(236, 240, 241, 0.05);
-        padding: 0.75rem 0.75rem 0 0.75rem;
-        box-sizing: border-box;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        @media ${theme.breakpoints.compact} {
-          height: 360px;
-          padding: 0.5rem 0.5rem 0 0.5rem;
-        }
-      `,
-      itemImage: css`
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: contain;
-        display: block;
-      `,
-      featuredImage: css`
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: contain;
-        display: block;
-      `,
-      stickerImageWrapper: css`
-        height: 200px;
-        background: rgba(236, 240, 241, 0.1);
-        padding: 1rem;
-        box-sizing: border-box;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        @media ${theme.breakpoints.compact} {
-          height: 160px;
-          padding: 0.5rem;
-        }
-      `,
-      stickerImage: css`
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: contain;
-        display: block;
-      `,
-      itemInfo: css`
-        padding: 0.75rem;
-
-        @media ${theme.breakpoints.compact} {
-          padding: 0.5rem;
-        }
-      `,
-      itemName: css`
-        ${theme.styles.text};
-        font-size: 1rem;
-        font-weight: 700;
-        color: #8b7355;
-        margin: 0.5rem 0 0.5rem 0;
-        line-height: 1.2;
-
-        @media ${theme.breakpoints.compact} {
-          font-size: 0.9rem;
-          margin: 0.4rem 0 0.4rem 0;
-        }
-      `,
-      itemTypeAndPrice: css`
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin: 0 0 0.5rem 0;
-      `,
-      itemType: css`
-        ${theme.styles.text};
-        font-size: 0.7rem;
-        color: #a68b5b;
-        margin: 0;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        font-weight: 500;
-      `,
-      itemPrice: css`
-        ${theme.styles.text};
-        font-size: 0.9rem;
-        font-weight: 600;
-        color: #e67e22;
-        margin: 0;
-      `,
-      availabilitySection: css`
-        margin-top: 0.5rem;
-      `,
-      availabilityTitle: css`
-        ${theme.styles.text};
-        font-size: 0.8rem;
-        font-weight: 600;
-        color: #a68b5b;
-        margin: 0 0 0.3rem 0;
-      `,
-      availabilityList: css`
-        list-style: none;
-        padding: 0;
-        margin: 0;
-      `,
-      availabilityItem: css`
-        ${theme.styles.text};
-        font-size: 0.7rem;
-        margin: 0.15rem 0;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        color: #a68b5b;
-      `,
-      availabilityStatus: css`
-        padding: 0.15rem 0.5rem;
-        border-radius: 2px;
-        font-size: 0.7rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        min-width: 60px;
-        text-align: center;
-        display: inline-block;
       `,
       otherItemsList: css`
         display: grid;
@@ -442,298 +276,14 @@ const useStyles = (enableAnimation: boolean = false) => {
           grid-template-columns: 1fr;
         }
       `,
-      otherItem: css`
-        background: #f1ebe6;
-        border: 2px solid rgba(212, 165, 116, 0.3);
-        border-radius: 0;
-        padding: 1.5rem;
-        text-align: center;
-        transition: all 0.3s ease;
-        position: relative;
-        z-index: 2;
-
-        &:hover {
-          transform: translateY(-2px);
-        }
-
-        @media ${theme.breakpoints.compact} {
-          padding: 1rem;
-        }
-      `,
-      otherItemName: css`
-        ${theme.styles.text};
-        font-size: 1.2rem;
-        font-weight: 600;
-        color: #8b7355;
-        margin: 0;
-
-        @media ${theme.breakpoints.compact} {
-          font-size: 1rem;
-        }
-      `,
-      websiteLink: css`
-        text-decoration: none;
-        color: inherit;
-        display: block;
-
-        &:hover {
-          text-decoration: underline;
-        }
-      `,
-      availabilityLink: css`
-        text-decoration: none;
-        color: inherit;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-
-        &:hover {
-          text-decoration: underline;
-        }
-      `,
-      groupSetCard: css`
-        background: #f1ebe6;
-        border: 2px solid #d4a574;
-        border-radius: 0;
-        overflow: hidden;
-        transition: all 0.3s ease;
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        z-index: 2;
-
-        &:hover {
-          transform: translateY(-2px);
-        }
-      `,
-      setBadge: css`
-        position: absolute;
-        top: 0;
-        right: 0;
-        background: #e67e22;
-        color: white;
-        padding: 0.4rem 0.8rem;
-        font-size: 0.75rem;
-        font-weight: 700;
-        letter-spacing: 0.1em;
-        z-index: 1;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-
-        @media ${theme.breakpoints.compact} {
-          font-size: 0.7rem;
-          padding: 0.3rem 0.6rem;
-        }
-      `,
     }),
     [theme, enableAnimation],
   )
 }
 
-const getAvailabilityStatusStyle = (status: AvailabilityState) => {
-  switch (status) {
-    case 'available':
-      return css`
-        background-color: #a8d5a8;
-        color: #2d5a2d;
-      `
-    case 'unavailable':
-      return css`
-        background-color: #f5b7b1;
-        color: #8b2635;
-      `
-    case 'preparing':
-      return css`
-        background-color: #fdeaa7;
-        color: #8b6914;
-      `
-    default:
-      return css`
-        background-color: #d5d5d5;
-        color: #5a5a5a;
-      `
-  }
-}
-
-const getAvailabilityStatusText = (status: AvailabilityState) => {
-  switch (status) {
-    case 'available':
-      return '販売中'
-    case 'unavailable':
-      return '販売終了'
-    case 'preparing':
-      return '準備中'
-    case 'unknown':
-      return '不明'
-    case 'notApplicable':
-      return '対象外'
-    default:
-      return status
-  }
-}
-
-const ItemInfo = ({
-  title,
-  itemType,
-  colorType,
-  price,
-  availability,
-  links,
-}: {
-  title: string
-  itemType: string
-  colorType?: string
-  price: string
-  availability: {
-    venue: AvailabilityState
-    onlinePhysical?: AvailabilityState
-    onlineDigital?: AvailabilityState
-  }
-  links?: {
-    onlinePhysical?: string[]
-    onlineDigital?: string[]
-  }
-}) => {
-  const styles = useStyles()
-
-  const displayItemType = colorType ? `${itemType}・${colorType}` : itemType
-
-  return (
-    <div css={styles.itemInfo}>
-      <h3 css={styles.itemName}>{title}</h3>
-      <div css={styles.itemTypeAndPrice}>
-        <p css={styles.itemType}>{displayItemType}</p>
-        <p css={styles.itemPrice}>{price}</p>
-      </div>
-      <div css={styles.availabilitySection}>
-        <h4 css={styles.availabilityTitle}>販売状況</h4>
-        <ul css={styles.availabilityList}>
-          <li css={styles.availabilityItem}>
-            <span>会場販売</span>
-            <span css={[styles.availabilityStatus, getAvailabilityStatusStyle(availability.venue)]}>
-              {getAvailabilityStatusText(availability.venue)}
-            </span>
-          </li>
-          {availability.onlinePhysical && (
-            <li css={styles.availabilityItem}>
-              {links?.onlinePhysical && links.onlinePhysical.length > 0 ? (
-                <a
-                  href={links.onlinePhysical[0]}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  css={styles.availabilityLink}
-                >
-                  <span>オンライン（物理）</span>
-                  <span css={[styles.availabilityStatus, getAvailabilityStatusStyle(availability.onlinePhysical)]}>
-                    {getAvailabilityStatusText(availability.onlinePhysical)}
-                  </span>
-                </a>
-              ) : (
-                <>
-                  <span>オンライン（物理）</span>
-                  <span css={[styles.availabilityStatus, getAvailabilityStatusStyle(availability.onlinePhysical)]}>
-                    {getAvailabilityStatusText(availability.onlinePhysical)}
-                  </span>
-                </>
-              )}
-            </li>
-          )}
-          {availability.onlineDigital && (
-            <li css={styles.availabilityItem}>
-              {links?.onlineDigital && links.onlineDigital.length > 0 ? (
-                <a
-                  href={links.onlineDigital[0]}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  css={styles.availabilityLink}
-                >
-                  <span>オンライン（デジタル）</span>
-                  <span css={[styles.availabilityStatus, getAvailabilityStatusStyle(availability.onlineDigital)]}>
-                    {getAvailabilityStatusText(availability.onlineDigital)}
-                  </span>
-                </a>
-              ) : (
-                <>
-                  <span>オンライン（デジタル）</span>
-                  <span css={[styles.availabilityStatus, getAvailabilityStatusStyle(availability.onlineDigital)]}>
-                    {getAvailabilityStatusText(availability.onlineDigital)}
-                  </span>
-                </>
-              )}
-            </li>
-          )}
-        </ul>
-      </div>
-    </div>
-  )
-}
-
-const BookItem = ({ item, isFeatured = false }: { item: ItemBook; isFeatured?: boolean }) => {
-  const styles = useStyles()
-
-  const imageElement = (
-    <div
-      css={isFeatured ? styles.featuredImageWrapper : styles.itemImageWrapper}
-      data-testid={isFeatured ? 'featured-image-wrapper' : 'image-wrapper'}
-    >
-      <img src={item.imageUrl} alt={item.name} css={isFeatured ? styles.featuredImage : styles.itemImage} />
-    </div>
-  )
-
-  return (
-    <div
-      css={item.isSet ? styles.groupSetCard : styles.itemCard}
-      data-testid={isFeatured ? 'featured-book-item' : 'book-item'}
-    >
-      {item.isSet && <div css={styles.setBadge}>セット</div>}
-      {item.links?.website ? (
-        <Link href={item.links.website} css={styles.websiteLink}>
-          {imageElement}
-        </Link>
-      ) : (
-        imageElement
-      )}
-      <ItemInfo
-        title={item.name}
-        itemType={item.bookType === 'manga' ? 'マンガ' : 'イラスト'}
-        colorType={
-          item.colorType === 'fullColor' ? 'フルカラー' : item.colorType === 'monochrome' ? 'モノクロ' : undefined
-        }
-        price={item.price}
-        availability={item.availability}
-        links={item.links}
-      />
-    </div>
-  )
-}
-
-const StickerItem = ({ item }: { item: ItemSticker }) => {
-  const styles = useStyles()
-
-  return (
-    <div css={styles.stickerCard}>
-      <div css={styles.stickerImageWrapper}>
-        <img src={item.imageUrl} alt="ステッカー" css={styles.stickerImage} />
-      </div>
-      <div css={styles.stickerInfo}>
-        <p css={styles.stickerPrice}>{item.price}</p>
-      </div>
-    </div>
-  )
-}
-
-const OtherItem = ({ item }: { item: ItemOther }) => {
-  const styles = useStyles()
-
-  return (
-    <div css={styles.otherItem}>
-      <h3 css={styles.otherItemName}>{item.name}</h3>
-    </div>
-  )
-}
-
 export default function ItemListContent() {
   const [enableAnimation, setEnableAnimation] = useState(false)
+  const [printMode, setPrintMode] = useState(false)
 
   useEffect(() => {
     const userAgent = navigator.userAgent
@@ -743,6 +293,19 @@ export default function ItemListContent() {
     setEnableAnimation(!isSafari)
   }, [])
 
+  useEffect(() => {
+    const stored = localStorage.getItem('item-list-print-mode')
+    if (stored !== null) {
+      setPrintMode(stored === 'true')
+    }
+  }, [])
+
+  const handleTogglePrintMode = () => {
+    const newValue = !printMode
+    setPrintMode(newValue)
+    localStorage.setItem('item-list-print-mode', String(newValue))
+  }
+
   const styles = useStyles(enableAnimation)
 
   const handleDownloadImage = async () => {
@@ -751,53 +314,68 @@ export default function ItemListContent() {
     const element = document.querySelector('main')
     if (!element) return
 
-    const canvas = await html2canvas(element, {
-      useCORS: true,
-      allowTaint: true,
-      scale: Math.min(window.devicePixelRatio, 2),
-      width: 1400,
-      windowWidth: 1400,
-    })
+    // Remember the original print mode state
+    const wasPrintModeOn = printMode
 
-    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'))
-    if (!blob) return
-
-    const fileName = `item-list-${new Date().toISOString().split('T')[0]}.png`
-
-    // Use Share API on mobile devices if available (iOS/Android)
-    if (isMobile && navigator.share && navigator.canShare) {
-      const file = new File([blob], fileName, { type: 'image/png' })
-
-      if (navigator.canShare({ files: [file] })) {
-        try {
-          await navigator.share({
-            files: [file],
-            title: 'お品書き',
-          })
-          return
-        } catch (error) {
-          if (error instanceof Error) {
-            if (error.name === 'AbortError') {
-              // User cancelled the share dialog - don't fall through to download
-              return
-            }
-            // Log other errors (e.g., NotAllowedError from user gesture timeout)
-            console.warn('Share API failed:', error.name, error.message)
-          }
-          // Fall through to traditional download
-        }
-      }
+    // Auto-apply print-mode class for download (only if not already on)
+    if (!wasPrintModeOn) {
+      element.classList.add('print-mode')
     }
 
-    // Fallback: Traditional download (desktop and older mobile browsers)
-    const url = URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.download = fileName
-    link.href = url
-    link.click()
+    try {
+      const canvas = await html2canvas(element, {
+        useCORS: true,
+        allowTaint: true,
+        scale: Math.min(window.devicePixelRatio, 2),
+        width: 1864,
+        windowWidth: 1864,
+      })
 
-    // Clean up the object URL after download starts
-    setTimeout(() => URL.revokeObjectURL(url), 1000)
+      const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'))
+      if (!blob) return
+
+      const fileName = `item-list-${new Date().toISOString().split('T')[0]}.png`
+
+      // Use Share API on mobile devices if available (iOS/Android)
+      if (isMobile && navigator.share && navigator.canShare) {
+        const file = new File([blob], fileName, { type: 'image/png' })
+
+        if (navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({
+              files: [file],
+              title: 'お品書き',
+            })
+            return
+          } catch (error) {
+            if (error instanceof Error) {
+              if (error.name === 'AbortError') {
+                // User cancelled the share dialog - don't fall through to download
+                return
+              }
+              // Log other errors (e.g., NotAllowedError from user gesture timeout)
+              console.warn('Share API failed:', error.name, error.message)
+            }
+            // Fall through to traditional download
+          }
+        }
+      }
+
+      // Fallback: Traditional download (desktop and older mobile browsers)
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.download = fileName
+      link.href = url
+      link.click()
+
+      // Clean up the object URL after download starts
+      setTimeout(() => URL.revokeObjectURL(url), 1000)
+    } finally {
+      // Only remove print-mode if it wasn't on before download
+      if (!wasPrintModeOn) {
+        element.classList.remove('print-mode')
+      }
+    }
   }
 
   return (
@@ -917,84 +495,101 @@ export default function ItemListContent() {
           </filter>
         </defs>
       </svg>
-      <main css={styles.container}>
+      <main css={styles.container} className={printMode ? 'print-mode' : ''}>
         <Menu color="#8b7355" secondaryColor="#a68b5b" />
 
         <header css={styles.header}>
-          <h1 css={styles.title}>お品書き</h1>
-          <p css={styles.subtitle}>Pon Pon Creamsoda アイテム一覧</p>
+          <Logo colors={{ primary: '#8b7355' }} css={styles.logo} />
+          <p css={styles.subtitle}>〜お品書き〜</p>
           <button data-html2canvas-ignore css={styles.downloadButton} onClick={handleDownloadImage}>
             画像としてダウンロード
           </button>
         </header>
 
+        <button
+          data-html2canvas-ignore
+          css={styles.printModeToggle}
+          onClick={handleTogglePrintMode}
+          title={printMode ? '印刷モード: ON' : '印刷モード: OFF'}
+        >
+          <AiOutlinePrinter />
+        </button>
+
         {/* New Releases */}
-        {itemList.newReleases.map((category, categoryIndex) => (
-          <section key={categoryIndex} css={styles.section}>
-            <div css={styles.sectionTitleWrapper}>
-              <h2 css={styles.sectionTitle}>新刊</h2>
-            </div>
-            <div css={styles.featuredGrid}>
-              {category.items.map((item, itemIndex) => {
-                if (item.itemType === 'book') {
-                  return <BookItem key={`item-${itemIndex}`} item={item} isFeatured={true} />
-                }
-                return null
-              })}
-            </div>
-          </section>
-        ))}
+        <section css={styles.section}>
+          <div css={styles.sectionTitleWrapper}>
+            <h2 css={styles.sectionTitle}>新刊</h2>
+          </div>
+          <div css={styles.featuredGridWrapper}>
+            {groupItemsByType(itemList.newReleases).map((group, groupIndex) => (
+              <div key={`group-${groupIndex}`} css={styles.featuredGrid}>
+                {group.map((item, itemIndex) => {
+                  if (isGroupItem(item)) {
+                    return <GroupItemComponent key={`item-${itemIndex}`} item={item} isFeatured={true} />
+                  }
+                  if (item.itemType === 'book') {
+                    return <BookItem key={`item-${itemIndex}`} item={item} isFeatured={true} />
+                  }
+                  return null
+                })}
+              </div>
+            ))}
+          </div>
+        </section>
 
         {/* Back Catalog */}
-        {itemList.backCatalog.map((category, categoryIndex) => (
-          <section key={categoryIndex} css={styles.section}>
-            <div css={styles.sectionTitleWrapper}>
-              <h2 css={styles.sectionTitle}>既刊</h2>
-            </div>
-            <div css={styles.itemGrid}>
-              {category.items.toReversed().map((item, itemIndex) => {
-                if (item.itemType === 'book') {
-                  return <BookItem key={itemIndex} item={item} />
-                }
-                return null
-              })}
-            </div>
-          </section>
-        ))}
+        <section css={styles.section}>
+          <div css={styles.sectionTitleWrapper}>
+            <h2 css={styles.sectionTitle}>既刊</h2>
+          </div>
+          <div css={styles.itemGrid}>
+            {itemList.backCatalog.toReversed().map((item, itemIndex) => {
+              if (isGroupItem(item)) {
+                // Flatten group items into individual items
+                return item.items.map((childItem, childIndex) => {
+                  if (childItem.itemType === 'book') {
+                    return <BookItem key={`${itemIndex}-${childIndex}`} item={childItem} />
+                  }
+                  return null
+                })
+              }
+              if (item.itemType === 'book') {
+                return <BookItem key={itemIndex} item={item} />
+              }
+              return null
+            })}
+          </div>
+        </section>
 
         {/* Stickers */}
-        {itemList.stickers.map((category, categoryIndex) => (
-          <section key={categoryIndex} css={styles.section}>
-            <div css={styles.sectionTitleWrapper}>
-              <h2 css={styles.sectionTitle}>ステッカー</h2>
-            </div>
-            <div css={styles.stickerGrid}>
-              {category.items.map((item, itemIndex) => {
-                if (item.itemType === 'sticker') {
-                  return <StickerItem key={itemIndex} item={item} />
-                }
-                return null
-              })}
-            </div>
-          </section>
-        ))}
+        <section css={styles.section}>
+          <div css={styles.sectionTitleWrapper}>
+            <h2 css={styles.sectionTitle}>ステッカー</h2>
+          </div>
+          <div css={styles.stickerGrid}>
+            {itemList.stickers.map((item, itemIndex) => {
+              if (item.itemType === 'sticker') {
+                return <StickerItem key={itemIndex} item={item} />
+              }
+              return null
+            })}
+          </div>
+        </section>
 
         {/* Others */}
-        {itemList.others.map((category, categoryIndex) => (
-          <section key={categoryIndex} css={styles.section}>
-            <div css={styles.sectionTitleWrapper}>
-              <h2 css={styles.sectionTitle}>その他</h2>
-            </div>
-            <div css={styles.otherItemsList}>
-              {category.items.map((item, itemIndex) => {
-                if (item.itemType === 'other') {
-                  return <OtherItem key={itemIndex} item={item} />
-                }
-                return null
-              })}
-            </div>
-          </section>
-        ))}
+        <section css={styles.section}>
+          <div css={styles.sectionTitleWrapper}>
+            <h2 css={styles.sectionTitle}>その他</h2>
+          </div>
+          <div css={styles.otherItemsList}>
+            {itemList.others.map((item, itemIndex) => {
+              if (item.itemType === 'other') {
+                return <OtherItem key={itemIndex} item={item} />
+              }
+              return null
+            })}
+          </div>
+        </section>
       </main>
     </>
   )
