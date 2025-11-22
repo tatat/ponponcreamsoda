@@ -76,7 +76,7 @@ const useStyles = (enableAnimation: boolean = false) => {
         letter-spacing: 0.1em;
 
         .print-mode & {
-          font-size: 7rem;
+          font-size: 7.1rem;
         }
 
         @media ${theme.breakpoints.compact} {
@@ -92,7 +92,7 @@ const useStyles = (enableAnimation: boolean = false) => {
         letter-spacing: 0.05em;
 
         .print-mode & {
-          font-size: 2.4rem;
+          font-size: 2.5rem;
         }
 
         @media ${theme.breakpoints.compact} {
@@ -188,7 +188,7 @@ const useStyles = (enableAnimation: boolean = false) => {
         }
 
         .print-mode & {
-          font-size: 5rem;
+          font-size: 5.1rem;
         }
 
         .print-mode &::after {

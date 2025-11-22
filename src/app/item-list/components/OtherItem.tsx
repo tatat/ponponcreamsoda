@@ -31,7 +31,7 @@ const useStyles = () => {
         margin: 0;
 
         .print-mode & {
-          font-size: 2.08rem;
+          font-size: 2.18rem;
         }
 
         @media ${theme.breakpoints.compact} {

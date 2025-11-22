@@ -49,7 +49,7 @@ const useStyles = () => {
         margin: 0;
 
         .print-mode & {
-          font-size: 1.44rem;
+          font-size: 1.54rem;
         }
       `,
       stickerImageWrapper: css`

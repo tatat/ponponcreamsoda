@@ -10,7 +10,7 @@ const useStyles = () => {
   return useMemo(
     () => ({
       itemInfo: css`
-        padding: 1rem;
+        padding: 0.5rem 1rem 1rem 1rem;
         overflow: visible;
         position: relative;
         z-index: 10;
@@ -28,7 +28,7 @@ const useStyles = () => {
         line-height: 1.2;
 
         .print-mode & {
-          font-size: 1.76rem;
+          font-size: 1.86rem;
         }
 
         @media ${theme.breakpoints.compact} {
@@ -45,7 +45,7 @@ const useStyles = () => {
         line-height: 1.2;
 
         .print-mode & {
-          font-size: 2.08rem;
+          font-size: 2.18rem;
         }
 
         @media ${theme.breakpoints.compact} {
@@ -69,7 +69,7 @@ const useStyles = () => {
         font-weight: 500;
 
         .print-mode & {
-          font-size: 1.12rem;
+          font-size: 1.22rem;
         }
       `,
       itemPrice: css`
@@ -80,7 +80,7 @@ const useStyles = () => {
         margin: 0;
 
         .print-mode & {
-          font-size: 1.44rem;
+          font-size: 1.9rem;
         }
       `,
       availabilitySection: css`
@@ -106,7 +106,7 @@ const useStyles = () => {
         color: #a68b5b;
 
         .print-mode & {
-          font-size: 1.12rem;
+          font-size: 1.22rem;
         }
       `,
       availabilityStatus: css`
@@ -121,7 +121,7 @@ const useStyles = () => {
         display: inline-block;
 
         .print-mode & {
-          font-size: 1.12rem;
+          font-size: 1.22rem;
         }
       `,
       availabilityLabelWithTooltip: css`
@@ -143,7 +143,7 @@ const useStyles = () => {
         }
 
         .print-mode & {
-          font-size: 1.28rem;
+          font-size: 1.38rem;
         }
       `,
       availabilityTooltip: css`
@@ -201,7 +201,8 @@ const useStyles = () => {
         }
 
         .print-mode & {
-          font-size: 1.12rem;
+          font-size: 1.22rem;
+          text-decoration: none;
         }
       `,
     }),

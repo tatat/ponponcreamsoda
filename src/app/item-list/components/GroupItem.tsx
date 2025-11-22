@@ -77,7 +77,7 @@ const useStyles = () => {
         margin: 0;
 
         .print-mode & {
-          font-size: 2.4rem;
+          font-size: 2.5rem;
         }
 
         @media ${theme.breakpoints.compact} {
@@ -93,7 +93,7 @@ const useStyles = () => {
         width: 100%;
 
         .print-mode & {
-          font-size: 1.44rem;
+          font-size: 1.54rem;
         }
 
         @media ${theme.breakpoints.compact} {
@@ -108,7 +108,7 @@ const useStyles = () => {
       `,
       groupInfoImageWrapper: css`
         padding: 1rem;
-        background: repeating-linear-gradient(45deg, #e0e0e0, #e0e0e0 10px, #d0d0d0 10px, #d0d0d0 20px);
+        background: linear-gradient(135deg, #e8e8e8, #d8d8d8);
         border-radius: 4px;
       `,
       groupInfoImage: css`
