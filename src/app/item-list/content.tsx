@@ -209,7 +209,7 @@ const useStyles = (enableAnimation: boolean = false) => {
       itemGrid: css`
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 2rem;
+        gap: 1rem;
         max-width: 1200px;
         margin: 0 auto;
 
@@ -222,10 +222,14 @@ const useStyles = (enableAnimation: boolean = false) => {
       featuredGrid: css`
         display: flex;
         flex-wrap: wrap;
-        gap: 2rem;
-        max-width: 1900px;
+        gap: 1rem;
+        max-width: 1200px;
         margin: 0 auto;
         justify-content: center;
+
+        @media ${theme.breakpoints.wide} {
+          max-width: 1790px;
+        }
 
         @media ${theme.breakpoints.compact} {
           gap: 1.5rem;
@@ -252,7 +256,7 @@ const useStyles = (enableAnimation: boolean = false) => {
       stickerGrid: css`
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1.5rem;
+        gap: 1rem;
         max-width: 800px;
         margin: 0 auto;
 
@@ -503,15 +507,10 @@ const useStyles = (enableAnimation: boolean = false) => {
       groupItemContainer: css`
         background: #f1ebe6;
         border: 3px solid #d4a574;
-        border-radius: 8px;
-        padding: 1.5rem;
+        border-radius: 0;
+        padding: 1rem;
         position: relative;
-        max-width: 1900px;
         margin: 0 auto;
-
-        @media ${theme.breakpoints.compact} {
-          padding: 1rem;
-        }
       `,
       groupItemTitle: css`
         font-size: 1.2rem;
@@ -528,19 +527,20 @@ const useStyles = (enableAnimation: boolean = false) => {
       `,
       groupItemsGrid: css`
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(599px, 1fr));
+        grid-template-columns: repeat(2, 1fr);
         gap: 1rem;
+
+        @media ${theme.breakpoints.wide} {
+          grid-template-columns: repeat(3, 1fr);
+        }
 
         @media ${theme.breakpoints.compact} {
           grid-template-columns: 1fr;
-          gap: 1rem;
         }
       `,
       groupInfoCard: css`
-        grid-column: 1 / -1;
         background: #faf7f5;
-        border: 2px dashed #d4a574;
-        border-radius: 4px;
+        border-radius: 0;
         padding: 2rem;
         display: flex;
         align-items: center;
@@ -553,6 +553,7 @@ const useStyles = (enableAnimation: boolean = false) => {
         }
       `,
       groupInfoTitle: css`
+        ${theme.styles.text};
         font-size: 1.1rem;
         font-weight: 700;
         color: #5a4a3a;
@@ -760,6 +761,25 @@ const StickerItem = ({ item }: { item: ItemSticker }) => {
 
 const GroupItemComponent = ({ item, isFeatured = false }: { item: GroupItem; isFeatured?: boolean }) => {
   const styles = useStyles()
+  const theme = useTheme()
+  const itemCount = item.items.length
+
+  // Dynamic grid-column based on item count and screen size
+  const groupInfoCardStyle = css`
+    ${styles.groupInfoCard};
+
+    /* Default (2-column layout): */
+    /* 3 items: auto (2nd column, 2nd row) */
+    /* 4 items: full width (3rd row) */
+    grid-column: ${itemCount === 4 ? '1 / -1' : 'auto'};
+
+    /* Wide (3-column layout): */
+    @media ${theme.breakpoints.wide} {
+      /* 3 items: full width (2nd row) */
+      /* 4 items: columns 2-3 (2nd row) */
+      grid-column: ${itemCount === 3 ? '1 / -1' : '2 / 4'};
+    }
+  `
 
   return (
     <div css={isFeatured ? styles.featuredGroupWrapper : undefined}>
@@ -777,7 +797,7 @@ const GroupItemComponent = ({ item, isFeatured = false }: { item: GroupItem; isF
             }
             return null
           })}
-          <div css={styles.groupInfoCard}>
+          <div css={groupInfoCardStyle}>
             <h3 css={styles.groupInfoTitle}>{item.name}</h3>
           </div>
         </div>
@@ -819,8 +839,8 @@ export default function ItemListContent() {
       useCORS: true,
       allowTaint: true,
       scale: Math.min(window.devicePixelRatio, 2),
-      width: 1400,
-      windowWidth: 1400,
+      width: 1864,
+      windowWidth: 1864,
     })
 
     const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'))
