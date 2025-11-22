@@ -6,7 +6,8 @@ import Link from 'next/link'
 import html2canvas from 'html2canvas'
 import Menu from '@/components/Menu'
 import { itemList } from '@/item-list'
-import type { ItemBook, ItemSticker, ItemOther, AvailabilityState } from '@/item-list-type'
+import type { ItemBook, ItemSticker, ItemOther, GroupItem, AvailabilityState } from '@/item-list-type'
+import { isGroupItem } from '@/item-list-type'
 
 const scanlineAnimation = keyframes`
   0% {
@@ -492,37 +493,66 @@ const useStyles = (enableAnimation: boolean = false) => {
           text-decoration: underline;
         }
       `,
-      groupSetCard: css`
+      groupItemContainer: css`
         background: #f1ebe6;
-        border: 2px solid #d4a574;
-        border-radius: 0;
-        overflow: hidden;
-        transition: all 0.3s ease;
+        border: 3px solid #d4a574;
+        border-radius: 8px;
+        padding: 1.5rem;
         position: relative;
-        display: flex;
-        flex-direction: column;
-        z-index: 2;
-
-        &:hover {
-          transform: translateY(-2px);
-        }
-      `,
-      setBadge: css`
-        position: absolute;
-        top: 0;
-        right: 0;
-        background: #e67e22;
-        color: white;
-        padding: 0.4rem 0.8rem;
-        font-size: 0.75rem;
-        font-weight: 700;
-        letter-spacing: 0.1em;
-        z-index: 1;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        max-width: 1200px;
+        margin: 0 auto;
 
         @media ${theme.breakpoints.compact} {
-          font-size: 0.7rem;
-          padding: 0.3rem 0.6rem;
+          padding: 1rem;
+        }
+      `,
+      groupItemTitle: css`
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #5a4a3a;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #d4a574;
+
+        @media ${theme.breakpoints.compact} {
+          font-size: 1rem;
+          margin-bottom: 0.8rem;
+        }
+      `,
+      groupItemsGrid: css`
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 1.5rem;
+
+        @media ${theme.breakpoints.compact} {
+          grid-template-columns: 1fr;
+          gap: 1rem;
+        }
+      `,
+      groupInfoCard: css`
+        background: #faf7f5;
+        border: 2px dashed #d4a574;
+        border-radius: 4px;
+        padding: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 200px;
+
+        @media ${theme.breakpoints.compact} {
+          padding: 1.5rem;
+          min-height: 150px;
+        }
+      `,
+      groupInfoTitle: css`
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #5a4a3a;
+        text-align: center;
+        line-height: 1.6;
+
+        @media ${theme.breakpoints.compact} {
+          font-size: 1rem;
         }
       `,
     }),
@@ -681,11 +711,7 @@ const BookItem = ({ item, isFeatured = false }: { item: ItemBook; isFeatured?: b
   )
 
   return (
-    <div
-      css={item.isSet ? styles.groupSetCard : styles.itemCard}
-      data-testid={isFeatured ? 'featured-book-item' : 'book-item'}
-    >
-      {item.isSet && <div css={styles.setBadge}>セット</div>}
+    <div css={styles.itemCard} data-testid={isFeatured ? 'featured-book-item' : 'book-item'}>
       {item.links?.website ? (
         <Link href={item.links.website} css={styles.websiteLink}>
           {imageElement}
@@ -717,6 +743,32 @@ const StickerItem = ({ item }: { item: ItemSticker }) => {
       </div>
       <div css={styles.stickerInfo}>
         <p css={styles.stickerPrice}>{item.price}</p>
+      </div>
+    </div>
+  )
+}
+
+const GroupItemComponent = ({ item, isFeatured = false }: { item: GroupItem; isFeatured?: boolean }) => {
+  const styles = useStyles()
+
+  return (
+    <div css={styles.groupItemContainer}>
+      <div css={styles.groupItemsGrid}>
+        {item.items.map((childItem, index) => {
+          if (childItem.itemType === 'book') {
+            return <BookItem key={`group-item-${index}`} item={childItem} isFeatured={isFeatured} />
+          }
+          if (childItem.itemType === 'sticker') {
+            return <StickerItem key={`group-item-${index}`} item={childItem} />
+          }
+          if (childItem.itemType === 'other') {
+            return <OtherItem key={`group-item-${index}`} item={childItem} />
+          }
+          return null
+        })}
+        <div css={styles.groupInfoCard}>
+          <h3 css={styles.groupInfoTitle}>{item.name}</h3>
+        </div>
       </div>
     </div>
   )
@@ -936,6 +988,9 @@ export default function ItemListContent() {
             </div>
             <div css={styles.featuredGrid}>
               {category.items.map((item, itemIndex) => {
+                if (isGroupItem(item)) {
+                  return <GroupItemComponent key={`item-${itemIndex}`} item={item} isFeatured={true} />
+                }
                 if (item.itemType === 'book') {
                   return <BookItem key={`item-${itemIndex}`} item={item} isFeatured={true} />
                 }

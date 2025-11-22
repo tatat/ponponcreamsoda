@@ -18,7 +18,6 @@ export type ItemBook = {
   itemType: 'book'
   name: string
   imageUrl: string
-  isSet?: boolean // Whether this is a set of multiple items
   links?: {
     website?: string // Link to the book on the website
     onlinePhysical?: string[] // Link to the book on online physical store
@@ -37,12 +36,18 @@ export type ItemSticker = {
   price: string
 }
 
+export type GroupItem = {
+  itemType: 'group'
+  name: string
+  items: (ItemBook | ItemSticker | ItemOther)[]
+}
+
 export type ItemOther = {
   itemType: 'other'
   name: string
 }
 
-export type Item = ItemBook | ItemSticker | ItemOther
+export type Item = ItemBook | ItemSticker | ItemOther | GroupItem
 
 export type ItemListCategory = {
   title: string
@@ -54,4 +59,9 @@ export type ItemList = {
   backCatalog: ItemListCategory[]
   stickers: ItemListCategory[]
   others: ItemListCategory[]
+}
+
+// Type guard for GroupItem
+export function isGroupItem(item: Item): item is GroupItem {
+  return item.itemType === 'group'
 }
