@@ -49,16 +49,11 @@ export type ItemOther = {
 
 export type Item = ItemBook | ItemSticker | ItemOther | GroupItem
 
-export type ItemListCategory = {
-  title: string
-  items: Item[]
-}
-
 export type ItemList = {
-  newReleases: ItemListCategory[]
-  backCatalog: ItemListCategory[]
-  stickers: ItemListCategory[]
-  others: ItemListCategory[]
+  newReleases: Item[]
+  backCatalog: Item[]
+  stickers: Item[]
+  others: Item[]
 }
 
 // Type guard for GroupItem

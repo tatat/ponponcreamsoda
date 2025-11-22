@@ -525,7 +525,7 @@ const useStyles = (enableAnimation: boolean = false) => {
           margin-bottom: 0.8rem;
         }
       `,
-      groupItemsGrid: css`
+      groupItemsGridFeatured: css`
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         gap: 1rem;
@@ -533,6 +533,15 @@ const useStyles = (enableAnimation: boolean = false) => {
         @media ${theme.breakpoints.wide} {
           grid-template-columns: repeat(3, 1fr);
         }
+
+        @media ${theme.breakpoints.compact} {
+          grid-template-columns: 1fr;
+        }
+      `,
+      groupItemsGridNormal: css`
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1rem;
 
         @media ${theme.breakpoints.compact} {
           grid-template-columns: 1fr;
@@ -781,13 +790,15 @@ const GroupItemComponent = ({ item, isFeatured = false }: { item: GroupItem; isF
     }
   `
 
+  const gridStyle = isFeatured ? styles.groupItemsGridFeatured : styles.groupItemsGridNormal
+
   return (
     <div css={isFeatured ? styles.featuredGroupWrapper : undefined}>
       <div css={styles.groupItemContainer}>
-        <div css={styles.groupItemsGrid}>
+        <div css={gridStyle}>
           {item.items.map((childItem, index) => {
             if (childItem.itemType === 'book') {
-              return <BookItem key={`group-item-${index}`} item={childItem} isFeatured={true} />
+              return <BookItem key={`group-item-${index}`} item={childItem} isFeatured={isFeatured} />
             }
             if (childItem.itemType === 'sticker') {
               return <StickerItem key={`group-item-${index}`} item={childItem} />
@@ -1013,75 +1024,76 @@ export default function ItemListContent() {
         </header>
 
         {/* New Releases */}
-        {itemList.newReleases.map((category, categoryIndex) => (
-          <section key={categoryIndex} css={styles.section}>
-            <div css={styles.sectionTitleWrapper}>
-              <h2 css={styles.sectionTitle}>新刊</h2>
-            </div>
-            <div css={styles.featuredGrid}>
-              {category.items.map((item, itemIndex) => {
-                if (isGroupItem(item)) {
-                  return <GroupItemComponent key={`item-${itemIndex}`} item={item} isFeatured={true} />
-                }
-                if (item.itemType === 'book') {
-                  return <BookItem key={`item-${itemIndex}`} item={item} isFeatured={true} />
-                }
-                return null
-              })}
-            </div>
-          </section>
-        ))}
+        <section css={styles.section}>
+          <div css={styles.sectionTitleWrapper}>
+            <h2 css={styles.sectionTitle}>新刊</h2>
+          </div>
+          <div css={styles.featuredGrid}>
+            {itemList.newReleases.map((item, itemIndex) => {
+              if (isGroupItem(item)) {
+                return <GroupItemComponent key={`item-${itemIndex}`} item={item} isFeatured={true} />
+              }
+              if (item.itemType === 'book') {
+                return <BookItem key={`item-${itemIndex}`} item={item} isFeatured={true} />
+              }
+              return null
+            })}
+          </div>
+        </section>
 
         {/* Back Catalog */}
-        {itemList.backCatalog.map((category, categoryIndex) => (
-          <section key={categoryIndex} css={styles.section}>
-            <div css={styles.sectionTitleWrapper}>
-              <h2 css={styles.sectionTitle}>既刊</h2>
-            </div>
-            <div css={styles.itemGrid}>
-              {category.items.toReversed().map((item, itemIndex) => {
-                if (item.itemType === 'book') {
-                  return <BookItem key={itemIndex} item={item} />
-                }
-                return null
-              })}
-            </div>
-          </section>
-        ))}
+        <section css={styles.section}>
+          <div css={styles.sectionTitleWrapper}>
+            <h2 css={styles.sectionTitle}>既刊</h2>
+          </div>
+          <div css={styles.itemGrid}>
+            {itemList.backCatalog.toReversed().map((item, itemIndex) => {
+              if (isGroupItem(item)) {
+                // Flatten group items into individual items
+                return item.items.map((childItem, childIndex) => {
+                  if (childItem.itemType === 'book') {
+                    return <BookItem key={`${itemIndex}-${childIndex}`} item={childItem} />
+                  }
+                  return null
+                })
+              }
+              if (item.itemType === 'book') {
+                return <BookItem key={itemIndex} item={item} />
+              }
+              return null
+            })}
+          </div>
+        </section>
 
         {/* Stickers */}
-        {itemList.stickers.map((category, categoryIndex) => (
-          <section key={categoryIndex} css={styles.section}>
-            <div css={styles.sectionTitleWrapper}>
-              <h2 css={styles.sectionTitle}>ステッカー</h2>
-            </div>
-            <div css={styles.stickerGrid}>
-              {category.items.map((item, itemIndex) => {
-                if (item.itemType === 'sticker') {
-                  return <StickerItem key={itemIndex} item={item} />
-                }
-                return null
-              })}
-            </div>
-          </section>
-        ))}
+        <section css={styles.section}>
+          <div css={styles.sectionTitleWrapper}>
+            <h2 css={styles.sectionTitle}>ステッカー</h2>
+          </div>
+          <div css={styles.stickerGrid}>
+            {itemList.stickers.map((item, itemIndex) => {
+              if (item.itemType === 'sticker') {
+                return <StickerItem key={itemIndex} item={item} />
+              }
+              return null
+            })}
+          </div>
+        </section>
 
         {/* Others */}
-        {itemList.others.map((category, categoryIndex) => (
-          <section key={categoryIndex} css={styles.section}>
-            <div css={styles.sectionTitleWrapper}>
-              <h2 css={styles.sectionTitle}>その他</h2>
-            </div>
-            <div css={styles.otherItemsList}>
-              {category.items.map((item, itemIndex) => {
-                if (item.itemType === 'other') {
-                  return <OtherItem key={itemIndex} item={item} />
-                }
-                return null
-              })}
-            </div>
-          </section>
-        ))}
+        <section css={styles.section}>
+          <div css={styles.sectionTitleWrapper}>
+            <h2 css={styles.sectionTitle}>その他</h2>
+          </div>
+          <div css={styles.otherItemsList}>
+            {itemList.others.map((item, itemIndex) => {
+              if (item.itemType === 'other') {
+                return <OtherItem key={itemIndex} item={item} />
+              }
+              return null
+            })}
+          </div>
+        </section>
       </main>
     </>
   )
