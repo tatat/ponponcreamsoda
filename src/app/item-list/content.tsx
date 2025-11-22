@@ -120,14 +120,14 @@ const useStyles = (enableAnimation: boolean = false) => {
       title: css`
         ${theme.styles.text};
         color: #8b7355;
-        font-size: 3rem;
+        font-size: 3.5rem;
         font-weight: 700;
         margin: 0 0 1rem 0;
         text-shadow: 1px 1px 2px rgba(139, 115, 85, 0.1);
         letter-spacing: 0.1em;
 
         @media ${theme.breakpoints.compact} {
-          font-size: 2rem;
+          font-size: 2.5rem;
         }
       `,
       subtitle: css`
@@ -184,7 +184,7 @@ const useStyles = (enableAnimation: boolean = false) => {
       sectionTitle: css`
         ${theme.styles.text};
         color: #8b7355;
-        font-size: 2rem;
+        font-size: 2.5rem;
         font-weight: 700;
         margin: 0;
         text-shadow: 1px 1px 2px rgba(139, 115, 85, 0.1);
@@ -258,12 +258,17 @@ const useStyles = (enableAnimation: boolean = false) => {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 1rem;
-        max-width: 800px;
+        max-width: 1200px;
         margin: 0 auto;
+
+        @media ${theme.breakpoints.wide} {
+          max-width: 1790px;
+        }
 
         @media ${theme.breakpoints.compact} {
           grid-template-columns: repeat(2, 1fr);
           gap: 1rem;
+          max-width: 600px;
         }
       `,
       itemCard: css`
