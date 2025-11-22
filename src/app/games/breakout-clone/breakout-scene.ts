@@ -44,7 +44,7 @@ export class BreakoutScene extends Phaser.Scene {
     // Load pre-sized brick images (2x resolution for Retina support)
     constants.BRICK_NAMES.forEach((name) => {
       constants.BRICK_SIZES.forEach((size) => {
-        this.load.image(`brick-${name}-${size}`, `/games/breakout-clone/images/i-${name}-${size}@2x.png`)
+        this.load.image(`brick-${name}-${size}`, `/games/common/images/stickers/${name}-${size}@2x.png`)
       })
     })
 

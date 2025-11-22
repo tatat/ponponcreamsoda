@@ -8,10 +8,10 @@
 
 ```typescript
 // Use this:
-mcp__playwright__browser_take_screenshot({ type: "jpeg" })
-mcp__chrome-devtools__take_screenshot({ format: "jpeg" })
+mcp__playwright__browser_take_screenshot({ type: 'jpeg' })
+mcp__chrome - devtools__take_screenshot({ format: 'jpeg' })
 
 // Instead of:
-mcp__playwright__browser_take_screenshot({ type: "png" })  // Will error
-mcp__chrome-devtools__take_screenshot({ format: "png" })  // Will error
+mcp__playwright__browser_take_screenshot({ type: 'png' }) // Will error
+mcp__chrome - devtools__take_screenshot({ format: 'png' }) // Will error
 ```
