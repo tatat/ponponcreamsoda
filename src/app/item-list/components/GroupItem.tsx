@@ -1,6 +1,7 @@
 import { css, useTheme } from '@emotion/react'
 import { useMemo } from 'react'
 import type { GroupItem } from '@/item-list-type'
+import { AvailabilityInfo } from './AvailabilityInfo'
 import { BookItem } from './BookItem'
 import { StickerItem } from './StickerItem'
 import { OtherItem } from './OtherItem'
@@ -121,6 +122,9 @@ const useStyles = () => {
           max-height: 280px;
         }
       `,
+      availabilitySection: css`
+        margin-top: 1rem;
+      `,
       featuredGroupWrapper: css`
         grid-column: 1 / -1;
         width: 100%;
@@ -177,6 +181,11 @@ export const GroupItemComponent = ({ item, isFeatured = false }: { item: GroupIt
                     <img src={imageUrl} alt={`${item.name} - ${index + 1}`} css={styles.groupInfoImage} />
                   </div>
                 ))}
+              </div>
+            )}
+            {item.availability && (
+              <div css={styles.availabilitySection}>
+                <AvailabilityInfo availability={item.availability} links={item.links} centered />
               </div>
             )}
           </div>
