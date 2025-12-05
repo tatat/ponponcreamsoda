@@ -43,6 +43,11 @@ export type GroupItem = {
   name: string
   description?: ReactNode
   imageUrls?: string[]
+  availability?: AvailabilityStatus
+  links?: {
+    onlinePhysical?: string[]
+    onlineDigital?: string[]
+  }
   items: (ItemBook | ItemSticker | ItemOther)[]
 }
 

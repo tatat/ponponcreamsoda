@@ -19,16 +19,27 @@ export const itemList: ItemList = {
         </div>
       ),
       imageUrls: ['/images/item-list/clear-folder-01-b.png', '/images/item-list/clear-folder-01-f.png'],
+      availability: {
+        venue: 'available',
+        onlinePhysical: 'available',
+        onlineDigital: 'notApplicable',
+      },
+      links: {
+        onlinePhysical: ['https://ponponcreamsoda.booth.pm/items/7731978'],
+      },
       items: [
         {
           itemType: 'book',
           name: 'Now',
           imageUrl: '/images/item-list/book-06-1.jpg',
+          links: {
+            onlinePhysical: ['https://ponponcreamsoda.booth.pm/items/7732114'],
+          },
           bookType: 'illustration',
           colorType: 'fullColor',
           availability: {
             venue: 'available',
-            onlinePhysical: 'preparing',
+            onlinePhysical: 'available',
             onlineDigital: 'notApplicable',
           },
           price: '400yen',
@@ -37,11 +48,14 @@ export const itemList: ItemList = {
           itemType: 'book',
           name: 'embalm',
           imageUrl: '/images/item-list/book-06-2.jpg',
+          links: {
+            onlinePhysical: ['https://ponponcreamsoda.booth.pm/items/7732119'],
+          },
           bookType: 'illustration',
           colorType: 'fullColor',
           availability: {
             venue: 'available',
-            onlinePhysical: 'preparing',
+            onlinePhysical: 'available',
             onlineDigital: 'notApplicable',
           },
           price: '400yen',
@@ -50,11 +64,14 @@ export const itemList: ItemList = {
           itemType: 'book',
           name: 'A SONG RUNS THROUGH WORLD',
           imageUrl: '/images/item-list/book-06-3.jpg',
+          links: {
+            onlinePhysical: ['https://ponponcreamsoda.booth.pm/items/7732094'],
+          },
           bookType: 'illustration',
           colorType: 'fullColor',
           availability: {
             venue: 'available',
-            onlinePhysical: 'preparing',
+            onlinePhysical: 'available',
             onlineDigital: 'notApplicable',
           },
           price: '400yen',
@@ -139,12 +156,13 @@ export const itemList: ItemList = {
       imageUrl: '/images/item-list/book-05.jpg',
       links: {
         website: '/books/05',
+        onlinePhysical: ['https://ponponcreamsoda.booth.pm/items/7170959'],
       },
       bookType: 'manga',
       colorType: 'monochrome',
       availability: {
         venue: 'available',
-        onlinePhysical: 'preparing',
+        onlinePhysical: 'available',
         onlineDigital: 'preparing',
       },
       price: '500yen',
