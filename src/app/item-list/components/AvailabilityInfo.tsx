@@ -153,19 +153,23 @@ export const AvailabilityInfo = ({
 
   const sectionStyle = css`
     ${styles.availabilitySection};
-    ${centered &&
-    css`
-      justify-content: center;
-    `}
+    ${
+      centered &&
+      css`
+        justify-content: center;
+      `
+    }
   `
 
   const tagsContainerStyle = css`
     ${styles.availabilityTagsContainer};
-    ${centered &&
-    css`
-      flex: none;
-      justify-content: center;
-    `}
+    ${
+      centered &&
+      css`
+        flex: none;
+        justify-content: center;
+      `
+    }
   `
 
   return (

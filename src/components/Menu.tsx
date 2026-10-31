@@ -21,7 +21,7 @@ const useMenuItemAnimations = (count: number, delay: number) => {
           transition: {
             delay: x,
             duration: 0.1,
-            ease: 'easeIn',
+            ease: 'easeIn' as const,
           },
         },
         exit: {
@@ -29,7 +29,7 @@ const useMenuItemAnimations = (count: number, delay: number) => {
           transition: {
             delay: self[self.length - 1 - i],
             duration: 0.1,
-            ease: 'easeIn',
+            ease: 'easeIn' as const,
           },
         },
       })),

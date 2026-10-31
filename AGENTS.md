@@ -24,7 +24,7 @@ npm run test:ui      # Run tests with Vitest UI
 ### Code Quality
 
 ```bash
-npm run lint         # Run Next.js linter
+npm run lint         # Run ESLint
 npm run format       # Format code with Prettier
 ```
 
@@ -38,15 +38,15 @@ npm run type-check   # Check for TypeScript type errors
 
 ## Architecture Overview
 
-This is a Next.js 15+ TypeScript project for the Pon Pon Creamsoda doujin circle website using App Router with static export.
+This is a Next.js 16 TypeScript project for the Pon Pon Creamsoda doujin circle website using App Router with static export.
 
 ### Key Technologies
 
-- **Next.js 15+** with App Router (static export mode)
+- **Next.js 16** with App Router (static export mode)
 - **TypeScript** with strict mode
 - **Emotion** for CSS-in-JS with theme support
 - **Framer Motion** for animations
-- **Phaser 3** for the breakout game
+- **Phaser 4** for the games
 - **Firebase** for analytics
 - **Vitest** for testing with jsdom environment
 

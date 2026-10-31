@@ -8,10 +8,12 @@ export type UseBreakpointFactory<T> = (breakpoint: Breakpoint | null) => T
 export const useBreakpoint = <T>(factory: UseBreakpointFactory<T>) => {
   const { breakpoints } = useTheme()
   const [data, setData] = useState<T>(factory(null))
-  const factoryRef = useRef<UseBreakpointFactory<T>>()
+  const factoryRef = useRef<UseBreakpointFactory<T>>(undefined)
   const prevMatchedRef = useRef<Breakpoint | null>(null)
 
-  factoryRef.current = factory
+  useEffect(() => {
+    factoryRef.current = factory
+  })
 
   useEffect(() => {
     const run = () => {

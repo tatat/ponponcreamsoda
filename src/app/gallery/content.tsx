@@ -222,8 +222,6 @@ const GalleryThumbnails = () => {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    setIsLoading(true)
-
     const abortController = new AbortController()
     const startAt = Date.now()
 

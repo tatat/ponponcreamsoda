@@ -453,7 +453,7 @@ export class BreakoutScene extends Phaser.Scene {
     this.createBricks()
 
     // Fade in all new bricks
-    this.bricks.children.entries.forEach((brick) => {
+    this.bricks.getChildren().forEach((brick) => {
       const brickSprite = brick as Phaser.Physics.Arcade.Sprite
       brickSprite.setAlpha(0)
       this.tweens.add({
@@ -466,7 +466,7 @@ export class BreakoutScene extends Phaser.Scene {
   }
 
   private hideBricksWithFadeOut(onComplete?: () => void) {
-    const brickEntries = this.bricks.children.entries
+    const brickEntries = this.bricks.getChildren()
     let completedAnimations = 0
     const totalBricks = brickEntries.length
 

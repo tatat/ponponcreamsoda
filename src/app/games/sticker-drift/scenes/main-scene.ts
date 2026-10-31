@@ -434,7 +434,7 @@ Press SPACE or TAP to restart`,
     }
 
     // Homing obstacles and cleanup (continue during death animation)
-    this.obstacles.children.entries.forEach((obstacle) => {
+    this.obstacles.getChildren().forEach((obstacle) => {
       const sprite = obstacle as Phaser.Physics.Arcade.Sprite
 
       // Homing behavior - gently track player Y position with smooth curves (only if game is active)

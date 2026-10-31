@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { css } from '@emotion/react'
 import Link from 'next/link'
 import { GameSettings, saveSettings, resetSettings, MusicalScale, BaseKey } from './settings'
@@ -12,10 +12,13 @@ interface SettingsModalProps {
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, settings, onSettingsChange }) => {
   const [localSettings, setLocalSettings] = useState<GameSettings>(settings)
+  const [prevSettings, setPrevSettings] = useState<GameSettings>(settings)
 
-  useEffect(() => {
+  // Reset local edits when the settings prop changes
+  if (settings !== prevSettings) {
+    setPrevSettings(settings)
     setLocalSettings(settings)
-  }, [settings])
+  }
 
   const handleSave = () => {
     onSettingsChange(localSettings)
