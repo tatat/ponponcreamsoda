@@ -252,7 +252,7 @@ export class BrickGenerator {
    */
   updateOccupiedSpaces(): void {
     this.occupiedSpaces = []
-    this.bricks.children.entries.forEach((brick) => {
+    this.bricks.getChildren().forEach((brick) => {
       const brickSprite = brick as Phaser.Physics.Arcade.Sprite
       const brickWidth = brickSprite.displayWidth
       const brickHeight = brickSprite.displayHeight

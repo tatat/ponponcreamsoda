@@ -1,13 +1,5 @@
 export type MusicalScale =
-  | 'chromatic'
-  | 'major'
-  | 'minor'
-  | 'pentatonic'
-  | 'blues'
-  | 'dorian'
-  | 'mixolydian'
-  | 'wholeTone'
-  | 'diminished'
+  'chromatic' | 'major' | 'minor' | 'pentatonic' | 'blues' | 'dorian' | 'mixolydian' | 'wholeTone' | 'diminished'
 
 export type BaseKey = 'C' | 'C#' | 'D' | 'D#' | 'E' | 'F' | 'F#' | 'G' | 'G#' | 'A' | 'A#' | 'B'
 

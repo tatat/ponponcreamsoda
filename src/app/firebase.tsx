@@ -59,6 +59,8 @@ export const FirebaseProvider: React.FC<FirebaseProviderProps> = ({
   const [contextValue, setContextValue] = useState<FirebaseContextType | null>(null)
 
   useEffect(() => {
+    // Firebase must be initialized on the client only (static export)
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setContextValue(init(config, inactivateAnalytics))
   }, [config, inactivateAnalytics])
 

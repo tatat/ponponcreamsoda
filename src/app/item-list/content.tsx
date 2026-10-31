@@ -1,7 +1,7 @@
 'use client'
 
 import { css, useTheme } from '@emotion/react'
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect, useSyncExternalStore } from 'react'
 import html2canvas from 'html2canvas'
 import { AiOutlinePrinter } from 'react-icons/ai'
 import Menu from '@/components/Menu'
@@ -27,10 +27,12 @@ const useStyles = (enableAnimation: boolean = false) => {
         padding: 2rem;
         box-sizing: border-box;
         transform: translateZ(0);
-        ${enableAnimation &&
-        css`
-          animation: ${chromaticAberrationAnimation} 16s step-end infinite;
-        `}
+        ${
+          enableAnimation &&
+          css`
+            animation: ${chromaticAberrationAnimation} 16s step-end infinite;
+          `
+        }
 
         &::before {
           content: '';
@@ -282,21 +284,27 @@ const useStyles = (enableAnimation: boolean = false) => {
   )
 }
 
-export default function ItemListContent() {
-  const [enableAnimation, setEnableAnimation] = useState(false)
-  const [printMode, setPrintMode] = useState(false)
+const subscribeNoop = () => () => {}
 
-  useEffect(() => {
-    const userAgent = navigator.userAgent
-    // Enable animation for all browsers except Safari
-    // Safari: CSS animation with filter: url(#id) is not supported
-    const isSafari = /Safari/.test(userAgent) && !/Chrome/.test(userAgent)
-    setEnableAnimation(!isSafari)
-  }, [])
+// Enable animation for all browsers except Safari
+// Safari: CSS animation with filter: url(#id) is not supported
+const getEnableAnimation = () => {
+  const userAgent = navigator.userAgent
+  const isSafari = /Safari/.test(userAgent) && !/Chrome/.test(userAgent)
+  return !isSafari
+}
+
+const getEnableAnimationOnServer = () => false
+
+export default function ItemListContent() {
+  const enableAnimation = useSyncExternalStore(subscribeNoop, getEnableAnimation, getEnableAnimationOnServer)
+  const [printMode, setPrintMode] = useState(false)
 
   useEffect(() => {
     const stored = localStorage.getItem('item-list-print-mode')
     if (stored !== null) {
+      // Restore the persisted preference after hydration
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setPrintMode(stored === 'true')
     }
   }, [])
